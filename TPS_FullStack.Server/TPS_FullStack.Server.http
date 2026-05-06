@@ -1,0 +1,6 @@
+@TPS_FullStack.Server_HostAddress = http://localhost:5047
+
+GET {{TPS_FullStack.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

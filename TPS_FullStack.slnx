@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="tps_fullstack.client/tps_fullstack.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="TPS_FullStack.Server/TPS_FullStack.Server.csproj" />
+</Solution>
