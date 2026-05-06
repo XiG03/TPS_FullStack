@@ -21,11 +21,14 @@ namespace TPS_FullStack.Server.Entities
         public string Mota { get; set; }
         public bool? Khongsudung { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public Guid? CreatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public Guid? UpdatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; }
-        public Guid? DeletedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? DeletedBy { get; set; }
 
     }
 

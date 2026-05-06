@@ -37,6 +37,11 @@ namespace TPS_FullStack.Server.Modules.Admin
             return list;
             throw new NotImplementedException();
         }
+
+        public Task<Chuyende_ChitietDto> GetTopicByID(string MaID)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

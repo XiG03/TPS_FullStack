@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TPS_FullStack.Server.AppDbContext;
 
@@ -11,9 +12,11 @@ using TPS_FullStack.Server.AppDbContext;
 namespace TPS_FullStack.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506084523_#002_Change audit Column in Chuyende Table")]
+    partial class _002_ChangeauditColumninChuyendeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,7 +287,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Chungchi", (string)null);
+                    b.ToTable("Chungchi");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chungchi_Hocvien", b =>
@@ -330,7 +333,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Chungchi_Hocvien", (string)null);
+                    b.ToTable("Chungchi_Hocvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
@@ -369,7 +372,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Chuyende", (string)null);
+                    b.ToTable("Chuyende");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
@@ -390,7 +393,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Chuyende_Cauhoi", (string)null);
+                    b.ToTable("Chuyende_Cauhoi");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
@@ -411,7 +414,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaId");
 
-                    b.ToTable("Chuyende_Dapan", (string)null);
+                    b.ToTable("Chuyende_Dapan");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
@@ -442,7 +445,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Chuyende_Tailieu", (string)null);
+                    b.ToTable("Chuyende_Tailieu");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Giangvien", b =>
@@ -499,7 +502,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Giangvien", (string)null);
+                    b.ToTable("Giangvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Hocvien", b =>
@@ -556,7 +559,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Hocvien", (string)null);
+                    b.ToTable("Hocvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Khoahoc", b =>
@@ -606,7 +609,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Khoahoc", (string)null);
+                    b.ToTable("Khoahoc");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Khoahoc_Chuyende", b =>
@@ -624,7 +627,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Khoahoc_Chuyende", (string)null);
+                    b.ToTable("Khoahoc_Chuyende");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Khoahoc_Giangvien", b =>
@@ -642,7 +645,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Khoahoc_Giangvien", (string)null);
+                    b.ToTable("Khoahoc_Giangvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Khoahoc_Hocvien", b =>
@@ -666,7 +669,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Khoahoc_Hocvien", (string)null);
+                    b.ToTable("Khoahoc_Hocvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Khoahoc_dmTrangthai", b =>
@@ -684,7 +687,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Khoahoc_DmTrangthai", (string)null);
+                    b.ToTable("Khoahoc_DmTrangthai");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Lichhoc", b =>
@@ -704,7 +707,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Lichhoc", (string)null);
+                    b.ToTable("Lichhoc");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Lichhoc_Ct", b =>
@@ -734,7 +737,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Lichhoc_Ct", (string)null);
+                    b.ToTable("Lichhoc_Ct");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Lichhoc_Ct_Diemdanh", b =>
@@ -752,7 +755,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Lichhoc_Ct_Diemdanh", (string)null);
+                    b.ToTable("Lichhoc_Ct_Diemdanh");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.RefreshToken", b =>
@@ -784,7 +787,7 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
