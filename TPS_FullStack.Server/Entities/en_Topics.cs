@@ -12,7 +12,7 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaID { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
         public string Ten { get; set; }
@@ -22,13 +22,13 @@ namespace TPS_FullStack.Server.Entities
         public bool? Khongsudung { get; set; }
         public DateTime? CreatedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
-        public string? CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
-        public string? UpdatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
-        public string? DeletedBy { get; set; }
+        public Guid? DeletedBy { get; set; }
 
     }
 
@@ -36,10 +36,10 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaID { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string ChuyendeID { get; set; }
+        public Guid ChuyendeID { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Tieude { get; set; }
@@ -55,10 +55,10 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaID { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string ChuyendeId { get; set; }
+        public Guid ChuyendeID { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Ten { get; set; }
@@ -71,10 +71,10 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaId { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string Chuyende_CauhoiID { get; set; }
+        public Guid Chuyende_CauhoiID { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Ten { get; set; }

@@ -5,7 +5,7 @@ namespace TPS_FullStack.Server.Modules.Admin
     {
         public Task<List<ChuyendeDto>> GetAllTopicAsync();
         public Task<ServiceDefault<Chuyende_ChitietDto>> GetTopicDetail(string MaID);
-        public Task<bool> CreateTopic (ChuyendeDto_CU chuyendeDto);
+        public Task<ServiceDefault<bool>> CreateTopic (Chuyende_ChitietDto chuyendeDto);
 
     }
 }

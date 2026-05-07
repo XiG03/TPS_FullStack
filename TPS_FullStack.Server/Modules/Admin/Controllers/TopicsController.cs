@@ -22,5 +22,20 @@ namespace TPS_FullStack.Server.Modules.Admin
             return Ok(data);
         }
 
+        [HttpPost(Name ="Topic")]
+        public async Task<IActionResult> CreateTopic(Chuyende_ChitietDto chuyendedto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _topicService.CreateTopic(chuyendedto);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Created(result.Message,result);
+        }
+
     }
 }

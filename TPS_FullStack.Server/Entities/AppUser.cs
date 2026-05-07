@@ -9,11 +9,14 @@ namespace TPS_FullStack.Server.Entities
     {
         public bool? Kichhoat { get; set; } = false; // Trang thai kich hoat -- True - False
         public DateTime? CreatedAt { get; set; }
-        public Guid? CreatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public Guid? UpdatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; }
-        public Guid? DeletedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? DeletedBy { get; set; }
         //Relation
         public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
@@ -42,11 +45,14 @@ namespace TPS_FullStack.Server.Entities
         [Column(TypeName = "NVARCHAR(50)")]
         public string Dienthoai { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public Guid? CreatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public Guid? UpdatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; }
-        public Guid? DeletedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? DeletedBy { get; set; }
     }
 
     public class Hocvien
@@ -73,11 +79,14 @@ namespace TPS_FullStack.Server.Entities
         [Column(TypeName = "NVARCHAR(50)")]
         public string Dienthoai { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public Guid? CreatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public Guid? UpdatedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; }
-        public Guid? DeletedBy { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
+        public string? DeletedBy { get; set; }
     }
 }
 

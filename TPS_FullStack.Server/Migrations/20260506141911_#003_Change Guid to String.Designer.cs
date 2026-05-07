@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TPS_FullStack.Server.AppDbContext;
 
@@ -11,9 +12,11 @@ using TPS_FullStack.Server.AppDbContext;
 namespace TPS_FullStack.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506141911_#003_Change Guid to String")]
+    partial class _003_ChangeGuidtoString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,7 +339,6 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
                 {
                     b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -376,10 +378,9 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
                 {
                     b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<string>("ChuyendeID")
+                    b.Property<string>("ChuyendeId")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
@@ -397,8 +398,7 @@ namespace TPS_FullStack.Server.Migrations
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
                 {
-                    b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("MaId")
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("Chuyende_CauhoiID")
@@ -412,7 +412,7 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(200)");
 
-                    b.HasKey("MaID");
+                    b.HasKey("MaId");
 
                     b.ToTable("Chuyende_Dapan");
                 });
@@ -420,7 +420,6 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
                 {
                     b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("ChuyendeID")

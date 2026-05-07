@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Identity.Client;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
@@ -10,9 +12,25 @@ namespace TPS_FullStack.Server.Modules.Admin
             _topicRepository = topicsRepository;
         }
 
-        public async Task<bool> CreateTopic(ChuyendeDto_CU chuyendeDto)
+        public async Task<ServiceDefault<bool>> CreateTopic(Chuyende_ChitietDto chuyendeDto)
         {   
-            
+            var result = await _topicRepository.CreateTopicAsync(chuyendeDto);
+            if (!result)
+            {
+                return new ServiceDefault<bool>
+                {
+                    Success = false,
+                    Message = "Can not create new topic"
+                };
+            }
+
+
+            return new ServiceDefault<bool>
+            {
+                Success = true,
+                Message = "Complete create topic"
+            };
+
             throw new NotImplementedException();
         }
 
