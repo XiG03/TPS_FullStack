@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Identity.Client;
 using TPS_FullStack.Server.Entities;
 
@@ -22,6 +23,7 @@ namespace TPS_FullStack.Server.AppDbContext
         public DbSet<Chuyende_Tailieu> Chuyende_Tailieu { get; set; }
         public DbSet<Chuyende_Cauhoi> Chuyende_Cauhoi { get; set; }
         public DbSet<Chuyende_Dapan> Chuyende_Dapan { get; set; }
+        public DbSet<Chuyende_Giangvien> Chuyende_Giangvien { get; set; }
         public DbSet<Khoahoc> Khoahoc { get; set; }
         public DbSet<Khoahoc_Hocvien> Khoahoc_Hocvien { get; set; }
         public DbSet<Khoahoc_Giangvien> Khoahoc_Giangvien { get; set; }
@@ -44,6 +46,30 @@ namespace TPS_FullStack.Server.AppDbContext
                 entity.HasOne(rt => rt.User)
                         .WithMany(u => u.RefreshTokens)
                         .HasForeignKey(rt => rt.UserId)
+                        .OnDelete(DeleteBehavior.Cascade);
+            });
+            builder.Entity<Chuyende_Tailieu>(entity =>
+            {
+                entity.HasKey(doc => doc.MaID);
+                entity.HasOne(doc => doc.Chuyende)
+                        .WithMany(topic => topic.Chuyende_Tailieus)
+                        .HasForeignKey(doc => doc.ChuyendeID)
+                        .OnDelete(DeleteBehavior.Cascade);
+            });
+            builder.Entity<Chuyende_Cauhoi>(entity =>
+            {
+                entity.HasKey(ques => ques.MaID);
+                entity.HasOne(ques => ques.Chuyende)
+                        .WithMany(topic => topic.Chuyende_Cauhois)
+                        .HasForeignKey(doc => doc.ChuyendeID)
+                        .OnDelete(DeleteBehavior.Cascade);
+            });
+            builder.Entity<Chuyende_Dapan>(entity =>
+            {
+                entity.HasKey(ans => ans.MaID);
+                entity.HasOne(ans => ans.Chuyende_Cauhoi)
+                        .WithMany(ques => ques.Chuyende_Dapans)
+                        .HasForeignKey(ans => ans.Chuyende_CauhoiID)
                         .OnDelete(DeleteBehavior.Cascade);
             });
         }

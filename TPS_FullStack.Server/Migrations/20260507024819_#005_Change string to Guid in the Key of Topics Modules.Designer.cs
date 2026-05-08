@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TPS_FullStack.Server.AppDbContext;
 
@@ -11,9 +12,11 @@ using TPS_FullStack.Server.AppDbContext;
 namespace TPS_FullStack.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260507024819_#005_Change string to Guid in the Key of Topics Modules")]
+    partial class _005_ChangestringtoGuidintheKeyofTopicsModules
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -379,7 +382,7 @@ namespace TPS_FullStack.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<string>("ChuyendeID")
+                    b.Property<string>("ChuyendeId")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
@@ -392,14 +395,12 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.HasIndex("ChuyendeID");
-
                     b.ToTable("Chuyende_Cauhoi");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
                 {
-                    b.Property<string>("MaID")
+                    b.Property<string>("MaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
@@ -414,32 +415,9 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(200)");
 
-                    b.HasKey("MaID");
-
-                    b.HasIndex("Chuyende_CauhoiID");
+                    b.HasKey("MaId");
 
                     b.ToTable("Chuyende_Dapan");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Giangvien", b =>
-                {
-                    b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.Property<string>("ChuyendeID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.Property<string>("GiangvienID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.HasKey("MaID");
-
-                    b.HasIndex("ChuyendeID");
-
-                    b.ToTable("Chuyende_Giangvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
@@ -470,8 +448,6 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("NVARCHAR(200)");
 
                     b.HasKey("MaID");
-
-                    b.HasIndex("ChuyendeID");
 
                     b.ToTable("Chuyende_Tailieu");
                 });
@@ -869,48 +845,6 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", "Chuyende")
-                        .WithMany("Chuyende_Cauhois")
-                        .HasForeignKey("ChuyendeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chuyende");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", "Chuyende_Cauhoi")
-                        .WithMany("Chuyende_Dapans")
-                        .HasForeignKey("Chuyende_CauhoiID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chuyende_Cauhoi");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Giangvien", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", null)
-                        .WithMany("Chuyende_Giangviens")
-                        .HasForeignKey("ChuyendeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", "Chuyende")
-                        .WithMany("Chuyende_Tailieus")
-                        .HasForeignKey("ChuyendeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chuyende");
-                });
-
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Giangvien", b =>
                 {
                     b.HasOne("TPS_FullStack.Server.Entities.AppUser", "User")
@@ -947,20 +881,6 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.AppUser", b =>
                 {
                     b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
-                {
-                    b.Navigation("Chuyende_Cauhois");
-
-                    b.Navigation("Chuyende_Giangviens");
-
-                    b.Navigation("Chuyende_Tailieus");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
-                {
-                    b.Navigation("Chuyende_Dapans");
                 });
 #pragma warning restore 612, 618
         }

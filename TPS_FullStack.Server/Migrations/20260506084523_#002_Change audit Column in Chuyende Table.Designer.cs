@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TPS_FullStack.Server.AppDbContext;
 
@@ -11,9 +12,11 @@ using TPS_FullStack.Server.AppDbContext;
 namespace TPS_FullStack.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506084523_#002_Change audit Column in Chuyende Table")]
+    partial class _002_ChangeauditColumninChuyendeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,14 +173,14 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -221,8 +224,8 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -249,14 +252,14 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Donvicap")
                         .IsRequired()
@@ -279,8 +282,8 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("MaID");
 
@@ -336,7 +339,6 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
                 {
                     b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -376,10 +378,9 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
                 {
                     b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<string>("ChuyendeID")
+                    b.Property<string>("ChuyendeId")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
@@ -392,15 +393,12 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.HasIndex("ChuyendeID");
-
                     b.ToTable("Chuyende_Cauhoi");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
                 {
-                    b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("MaId")
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("Chuyende_CauhoiID")
@@ -414,38 +412,14 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(200)");
 
-                    b.HasKey("MaID");
-
-                    b.HasIndex("Chuyende_CauhoiID");
+                    b.HasKey("MaId");
 
                     b.ToTable("Chuyende_Dapan");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Giangvien", b =>
-                {
-                    b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.Property<string>("ChuyendeID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.Property<string>("GiangvienID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.HasKey("MaID");
-
-                    b.HasIndex("ChuyendeID");
-
-                    b.ToTable("Chuyende_Giangvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
                 {
                     b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("ChuyendeID")
@@ -471,8 +445,6 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
-                    b.HasIndex("ChuyendeID");
-
                     b.ToTable("Chuyende_Tailieu");
                 });
 
@@ -484,14 +456,14 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Diachi")
                         .IsRequired()
@@ -519,8 +491,8 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -541,14 +513,14 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Diachi")
                         .IsRequired()
@@ -576,8 +548,8 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -602,14 +574,14 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Diemdat")
                         .HasColumnType("DECIMAL(18,2)");
@@ -632,8 +604,8 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("NVARCHAR(450)");
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("MaID");
 
@@ -869,48 +841,6 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", "Chuyende")
-                        .WithMany("Chuyende_Cauhois")
-                        .HasForeignKey("ChuyendeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chuyende");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", "Chuyende_Cauhoi")
-                        .WithMany("Chuyende_Dapans")
-                        .HasForeignKey("Chuyende_CauhoiID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chuyende_Cauhoi");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Giangvien", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", null)
-                        .WithMany("Chuyende_Giangviens")
-                        .HasForeignKey("ChuyendeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
-                {
-                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", "Chuyende")
-                        .WithMany("Chuyende_Tailieus")
-                        .HasForeignKey("ChuyendeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chuyende");
-                });
-
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Giangvien", b =>
                 {
                     b.HasOne("TPS_FullStack.Server.Entities.AppUser", "User")
@@ -947,20 +877,6 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.AppUser", b =>
                 {
                     b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
-                {
-                    b.Navigation("Chuyende_Cauhois");
-
-                    b.Navigation("Chuyende_Giangviens");
-
-                    b.Navigation("Chuyende_Tailieus");
-                });
-
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
-                {
-                    b.Navigation("Chuyende_Dapans");
                 });
 #pragma warning restore 612, 618
         }

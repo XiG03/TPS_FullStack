@@ -12,7 +12,7 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaID { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
         public string Ten { get; set; }
@@ -21,22 +21,29 @@ namespace TPS_FullStack.Server.Entities
         public string Mota { get; set; }
         public bool? Khongsudung { get; set; }
         public DateTime? CreatedAt { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
         public Guid? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
         public Guid? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; }
+        [Column(TypeName = "NVARCHAR(450)")]
         public Guid? DeletedBy { get; set; }
 
+        public ICollection<Chuyende_Tailieu> Chuyende_Tailieus { get; set; }
+        public ICollection<Chuyende_Cauhoi> Chuyende_Cauhois { get; set; }
+        public ICollection<Chuyende_Giangvien> Chuyende_Giangviens { get; set; }
     }
 
     public class Chuyende_Tailieu
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaID { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string ChuyendeID { get; set; }
+        public Guid ChuyendeID { get; set; }
+        public Chuyende Chuyende { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Tieude { get; set; }
@@ -52,32 +59,44 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaID { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string ChuyendeId { get; set; }
+        public Guid ChuyendeID { get; set; }
+        public Chuyende Chuyende { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Ten { get; set; }
 
         [Column(TypeName = "DECIMAL(18,2)")]
         public decimal Diem { get; set; } // Format  Decimal (18,2)
+        public ICollection<Chuyende_Dapan> Chuyende_Dapans { get; set; }
 
     }
     public class Chuyende_Dapan
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public string MaId { get; set; }
+        public Guid MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string Chuyende_CauhoiID { get; set; }
+        public Guid Chuyende_CauhoiID { get; set; }
+        public Chuyende_Cauhoi Chuyende_Cauhoi { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Ten { get; set; }
         public bool Dung { get; set; }
     }
 
-    // Chuyende_Giaovien
+    public class Chuyende_Giangvien
+    {
+        [Key]
+        [Column(TypeName = "NVARCHAR(50)")]
+        public Guid MaID { get; set; }
+        [Column(TypeName = "NVARCHAR(50)")]
+        public Guid ChuyendeID { get; set; }
+        [Column(TypeName = "NVARCHAR(50)")]
+        public Guid GiangvienID { get; set; }
+    }
 }
 
