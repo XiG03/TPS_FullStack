@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Identity.Client;
 
 namespace TPS_FullStack.Server.Entities
 {
@@ -41,7 +42,7 @@ namespace TPS_FullStack.Server.Entities
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Diachi { get; set; }
-        
+
         [Column(TypeName = "NVARCHAR(50)")]
         public string Dienthoai { get; set; }
         public DateTime? CreatedAt { get; set; }
@@ -75,7 +76,7 @@ namespace TPS_FullStack.Server.Entities
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Diachi { get; set; }
-        
+
         [Column(TypeName = "NVARCHAR(50)")]
         public string Dienthoai { get; set; }
         public DateTime? CreatedAt { get; set; }

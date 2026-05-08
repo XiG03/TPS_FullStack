@@ -12,40 +12,64 @@ namespace TPS_FullStack.Server.Modules.Admin
             _topicRepository = topicsRepository;
         }
 
-        public async Task<ServiceDefault<bool>> CreateTopic(Chuyende_ChitietDto chuyendeDto)
+        public async Task<Chuyende_ChitietDto> CreateTopic(Chuyende_ChitietDto chuyendeDto)
         {   
             var result = await _topicRepository.CreateTopicAsync(chuyendeDto);
             if (!result)
             {
-                return new ServiceDefault<bool>
-                {
-                    Success = false,
-                    Message = "Can not create new topic"
-                };
+                return null;
             }
 
+            return chuyendeDto;
 
-            return new ServiceDefault<bool>
-            {
-                Success = true,
-                Message = "Complete create topic"
-            };
+
+            // return new ServiceDefault<bool>
+            // {
+            //     Success = true,
+            //     Message = "Complete create topic"
+            // };
 
             throw new NotImplementedException();
         }
 
-        public async Task<List<ChuyendeDto>> GetAllTopicAsync()
+        public async Task<bool> DeleteTopicAsync(string MaID)
         {
-            var data = await _topicRepository.GetChuyendesAsync();
+            var result = await _topicRepository.DeleteTopicByIDAsync(MaID);
 
-            return data.Select(x => new ChuyendeDto
+            if(result == false)
             {
-                MaID = x.MaID,
-                Ten = x.Ten,
-                Mota = x.Mota
-            }).ToList();
+                return false;
+            }
 
+            if(result == true)
+            {
+                return true;
+            }
 
+            throw new NotImplementedException();
+        }
+        
+        public async Task<List<TopicGetAllDto>> GetAllTopicAsync() // Done
+        {
+            var data = await _topicRepository.GetTopicsAsync();
+
+            if(data != null)
+            {
+                return data;
+            }
+            return null;
+            throw new NotImplementedException();
+        }
+
+        public async Task<TopicDetailDto> GetTopicByID(string MaID)
+        {
+            var data = await _topicRepository.GetTopicByID(MaID);
+
+            if(data != null)
+            {
+                return data;
+            }
+            return null;
             throw new NotImplementedException();
         }
 
@@ -66,9 +90,19 @@ namespace TPS_FullStack.Server.Modules.Admin
             {
                 Success = true,
                 Message = "Complete read topic detail of " + MaID,
-                Data = result
             };
 
+            throw new NotImplementedException();
+        }
+
+        public async Task<TopicUpdateDto> UpdateTopicAsync(TopicUpdateDto chuyendeDto)
+        {
+            var result = await _topicRepository.UpdateTopicAsync(chuyendeDto);
+            if (!result)
+            {
+                return null;
+            }
+            return chuyendeDto;
             throw new NotImplementedException();
         }
     }

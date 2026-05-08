@@ -30,6 +30,9 @@ namespace TPS_FullStack.Server.Entities
         [Column(TypeName = "NVARCHAR(450)")]
         public Guid? DeletedBy { get; set; }
 
+        public ICollection<Chuyende_Tailieu> Chuyende_Tailieus { get; set; }
+        public ICollection<Chuyende_Cauhoi> Chuyende_Cauhois { get; set; }
+        public ICollection<Chuyende_Giangvien> Chuyende_Giangviens { get; set; }
     }
 
     public class Chuyende_Tailieu
@@ -40,6 +43,7 @@ namespace TPS_FullStack.Server.Entities
 
         [Column(TypeName = "NVARCHAR(50)")]
         public Guid ChuyendeID { get; set; }
+        public Chuyende Chuyende { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Tieude { get; set; }
@@ -59,12 +63,14 @@ namespace TPS_FullStack.Server.Entities
 
         [Column(TypeName = "NVARCHAR(50)")]
         public Guid ChuyendeID { get; set; }
+        public Chuyende Chuyende { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Ten { get; set; }
 
         [Column(TypeName = "DECIMAL(18,2)")]
         public decimal Diem { get; set; } // Format  Decimal (18,2)
+        public ICollection<Chuyende_Dapan> Chuyende_Dapans { get; set; }
 
     }
     public class Chuyende_Dapan
@@ -75,12 +81,22 @@ namespace TPS_FullStack.Server.Entities
 
         [Column(TypeName = "NVARCHAR(50)")]
         public Guid Chuyende_CauhoiID { get; set; }
+        public Chuyende_Cauhoi Chuyende_Cauhoi { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
         public string Ten { get; set; }
         public bool Dung { get; set; }
     }
 
-    // Chuyende_Giaovien
+    public class Chuyende_Giangvien
+    {
+        [Key]
+        [Column(TypeName = "NVARCHAR(50)")]
+        public Guid MaID { get; set; }
+        [Column(TypeName = "NVARCHAR(50)")]
+        public Guid ChuyendeID { get; set; }
+        [Column(TypeName = "NVARCHAR(50)")]
+        public Guid GiangvienID { get; set; }
+    }
 }
 
