@@ -1,28 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Identity.Client;
 
 namespace TPS_FullStack.Server.Entities
 {
-    public class AppUser : IdentityUser
+    public class en_Teacher
     {
-        public bool? Kichhoat { get; set; } = false; // Trang thai kich hoat -- True - False
-        public DateTime? CreatedAt { get; set; }
-        [Column(TypeName = "NVARCHAR(450)")]
-        public string? CreatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        [Column(TypeName = "NVARCHAR(450)")]
-        public string? UpdatedBy { get; set; }
-        public DateTime? DeletedAt { get; set; }
-        [Column(TypeName = "NVARCHAR(450)")]
-        public string? DeletedBy { get; set; }
-        //Relation
-        public ICollection<RefreshToken> RefreshTokens { get; set; }
+
     }
 
-    public class Hocvien
+    public class Giangvien
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
@@ -54,7 +40,16 @@ namespace TPS_FullStack.Server.Entities
         public DateTime? DeletedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
         public string? DeletedBy { get; set; }
+        public bool? Khongsudung { get; set; }
     }
-}
 
+    // public class Teacher_Certificate
+    // {
+    //     public string MaID {get; set;}
+    //     public string GiangvienID {get; set;}
+    //     public string Ten {get; set;}
+    //     public string 
+    // }
+
+}
 

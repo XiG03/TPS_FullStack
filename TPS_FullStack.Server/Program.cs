@@ -53,6 +53,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 // Inject Dependency of Admin module
 builder.Services.AddScoped<ITopicsRepository, TopicsRepository>();
 builder.Services.AddScoped<ITopicsService, TopicsService>();
+builder.Services.AddScoped<ITeachersRepository,TeachersRepository>();
+builder.Services.AddScoped<ITeachersService, TeachersService>();
 
 
 

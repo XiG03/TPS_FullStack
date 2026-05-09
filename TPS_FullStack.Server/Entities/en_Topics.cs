@@ -12,7 +12,7 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid MaID { get; set; }
+        public string MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
         public string Ten { get; set; }
@@ -22,13 +22,13 @@ namespace TPS_FullStack.Server.Entities
         public bool? Khongsudung { get; set; }
         public DateTime? CreatedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
-        public Guid? CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
-        public Guid? UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
-        public Guid? DeletedBy { get; set; }
+        public string? DeletedBy { get; set; }
 
         public ICollection<Chuyende_Tailieu> Chuyende_Tailieus { get; set; }
         public ICollection<Chuyende_Cauhoi> Chuyende_Cauhois { get; set; }
@@ -39,10 +39,10 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid MaID { get; set; }
+        public string MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid ChuyendeID { get; set; }
+        public string ChuyendeID { get; set; }
         public Chuyende Chuyende { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
@@ -59,10 +59,10 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid MaID { get; set; }
+        public string MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid ChuyendeID { get; set; }
+        public string ChuyendeID { get; set; }
         public Chuyende Chuyende { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
@@ -77,10 +77,10 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid MaID { get; set; }
+        public string MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid Chuyende_CauhoiID { get; set; }
+        public string Chuyende_CauhoiID { get; set; }
         public Chuyende_Cauhoi Chuyende_Cauhoi { get; set; }
 
         [Column(TypeName = "NVARCHAR(200)")]
@@ -92,11 +92,11 @@ namespace TPS_FullStack.Server.Entities
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid MaID { get; set; }
+        public string MaID { get; set; }
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid ChuyendeID { get; set; }
+        public string ChuyendeID { get; set; }
         [Column(TypeName = "NVARCHAR(50)")]
-        public Guid GiangvienID { get; set; }
+        public string GiangvienID { get; set; }
     }
 }
 

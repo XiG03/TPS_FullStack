@@ -47,6 +47,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
 
             chuyendeDto.MaID = Guid.NewGuid();
+            #region 
             // foreach (var tailieu in chuyendeDto.Chuyende_TailieuDtos)
             // {
             //     tailieu.MaID = Guid.NewGuid();
@@ -63,7 +64,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             //         dapan.Chuyende_CauhoiID = cauhoi.MaID;
             //     }
             // }
-
+            #endregion
 
             try
             {
@@ -71,104 +72,104 @@ namespace TPS_FullStack.Server.Modules.Admin
                 {
                     await conn.OpenAsync();
 
-                    using (var transaction = conn.BeginTransaction())
+                    //using (var transaction = conn.BeginTransaction())
+                    //{
+                    try
                     {
-                        try
+                        // Execute 1: Them chuyen de moi
+                        using (var cmd = new SqlCommand(queryTopicCreate, conn))
                         {
-                            // Execute 1: Them chuyen de moi
-                            using (var cmd = new SqlCommand(queryTopicCreate, conn))
-                            {
-                                //warning
-                                cmd.Parameters.AddWithValue("@MaID", chuyendeDto.MaID);
-                                cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten);
-                                cmd.Parameters.AddWithValue("@Mota", chuyendeDto.Mota);
+                            //warning
+                            cmd.Parameters.AddWithValue("@MaID", chuyendeDto.MaID);
+                            cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten);
+                            cmd.Parameters.AddWithValue("@Mota", chuyendeDto.Mota);
 
-                                if (await cmd.ExecuteNonQueryAsync() <= 0)
-                                {
-                                    return false;
-                                }
+                            if (await cmd.ExecuteNonQueryAsync() <= 0)
+                            {
+                                return false;
                             }
-                            if (chuyendeDto.Chuyende_TailieuDtos != null)
+                        }
+                        if (chuyendeDto.Chuyende_TailieuDtos != null)
+                        {
+                            foreach (var tailieu in chuyendeDto.Chuyende_TailieuDtos)
                             {
-                                foreach (var tailieu in chuyendeDto.Chuyende_TailieuDtos)
+                                tailieu.MaID = Guid.NewGuid();
+                                tailieu.ChuyendeID = chuyendeDto.MaID;
+
+                                using (var cmd = new SqlCommand(queryDocumentCreate, conn))
                                 {
-                                    tailieu.MaID = Guid.NewGuid();
-                                    tailieu.ChuyendeID = chuyendeDto.MaID;
+                                    cmd.Parameters.AddWithValue("@MaID", tailieu.MaID);
+                                    cmd.Parameters.AddWithValue("@ChuyendeID", tailieu.ChuyendeID);
+                                    cmd.Parameters.AddWithValue("@Tieude", tailieu.Tieude);
+                                    cmd.Parameters.AddWithValue("@Loaitailieu", tailieu.Loaitailieu);
+                                    cmd.Parameters.AddWithValue("@Kichthuoc", tailieu.Kichthuoc);
 
-                                    using (var cmd = new SqlCommand(queryDocumentCreate, conn))
+                                    if (await cmd.ExecuteNonQueryAsync() <= 0)
                                     {
-                                        cmd.Parameters.AddWithValue("@MaID", tailieu.MaID);
-                                        cmd.Parameters.AddWithValue("@ChuyendeID", tailieu.ChuyendeID);
-                                        cmd.Parameters.AddWithValue("@Tieude", tailieu.Tieude);
-                                        cmd.Parameters.AddWithValue("@Loaitailieu", tailieu.Loaitailieu);
-                                        cmd.Parameters.AddWithValue("@Kichthuoc", tailieu.Kichthuoc);
-
-                                        if (await cmd.ExecuteNonQueryAsync() <= 0)
-                                        {
-                                            return false;
-                                        }
+                                        return false;
                                     }
-
                                 }
+
                             }
+                        }
 
-                            // Execute 2: Them tai lieu cho chuyen de 
-                            // Warning forweach: Neu khong them duoc thi lam sao
+                        // Execute 2: Them tai lieu cho chuyen de 
+                        // Warning forweach: Neu khong them duoc thi lam sao
 
 
-                            // Execute 3: Them cau hoi va dap an cho chuyen de
-                            // Warning foreach
-                            if (chuyendeDto.Chuyende_CauhoiDtos != null)
+                        // Execute 3: Them cau hoi va dap an cho chuyen de
+                        // Warning foreach
+                        if (chuyendeDto.Chuyende_CauhoiDtos != null)
+                        {
+                            foreach (var cauhoi in chuyendeDto.Chuyende_CauhoiDtos)
                             {
-                                foreach (var cauhoi in chuyendeDto.Chuyende_CauhoiDtos)
+
+                                cauhoi.MaID = Guid.NewGuid();
+                                cauhoi.ChuyendeID = chuyendeDto.MaID;
+
+                                using (var cmd = new SqlCommand(queryQuestionCreate, conn))
                                 {
+                                    cmd.Parameters.AddWithValue("@MaID", cauhoi.MaID);
+                                    cmd.Parameters.AddWithValue("@ChuyendeID", cauhoi.ChuyendeID);
+                                    cmd.Parameters.AddWithValue("@Ten", cauhoi.Ten);
+                                    cmd.Parameters.AddWithValue("@Diem", cauhoi.Diem);
 
-                                    cauhoi.MaID = Guid.NewGuid();
-                                    cauhoi.ChuyendeID = chuyendeDto.MaID;
-
-                                    using (var cmd = new SqlCommand(queryQuestionCreate, conn))
+                                    if (await cmd.ExecuteNonQueryAsync() <= 0)
                                     {
-                                        cmd.Parameters.AddWithValue("@MaID", cauhoi.MaID);
-                                        cmd.Parameters.AddWithValue("@ChuyendeID", cauhoi.ChuyendeID);
-                                        cmd.Parameters.AddWithValue("@Ten", cauhoi.Ten);
-                                        cmd.Parameters.AddWithValue("@Diem", cauhoi.Diem);
-
-                                        if (await cmd.ExecuteNonQueryAsync() <= 0)
-                                        {
-                                            return false;
-                                        }
+                                        return false;
                                     }
+                                }
 
-                                    // 3.1: Them dapan 
-                                    if (cauhoi.Chuyende_DapanDtos != null)
+                                // 3.1: Them dapan 
+                                if (cauhoi.Chuyende_DapanDtos != null)
+                                {
+                                    foreach (var dapan in cauhoi.Chuyende_DapanDtos)
                                     {
-                                        foreach (var dapan in cauhoi.Chuyende_DapanDtos)
+                                        dapan.MaID = Guid.NewGuid();
+                                        dapan.Chuyende_CauhoiID = cauhoi.MaID;
+                                        using (var cmd = new SqlCommand(queryAnswerCreate, conn))
                                         {
-                                            dapan.MaID = Guid.NewGuid();
-                                            dapan.Chuyende_CauhoiID = cauhoi.MaID;
-                                            using (var cmd = new SqlCommand(queryAnswerCreate, conn))
+                                            cmd.Parameters.AddWithValue("@MaID", dapan.MaID);
+                                            cmd.Parameters.AddWithValue("@Chuyende_CauhoiID", dapan.Chuyende_CauhoiID);
+                                            cmd.Parameters.AddWithValue("@Ten", dapan.Ten);
+                                            cmd.Parameters.AddWithValue("@Dung", dapan.Dung);
+
+                                            if (await cmd.ExecuteNonQueryAsync() <= 0)
                                             {
-                                                cmd.Parameters.AddWithValue("@MaID", dapan.MaID);
-                                                cmd.Parameters.AddWithValue("@Chuyende_CauhoiID", dapan.Chuyende_CauhoiID);
-                                                cmd.Parameters.AddWithValue("@Ten", dapan.Ten);
-                                                cmd.Parameters.AddWithValue("@Dung", dapan.Dung);
-
-                                                if (await cmd.ExecuteNonQueryAsync() <= 0)
-                                                {
-                                                    return false;
-                                                }
+                                                return false;
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex.Message);
-                            return false;
-                        }
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message);
+                        return false;
+                    }
+                    //}
 
                 }
                 return true;
@@ -351,7 +352,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                 .Include(x => x.Chuyende_Tailieus)
                 .Include(x => x.Chuyende_Cauhois)
                     .ThenInclude(x => x.Chuyende_Dapans)
-                .FirstOrDefaultAsync(x => x.MaID.ToString() == chuyendeDto.MaID);
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(x => x.MaID == chuyendeDto.MaID);
 
 
             if (topic == null)
@@ -371,7 +373,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                 {
                     topic.Chuyende_Tailieus.Add(new Chuyende_Tailieu
                     {
-                        MaID = Guid.NewGuid(),
+                        MaID = Guid.NewGuid().ToString(),
                         Tieude = documentDto.Tieude,
                         Loaitailieu = documentDto.Loaitailieu,
                         Kichthuoc = documentDto.Kichthuoc
@@ -407,12 +409,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                 {
                     var newQuestion = new Chuyende_Cauhoi
                     {
-                        MaID = Guid.NewGuid(),
+                        MaID = Guid.NewGuid().ToString(),
                         Ten = questionDto.Ten,
                         Diem = questionDto.Diem,
                         Chuyende_Dapans = questionDto.AnswersDtos.Select(a => new Chuyende_Dapan
                         {
-                            MaID = Guid.NewGuid(),
+                            MaID = Guid.NewGuid().ToString(),
                             Ten = a.Ten,
                             Dung = a.Dung
                         }).ToList()
@@ -438,7 +440,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     {
                         exsitingquestion.Chuyende_Dapans.Add(new Chuyende_Dapan
                         {
-                            MaID = Guid.NewGuid(),
+                            MaID = Guid.NewGuid().ToString(),
                             Ten = answers.Ten,
                             Dung = answers.Dung
                         });
@@ -471,7 +473,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
             await _context.SaveChangesAsync();
             return true;
-    }
+        }
         #region 
         //Helper
         //     private Status UpdateCheckHelper(List<string> ObjectCheck, string MaID)

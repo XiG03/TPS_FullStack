@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TPS_FullStack.Server.AppDbContext;
 
@@ -11,9 +12,11 @@ using TPS_FullStack.Server.AppDbContext;
 namespace TPS_FullStack.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508091017_#008_Add Active column to Teacher table")]
+    partial class _008_AddActivecolumntoTeachertable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,6 +339,7 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
                 {
                     b.Property<string>("MaID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -375,6 +379,7 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
                 {
                     b.Property<string>("MaID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("ChuyendeID")
@@ -398,6 +403,7 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
                 {
                     b.Property<string>("MaID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("Chuyende_CauhoiID")
@@ -421,6 +427,7 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Giangvien", b =>
                 {
                     b.Property<string>("MaID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("ChuyendeID")
@@ -441,6 +448,7 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
                 {
                     b.Property<string>("MaID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("ChuyendeID")
