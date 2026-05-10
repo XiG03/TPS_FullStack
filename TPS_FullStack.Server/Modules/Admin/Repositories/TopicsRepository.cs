@@ -1,7 +1,11 @@
 ﻿using System.Data;
 using System.IO.Pipelines;
+using System.Net;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Transactions;
 using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
@@ -42,8 +46,8 @@ namespace TPS_FullStack.Server.Modules.Admin
             var queryQuestionCreate = @"INSERT INTO Chuyende_Cauhoi(MaID, ChuyendeID, Ten, Diem)
                                         VALUES (@MaID, @ChuyendeID, @Ten, @Diem)";
 
-            var queryAnswerCreate = @"INSERT INTO Chuyende_Dapan(MaId, Chuyende_CauhoiID, Ten, Dung)
-                                    VALUES (@MaID, @Chuyende_CauhoiID, @Ten, @Dung)";
+            var queryAnswerCreate = @"INSERT INTO Chuyende_Dapan(MaID, ChuyendeID, Chuyende_CauhoiID, Ten, Dung)
+                                    VALUES (@MaID, @ChuyendeID, @Chuyende_CauhoiID, @Ten, @Dung)";
 
 
             chuyendeDto.MaID = Guid.NewGuid();
@@ -150,6 +154,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                         using (var cmd = new SqlCommand(queryAnswerCreate, conn))
                                         {
                                             cmd.Parameters.AddWithValue("@MaID", dapan.MaID);
+                                            cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
                                             cmd.Parameters.AddWithValue("@Chuyende_CauhoiID", dapan.Chuyende_CauhoiID);
                                             cmd.Parameters.AddWithValue("@Ten", dapan.Ten);
                                             cmd.Parameters.AddWithValue("@Dung", dapan.Dung);
@@ -241,7 +246,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var query = @"SELECT cd.MaID, cd.Ten, cd.Mota,
                         cd_tl.MaID AS TailieuID, cd_tl.Tieude, cd_tl.Loaitailieu,
                         cd_ch.MaID AS CauhoiID,cd_ch.Ten AS CauhoiTen, cd_ch.Diem AS Diem,
-                        cd_da.MaID AS DapanID,cd_da.Ten AS DapanTen, cd_da.Dung,
+                        cd_da.MaID AS DapanID,cd_da.Chuyende_CauhoiID AS CauhoiID,cd_da.Ten AS DapanTen, cd_da.Dung,
                         gv.MaID AS GiangvienID, gv.Hoten
                         FROM dbo.Chuyende cd
                         LEFT JOIN dbo.Chuyende_Giangvien cd_gv ON cd.MaID = cd_gv.ChuyendeID
@@ -323,6 +328,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 question.Answers.Add(new AnswerDto
                                 {
                                     MaID = dapanId,
+                                    CauhoiID = reader["CauhoiID"].ToString(),
                                     Ten = reader["DapanTen"].ToString(),
                                     //Dung = Convert.ToBoolean(reader["Dung"])
                                     Dung = reader.IsDBNull(reader.GetOrdinal("Dung")) ? false : Convert.ToBoolean(reader["Dung"])
@@ -345,210 +351,138 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         public async Task<bool> UpdateTopicAsync(TopicUpdateDto chuyendeDto)
         {
-            // Topic
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            // Lay object topic - doc - question - answers
-            var topic = await _context.Chuyende
-                .Include(x => x.Chuyende_Tailieus)
-                .Include(x => x.Chuyende_Cauhois)
-                    .ThenInclude(x => x.Chuyende_Dapans)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(x => x.MaID == chuyendeDto.MaID);
+            // Gom Update bang chinh, xoa bang phu va create record moi 
+            #region 
+            var queryTopicUpdate = @"UPDATE dbo.Chuyende
+                                    SET
+                                    	Ten = @Ten,
+                                    	Mota = @Mota,
+                                    	UpdatedAt = SYSDATETIME(),
+                                    	UpdatedBy = ''
+                                    WHERE MaID = @MaID";
+            var queryDocDelete = @"DELETE dbo.Chuyende_Tailieu
+                                    WHERE ChuyendeID = @ChuyendeID";
 
+            var queryDocInsert = @"INSERT INTO Chuyende_Tailieu(MaID, ChuyendeId, Tieude, Ngaytao, Loaitailieu, Kichthuoc)
+                                    VALUES (@MaID, @ChuyendeID, @Tieude, @Ngaytao, @Loaitailieu, @Kichthuoc)";
 
-            if (topic == null)
+            var queryAnsDelete = @"DELETE dbo.Chuyende_Dapan
+                                    WHERE ChuyendeID = @ChuyendeID";
+
+            var queryQuesDelete = @"DELETE dbo.Chuyende_Cauhoi
+                                    WHERE ChuyendeID = @ChuyendeID";
+
+            var queryQuesInsert = @"INSERT INTO Chuyende_Cauhoi(MaID, ChuyendeID, Ten, Diem)
+                                    VALUES (@MaID ,@ChuyendeID, @Ten, @Diem)";
+
+            var queryAnsInsert = @"INSERT INTO Chuyende_Dapan(MaID, Chuyende_CauhoiID, ChuyendeID, Ten, Dung)
+                                    VALUES (@MaID, @CauhoiID, @ChuyendeID, @Ten,@Dung)";
+            #endregion
+
+            using (var conn = new SqlConnection(connectionString))
             {
-                return false;
-            }
+                await conn.OpenAsync();
 
-
-            topic.Ten = chuyendeDto.Ten;
-            topic.Mota = chuyendeDto.Mota;
-
-            //
-            foreach (var documentDto in chuyendeDto.DocumentsDto)
-            {
-                // Neu MaId cua document == null => Tao moi
-                if (string.IsNullOrEmpty(documentDto.MaID))
+                //Update Topic information
+                using (var cmd = new SqlCommand(queryTopicUpdate, conn))
                 {
-                    topic.Chuyende_Tailieus.Add(new Chuyende_Tailieu
-                    {
-                        MaID = Guid.NewGuid().ToString(),
-                        Tieude = documentDto.Tieude,
-                        Loaitailieu = documentDto.Loaitailieu,
-                        Kichthuoc = documentDto.Kichthuoc
-                    });
-                    continue;
-                }
+                    cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten);
+                    cmd.Parameters.AddWithValue("@Mota", chuyendeDto.Mota);
+                    // cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten); -- Update updated by
+                    cmd.Parameters.AddWithValue("@MaID", chuyendeDto.MaID);
 
-                //Tra ve document khong, neu khong co -> loi
-                var existingDocument = topic.Chuyende_Tailieus.FirstOrDefault(x => x.MaID.ToString() == documentDto.MaID);
-                if (existingDocument == null)
-                {
-                    return false;
-                }
-                // Neu co => Thay doi
-                existingDocument.Tieude = documentDto.Tieude;
-                existingDocument.Loaitailieu = documentDto.Loaitailieu;
-                existingDocument.Kichthuoc = documentDto.Kichthuoc;
-            }
-
-            var requestDocumentIds = chuyendeDto.DocumentsDto
-                                    .Where(x => !string.IsNullOrEmpty(x.MaID))
-                                    .Select(x => x.MaID)
-                                    .ToList();
-            var deletedDocuments = topic.Chuyende_Tailieus.Where(x => !requestDocumentIds.Contains(x.MaID.ToString()));
-
-            _context.Chuyende_Tailieu.RemoveRange(deletedDocuments);
-
-            // Question
-            foreach (var questionDto in chuyendeDto.QuestionsDtos)
-            {
-                // Neu question khong co ma ID -> Tao Question moi
-                if (string.IsNullOrEmpty(questionDto.MaID))
-                {
-                    var newQuestion = new Chuyende_Cauhoi
-                    {
-                        MaID = Guid.NewGuid().ToString(),
-                        Ten = questionDto.Ten,
-                        Diem = questionDto.Diem,
-                        Chuyende_Dapans = questionDto.AnswersDtos.Select(a => new Chuyende_Dapan
-                        {
-                            MaID = Guid.NewGuid().ToString(),
-                            Ten = a.Ten,
-                            Dung = a.Dung
-                        }).ToList()
-                    };
-                    topic.Chuyende_Cauhois.Add(newQuestion);
-                    continue;
-                }
-
-                // Doi chieu question, neu null thi tra ve false, neu != null thi update
-                var exsitingquestion = topic.Chuyende_Cauhois.FirstOrDefault(x => x.MaID.ToString() == questionDto.MaID);
-
-                if (exsitingquestion == null)
-                {
-                    return false;
-                }
-
-                exsitingquestion.Ten = questionDto.Ten;
-                exsitingquestion.Diem = questionDto.Diem;
-
-                foreach (var answers in questionDto.AnswersDtos)
-                {
-                    if (string.IsNullOrEmpty(answers.MaID))
-                    {
-                        exsitingquestion.Chuyende_Dapans.Add(new Chuyende_Dapan
-                        {
-                            MaID = Guid.NewGuid().ToString(),
-                            Ten = answers.Ten,
-                            Dung = answers.Dung
-                        });
-                        continue;
-                    }
-
-                    var existingAnswer = exsitingquestion.Chuyende_Dapans.FirstOrDefault(x => x.MaID.ToString() == answers.MaID);
-
-                    if (existingAnswer == null)
+                    if (await cmd.ExecuteNonQueryAsync() < 0)
                     {
                         return false;
                     }
-                    existingAnswer.Ten = answers.Ten;
-                    existingAnswer.Dung = answers.Dung;
                 }
-                var requestAnswerIds = questionDto.AnswersDtos
-                                        .Where(x => !string.IsNullOrEmpty(x.MaID))
-                                        .Select(x => x.MaID)
-                                        .ToList();
-                var deletedAnswers = exsitingquestion.Chuyende_Dapans.Where(x => !requestAnswerIds.Contains(x.MaID.ToString())).ToList();
-                _context.Chuyende_Dapan.RemoveRange(deletedAnswers);
+
+                #region //Documents
+
+                //#1 Delete document if have topicID
+                using (var cmd = new SqlCommand(queryDocDelete, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                foreach (var docs in chuyendeDto.DocumentsDto)
+                {
+                    using (var cmd = new SqlCommand(queryDocInsert, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@MaID", docs.MaID == null ? Guid.NewGuid().ToString()
+                                                                                : docs.MaID);
+                        cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                        cmd.Parameters.AddWithValue("@Tieude",docs.Tieude);
+                        cmd.Parameters.AddWithValue("@Ngaytao",docs.Ngaytao);
+                        cmd.Parameters.AddWithValue("@Loaitailieu",docs.Loaitailieu);
+                        cmd.Parameters.AddWithValue("@Kichthuoc", docs.Kichthuoc);
+
+                        if (await cmd.ExecuteNonQueryAsync() < 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region //Questions
+
+                //#1 Delete Ans and Ques
+                using (var cmd = new SqlCommand(queryAnsDelete, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                using (var cmd = new SqlCommand(queryQuesDelete, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                //#2 Insert Ques
+                foreach (var ques in chuyendeDto.QuestionsDtos)
+                {
+                    using (var cmd = new SqlCommand(queryQuesInsert, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@MaID", ques.MaID == null ? Guid.NewGuid().ToString()
+                                                                                : ques.MaID);
+                        cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                        cmd.Parameters.AddWithValue("@Ten",ques.Ten);
+                        cmd.Parameters.AddWithValue("@Diem",ques.Diem);
+
+                        if (await cmd.ExecuteNonQueryAsync() < 0)
+                        {
+                            return false;
+                        }
+                    }
+                    //#3 Insert Ans - Done
+                    foreach (var ans in ques.AnswersDtos)
+                    {
+                        using (var cmd = new SqlCommand(queryAnsInsert, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@MaID", ans.MaID == null ? Guid.NewGuid().ToString()
+                                                                                    : ans.MaID);
+                            cmd.Parameters.AddWithValue("@CauhoiID", ques.MaID);
+                            cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                            cmd.Parameters.AddWithValue("@Ten",ans.Ten);
+                            cmd.Parameters.AddWithValue("@Dung",ans.Dung);
+
+                            if (await cmd.ExecuteNonQueryAsync() < 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                #endregion
+                return true;
             }
 
-            var requestquestionIds = chuyendeDto.QuestionsDtos
-                                        .Where(x => !string.IsNullOrEmpty(x.MaID))
-                                        .Select(x => x.MaID)
-                                        .ToList();
-            var deletequestions = topic.Chuyende_Cauhois.Where(x => requestquestionIds.Contains(x.MaID.ToString())).ToList();
-            _context.Chuyende_Cauhoi.RemoveRange(deletequestions);
-
-            await _context.SaveChangesAsync();
-            return true;
+            return false;
         }
-        #region 
-        //Helper
-        //     private Status UpdateCheckHelper(List<string> ObjectCheck, string MaID)
-        //     {
-        //         if(MaID == null)
-        //         {
-        //             return Status.Create;
-        //         }
-        //         foreach(var check in ObjectCheck)
-        //         {
-        //             if(MaID == check)
-        //             {
-        //                 return Status.Update;
-        //             }
-        //         }
-        //         return Status.Error;
-
-        //     }
-        //     private void UpdateHelper(List<string>)
-        //     {
-
-        //     }
-        //     private async Task<CheckTopicDto> GetTopicItemIds(SqlConnection cnn)
-        //     {
-        //         CheckTopicDto dto = new CheckTopicDto();
-        //         var queryDocumentsList = @"SELECT MaID FROM Chuyende_Tailieu";
-        //         var queryQuestionsList = @"SELECT MaID FROM Chuyende_Cauhoi";
-        //         var queryAnswersList = @"SELECT MaID FROM Chuyende_Dapan";
-
-        //         using (var cmd = new SqlCommand(queryDocumentsList, cnn))
-        //         {
-        //             using var reader = await cmd.ExecuteReaderAsync();
-
-        //             while (await reader.ReadAsync())
-        //             {
-        //                 dto.DocumentsID.Add(reader["MaID"].ToString());
-        //             }
-        //         }
-        //         using (var cmd = new SqlCommand(queryQuestionsList, cnn))
-        //         {
-        //             using var reader = await cmd.ExecuteReaderAsync();
-
-        //             while (await reader.ReadAsync())
-        //             {
-        //                 dto.QuestionsID.Add(reader["MaID"].ToString());
-        //             }
-        //         }
-        //         using (var cmd = new SqlCommand(queryAnswersList, cnn))
-        //         {
-        //             using var reader = await cmd.ExecuteReaderAsync();
-
-        //             while (await reader.ReadAsync())
-        //             {
-        //                 dto.AnswersID.Add(reader["MaID"].ToString());
-        //             }
-        //         }
-
-        //         if(dto == null)
-        //         {
-        //             return null;
-        //         }
-        //         return dto;
-
-        //     }
-
-        //     public enum Status
-        //     {
-        //         Create,
-        //         Delete,
-        //         Update,
-        //         Error
-        //     }
-        // }
-        #endregion
     }
 }
-
-

@@ -15,6 +15,7 @@ namespace TPS_FullStack.Server.Modules.Admin
     {
         public string MaID { get; set; }
         public string Tieude { get; set; }
+        public DateTime Ngaytao { get; set; }
         public string Loaitailieu { get; set; }
         public decimal Kichthuoc { get; set; }
     }
@@ -25,12 +26,13 @@ namespace TPS_FullStack.Server.Modules.Admin
         public string Ten { get; set; }
         [Range(0, 10)]
         public decimal Diem { get; set; }
-        public ICollection<AnswersDto>?AnswersDtos { get; set; }
+        public ICollection<AnswersDto>? AnswersDtos { get; set; }
     }
     public class AnswersDto
     {
 
         public string MaID { get; set; }
+        public string CauhoiID { get; set; }
         public string Ten { get; set; }
 
         public bool Dung { get; set; }
