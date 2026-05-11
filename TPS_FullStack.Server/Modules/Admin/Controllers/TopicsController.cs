@@ -46,7 +46,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             {
                 return BadRequest();
             }
-            return Ok(result);
+            return Created();
         }
 
         [HttpDelete("{MaID}")]
