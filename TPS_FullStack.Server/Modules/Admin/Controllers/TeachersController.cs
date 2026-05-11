@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TPS_FullStack.Server.Modules.Admin;
 
-namespace MyApp.Namespace
+namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/admin/teacher")]
     [ApiController]
@@ -46,7 +46,7 @@ namespace MyApp.Namespace
             var result = await _teacherService.CreateTeacherAsync(createDto);
             if (result != null)
             {
-                return Ok(result);
+                return Created();
             }
             return BadRequest();
         }
@@ -65,7 +65,7 @@ namespace MyApp.Namespace
             return BadRequest();
         }
 
-        [HttpPut("{MaId}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateTeacherById(TeacherUpdateDto updateDto)
         {
             var result = await _teacherService.UpdateTeacherAsync(updateDto);
