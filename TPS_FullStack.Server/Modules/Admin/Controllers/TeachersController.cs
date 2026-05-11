@@ -13,7 +13,7 @@ namespace MyApp.Namespace
         {
             _teacherService = teachersService;
         }
-        [HttpGet]
+        [HttpGet("teachers")]
         public async Task<IActionResult> TeacherGetAll()
         {
             var result = await _teacherService.TeacherGetAllAsync();
@@ -23,6 +23,17 @@ namespace MyApp.Namespace
                 return Ok(result);
             }
             return BadRequest();
+        }
+        [HttpGet("{MaId}")]
+        public async Task<IActionResult> TeacherDetail(string MaId)
+        {
+            var result = await _teacherService.TeacherDetailAsync(MaId);
+            if(result != null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(result);
         }
         [HttpPost("create")]
         public async Task<IActionResult> CreateTeacher(TeacherCreateDto createDto)
@@ -41,7 +52,7 @@ namespace MyApp.Namespace
         }
 
 
-        [HttpDelete("{Maid}")]
+        [HttpDelete("{MaId}")]
         public async Task<IActionResult> DeleteTeacherId(string MaID)
         {
             var result = await _teacherService.DeleteTeacherAsync(MaID);
@@ -52,6 +63,18 @@ namespace MyApp.Namespace
             }
 
             return BadRequest();
+        }
+
+        [HttpPut("{MaId}")]
+        public async Task<IActionResult> UpdateTeacherById(TeacherUpdateDto updateDto)
+        {
+            var result = await _teacherService.UpdateTeacherAsync(updateDto);
+
+            if(result == null)
+            {
+                return BadRequest("Can not update teacher ");
+            }
+            return Ok(result);
         }
     }
 }

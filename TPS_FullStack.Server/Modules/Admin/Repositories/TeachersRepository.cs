@@ -119,21 +119,22 @@ namespace TPS_FullStack.Server.Modules.Admin
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             try
             {
-                using(var conn = new SqlConnection(connectionString))
+                using (var conn = new SqlConnection(connectionString))
                 {
                     conn.OpenAsync();
                     using (var cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@MaID", MaID);
 
-                        if(await cmd.ExecuteNonQueryAsync() <= 0)
+                        if (await cmd.ExecuteNonQueryAsync() <= 0)
                         {
                             return false;
                         }
                     }
                 }
                 return true;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
                 return false;
@@ -156,9 +157,14 @@ namespace TPS_FullStack.Server.Modules.Admin
                                     FROM Khoahoc kh
                                     --JOIN Khoahoc_DmTrangthai kh_tt ON kh.MaID = kh_tt.KhoahocID
                                     JOIN Khoahoc_Giangvien kh_gv ON kh.MaID = kh_gv.KhoahocID
-                                    WHERE kh_gv.GiangvienID = '' AND kh.Khongsudung = 0";
-            
-            var teacherStudents = @"";
+                                    WHERE kh_gv.GiangvienID = @GiangvienID AND kh.Khongsudung = 0";
+
+            var teacherStudents = @"SELECT hv.MaID AS HocvienID, hv.Hoten AS HocvienTen
+                                    FROM Hocvien hv
+                                    JOIN Khoahoc_Hocvien kh_hv ON hv.MaID = kh_hv.HocvienID
+                                    JOIN Khoahoc kh ON kh_hv.KhoahocID = kh.MaID
+                                    JOIN Khoahoc_Giangvien kh_gv ON kh.MaID = kh_gv.KhoahocID
+                                    WHERE kh_gv.GiangvienID = @GiangvienID";
             var teacherDetail = new TeacherDetailDto();
 
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -201,7 +207,42 @@ namespace TPS_FullStack.Server.Modules.Admin
                     }
                 }
 
-                //Step 3: Load danh sach khoa hoc
+                // Step 3: Load danh sach khoa hoc ma giang vien dam nhan
+                using (var cmd = new SqlCommand(teacherCourses, conn))
+                {
+                    cmd.Parameters.AddWithValue("@GiangvienID", MaID);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            teacherDetail.teacherCourses.Add(new CoursesDto
+                            {
+                                MaID = reader["MaID"].ToString(),
+                                Ten = reader["Ten"].ToString()
+                            });
+                        }
+                    }
+                }
+
+                // Step 4: Load danh sach hoc vien dang hoc voi giang vien 
+                using (var cmd = new SqlCommand(teacherStudents, conn))
+                {
+                    cmd.Parameters.AddWithValue("@GiangvienID", MaID);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            teacherDetail.teacherStudents.Add(new StudentsDto
+                            {
+                                MaID = reader["HocvienID"].ToString(),
+                                Ten = reader["HocvienTen"].ToString()
+                            });
+                        }
+                    }
+                }
+                return teacherDetail;
 
             }
             throw new NotImplementedException();
@@ -240,6 +281,71 @@ namespace TPS_FullStack.Server.Modules.Admin
                 }
             }
             return list;
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> UpdateTeacherAsync(TeacherUpdateDto updateDto) // hien tai dang chi thay doi chuyen de cho giang vien, ve sau can them thi vao day de them
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            var queryDeleteTeacherTopic = @"DELETE 
+                                            FROM dbo.Chuyende_Giangvien
+                                            WHERE GiangvienID = @GiangvienID";
+
+            var queryInsertTeacherTopic = @"INSERT INTO dbo.Chuyende_Giangvien (MaID, GiangvienID, ChuyendeID)
+                                            VALUES (@MaID, @GiangvienID, @ChuyendeID)";
+
+            var queryUpdateTeacher = @"UPDATE dbo.Giangvien
+                                        SET
+                                        	UpdatedAt = SYSDATETIME(),
+                                        	UpdatedBy = @GiangvienID
+                                        WHERE MaID = @GiangvienID";
+
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                #region // Delete teacher topic when have TeacherId
+                using (var cmd = new SqlCommand(queryDeleteTeacherTopic, conn))
+                {
+                    cmd.Parameters.AddWithValue("@GiangvienID", updateDto.MaID);
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                #endregion
+                #region // Insert teacher topic
+                foreach (var teachertopic in updateDto.teacherTopics)
+                {
+                    using (var cmd = new SqlCommand(queryInsertTeacherTopic, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@MaID", teachertopic.MaID == null ? Guid.NewGuid().ToString()
+                                                                                        : teachertopic.MaID);
+                        cmd.Parameters.AddWithValue("@GiangvienID", updateDto.MaID);
+                        cmd.Parameters.AddWithValue("@ChuyendeID", teachertopic.ChuyendeID);
+
+                        if(await cmd.ExecuteNonQueryAsync() < 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                #endregion
+                #region // Update field updatedat in teacher table
+                using (var cmd = new SqlCommand(queryUpdateTeacher, conn))
+                {
+                    cmd.Parameters.AddWithValue("@GiangvienID", updateDto.MaID);
+                    if(await cmd.ExecuteNonQueryAsync() < 0)
+                    {
+                        return false;
+                    }
+                }
+                #endregion
+
+            }
+            return true;
+
+
             throw new NotImplementedException();
         }
     }
