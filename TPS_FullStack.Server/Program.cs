@@ -55,6 +55,10 @@ builder.Services.AddScoped<ITopicsRepository, TopicsRepository>();
 builder.Services.AddScoped<ITopicsService, TopicsService>();
 builder.Services.AddScoped<ITeachersRepository,TeachersRepository>();
 builder.Services.AddScoped<ITeachersService, TeachersService>();
+builder.Services.AddScoped<IStudentsRepository,StudentsRepository>();
+builder.Services.AddScoped<IStudentsService, StudentsService>();
+builder.Services.AddScoped<ICourseRepository,CourseRepository>();
+builder.Services.AddScoped<ICoursesService, CoursesService>();
 
 
 
