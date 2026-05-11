@@ -1,4 +1,5 @@
-﻿using Microsoft.Identity.Client;
+﻿using System.Reflection.Metadata.Ecma335;
+using Microsoft.Identity.Client;
 using Microsoft.JSInterop.Infrastructure;
 
 namespace TPS_FullStack.Server.Modules.Admin
@@ -34,6 +35,17 @@ namespace TPS_FullStack.Server.Modules.Admin
             throw new NotImplementedException();
         }
 
+        public async Task<TeacherDetailDto> TeacherDetailAsync(string MaID)
+        {
+            var result = await _teachersRepository.TeacherDetailAsync(MaID);
+            if(result != null)
+            {
+                return result;
+            }
+            return null;
+            throw new NotImplementedException();
+        }
+
         public async Task<List<TeacherGetAllDto>> TeacherGetAllAsync()
         {
             var data = await _teachersRepository.TeacherGetAllAsync();
@@ -42,6 +54,18 @@ namespace TPS_FullStack.Server.Modules.Admin
                 return null;
             }
             return data;
+            throw new NotImplementedException();
+        }
+
+        public async Task<TeacherUpdateDto> UpdateTeacherAsync(TeacherUpdateDto updateDto)
+        {
+            var result = await _teachersRepository.UpdateTeacherAsync(updateDto);
+            if (result)
+            {
+                return updateDto;
+            }
+            return null;
+
             throw new NotImplementedException();
         }
     }

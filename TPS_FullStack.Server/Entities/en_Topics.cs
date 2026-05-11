@@ -79,6 +79,10 @@ namespace TPS_FullStack.Server.Entities
         [Column(TypeName = "NVARCHAR(50)")]
         public string MaID { get; set; }
 
+
+        [Column(TypeName = "NVARCHAR(50)")]
+        public string ChuyendeID { get; set; }
+
         [Column(TypeName = "NVARCHAR(50)")]
         public string Chuyende_CauhoiID { get; set; }
         public Chuyende_Cauhoi Chuyende_Cauhoi { get; set; }
