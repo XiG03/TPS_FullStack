@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TPS_FullStack.Server.Modules.Admin;
 
-namespace MyApp.Namespace
+namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/admin/course")]
     [ApiController]

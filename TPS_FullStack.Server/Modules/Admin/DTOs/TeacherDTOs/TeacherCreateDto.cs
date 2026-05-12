@@ -18,7 +18,6 @@ namespace TPS_FullStack.Server.Modules.Admin
     public class TeachertopicsDto
     {
         public string MaID { get; set; }
-        public string Ten { get; set; }
         public bool Picked { get; set; } // Bien de tao dung de kiem tra co them vao dto hay khong
     }
     // public class CoursesDto

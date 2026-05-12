@@ -6,6 +6,9 @@
         public string Hoten { get; set; }
         public string Email { get; set; }
         public string Dienthoai { get; set; }
+        public DateTime Ngaysinh { get; set; }
+        public string Gioitinh { get; set; }
+        public string Diachi { get; set; }
     }
 
 }
