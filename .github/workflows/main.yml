@@ -1,0 +1,15 @@
+on:
+  push:
+    branches:
+      -  develop
+jobs:
+  my_job:
+    name: testing
+    runs-on: windows-2022
+    steps:
+      - name: Checkout code
+        uses: action/checkout@v4
+      - name: Build .NET Core
+        run: |
+          dotnet restore
+          dotnet build
