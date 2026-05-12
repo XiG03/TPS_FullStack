@@ -7,8 +7,12 @@ jobs:
     name: testing
     runs-on: windows-2022
     steps:
+      - name: Setup .NET
+        uses: develop
+        with:
+          dotnet-version: 8.0.11
       - name: Build .NET Core
-        working-directory: .TPS_FullStack.Server
+        working-directory: ./TPS_FullStack.Server
         run: |
           dotnet restore
           dotnet build
