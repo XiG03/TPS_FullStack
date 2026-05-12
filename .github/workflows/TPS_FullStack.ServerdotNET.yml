@@ -7,9 +7,8 @@ jobs:
     name: testing
     runs-on: windows-2022
     steps:
-      - name: Go to Server project
-        run: cd ..\TPS_FullStack.Server\
       - name: Build .NET Core
+        working-directory: .TPS_FullStack.Server
         run: |
           dotnet restore
           dotnet build
