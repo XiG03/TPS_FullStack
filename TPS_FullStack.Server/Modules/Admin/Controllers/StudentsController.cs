@@ -24,9 +24,9 @@ namespace TPS_FullStack.Server.Modules.Admin
             return Ok(result);
         }
         [HttpGet("{MaId}")]
-        public async Task<IActionResult> StudentGetById(string MaID)
+        public async Task<IActionResult> StudentGetById(string MaId)
         {
-            var result = await _studentService.GetStudentByIDAsync(MaID);
+            var result = await _studentService.GetStudentByIDAsync(MaId);
             if(result == null)
             {
                 return BadRequest("Can not find student");

@@ -77,7 +77,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryGetAll = @"SELECT hv.MaID, hv.Hoten, hv.Email, hv.Dienthoai
-                            FROM dbo.Hocvien hv";
+                            FROM dbo.Hocvien hv ";
             var students = new List<StudentGetAllDto>();
             using(var conn = new SqlConnection(connectionString))
             {
@@ -106,8 +106,8 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<bool> StudentInsertAsync(StudentCreateDto createDto)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            var queryInsert = @"INSERT INTO dbo.Hocvien(MaID, Hoten, Email, Dienthoai, CreatedAt, CreatedBy)
-                                VALUES (@MaID, @Hoten, @Email, @Dienthoai, SYSDATETIME(), '')";
+            var queryInsert = @"INSERT INTO dbo.Hocvien(MaID, UserId, Hoten, Email, Dienthoai, Ngaysinh, Gioitinh, Diachi, CreatedAt, CreatedBy)
+                                VALUES (@MaID, @MaID,  @Hoten, @Email, @Dienthoai, @Ngaysinh, @Gioitinh, @Diachi, SYSDATETIME(), '')";
             createDto.MaID = Guid.NewGuid().ToString();
             var user = new AppUser
             {
@@ -133,6 +133,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                     cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten);
                     cmd.Parameters.AddWithValue("@Email", createDto.Email);
                     cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
+                    cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh);
+                    cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh);
+                    cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi);
                     if(await cmd.ExecuteNonQueryAsync() < 0)
                     {
                         return false;

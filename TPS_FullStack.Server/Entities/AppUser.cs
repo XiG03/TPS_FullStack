@@ -54,6 +54,7 @@ namespace TPS_FullStack.Server.Entities
         public DateTime? DeletedAt { get; set; }
         [Column(TypeName = "NVARCHAR(450)")]
         public string? DeletedBy { get; set; }
+        public bool? Khongsudung { get; set; }
     }
 }
 

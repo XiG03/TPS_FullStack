@@ -21,7 +21,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryCourseGetAll = @"SELECT kh.MaID, kh.Ten, kh.Mota
-                                    FROM dbo.Khoahoc kh";
+                                    FROM dbo.Khoahoc kh WHERE Khongsudung = 0";
 
             var courses = new List<CourseInfo>();
             using (var conn = new SqlConnection(connectionString))
@@ -65,7 +65,13 @@ namespace TPS_FullStack.Server.Modules.Admin
                                         FROM dbo.Hocvien hv
                                         JOIN  Khoahoc_Hocvien kh_hv ON kh_hv.HocvienID = hv.MaID
                                         WHERE kh_hv.KhoahocID = @MaID";
-            var courseDetail = new CourseDetailDto();
+            var courseDetail = new CourseDetailDto
+            {
+                courseInfo = new courseInfo(),
+                courseTopics = new List<courseTopics>(),
+                courseTeachers = new List<courseTeachers>(),
+                courseStudents = new List<courseStudents>(),
+            };
             using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
@@ -76,9 +82,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                     cmd.Parameters.AddWithValue("@MaID", MaID);
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        courseDetail.courseInfo.MaID = reader["MaID"].ToString();
-                        courseDetail.courseInfo.Ten = reader["Ten"].ToString();
-                        courseDetail.courseInfo.Mota = reader["Mota"].ToString();
+                        if (await reader.ReadAsync())
+                        {
+                            courseDetail.courseInfo.MaID = reader["MaID"].ToString();
+                            courseDetail.courseInfo.Ten = reader["Ten"].ToString();
+                            courseDetail.courseInfo.Mota = reader["Mota"].ToString();
+                        }
                     }
                 }
 
@@ -165,8 +174,8 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<bool> CourseInsertAsync(CourseCreateDto createDto)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            var queryCourseInsert = @"INSERT INTO dbo.Khoahoc(MaID, Ten, Mota, Diemdat, Khongsudung, CreatedAt, CreatedBy)
-                                    VALUES (@MaID, @Ten, @Mota, @Diemdat,0,SYSDATETIME(), '')";
+            var queryCourseInsert = @"INSERT INTO dbo.Khoahoc(MaID, Ten, Mota, Diemdat, ChungchiID, LichhocID, Khongsudung, CreatedAt, CreatedBy)
+                                    VALUES (@MaID, @Ten, @Mota, @Diemdat,@ChungchiID, @LichhocID, 0, SYSDATETIME(), '')";
             var queryCourseTopicInsert = @"INSERT INTO dbo.Khoahoc_Chuyende(MaID, KhoahocID, ChuyendeID)
                                             VALUES (@MaID, @KhoahocID, @ChuyendeID)";
             var queryCourseTeacherInsert = @"INSERT INTO dbo.Khoahoc_Giangvien(MaID, KhoahocID, GiangvienID)
@@ -185,12 +194,14 @@ namespace TPS_FullStack.Server.Modules.Admin
                     //Step 1: Insert course
                     using (var cmd = new SqlCommand(queryCourseInsert, conn, transaction))
                     {
+                        createDto.courseDto.MaID = Guid.NewGuid().ToString();
                         cmd.Parameters.AddWithValue("@MaID", createDto.courseDto.MaID == null ? Guid.NewGuid().ToString()
                                                                                             : createDto.courseDto.MaID);
                         cmd.Parameters.AddWithValue("@Ten", createDto.courseDto.Ten);
                         cmd.Parameters.AddWithValue("@Mota", createDto.courseDto.Mota);
                         cmd.Parameters.AddWithValue("@Diemdat", createDto.courseDto.Diemdat);
-
+                        cmd.Parameters.AddWithValue("@ChungchiID", createDto.courseDto.ChungchiID);
+                        cmd.Parameters.AddWithValue("@LichhocID", createDto.courseDto.LichhocID);
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
                             transaction.Rollback();
@@ -320,7 +331,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     {
                         return false;
                     }
-                    using(var cmd = new SqlCommand(querycourseUpdate, conn, transaction))
+                    using (var cmd = new SqlCommand(querycourseUpdate, conn, transaction))
                     {
                         cmd.Parameters.AddWithValue("@Ten", updateDto.courseUpdate.Ten);
                         cmd.Parameters.AddWithValue("@Mota", updateDto.courseUpdate.Mota);
@@ -331,7 +342,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                             return false;
                         }
                     }
-                }catch(Exception ex)
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     _logger.LogError(ex.Message);
