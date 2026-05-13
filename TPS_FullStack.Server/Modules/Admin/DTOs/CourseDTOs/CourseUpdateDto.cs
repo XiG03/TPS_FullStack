@@ -6,7 +6,7 @@
         public ICollection<courseTopics> courseTopics { get; set; }
         public ICollection<courseTeachers> courseTeachers { get; set; }
         public ICollection<courseStudentUpdate> courseStudents { get; set; }
-        public ICollection<courseScheduleUpdate> courseScheduleUpdates{get; set;}
+        public ICollection<CourseScheduleDto> courseScheduleUpdates{get; set;}
     }
     public class courseUpdate
     {
@@ -45,14 +45,6 @@
         public string HocvienID { get; set; }
         public decimal Diem { get; set; }
         public decimal Hieuchinh { get; set; }
-    }
-    public class courseScheduleUpdate
-    {
-        public string MaID { get; set; }
-        public DateTime Ngaydukien { get; set; }
-        public DateTime Ngaythucte { get; set; }
-        public DateTime Tugio { get; set; }
-        public DateTime Dengio { get; set; }
     }
 }
 
