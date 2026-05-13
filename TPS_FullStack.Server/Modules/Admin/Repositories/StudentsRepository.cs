@@ -24,16 +24,16 @@ namespace TPS_FullStack.Server.Modules.Admin
                                             FROM dbo.Hocvien hv
                                             WHERE hv.MaID = @MaID";
             var studentDetail = new StudentDetailDto();
-            using(var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
                 using (var cmd = new SqlCommand(queryGetStudentDetail, conn))
                 {
                     cmd.Parameters.AddWithValue("@MaID", MaID);
 
-                    using(var reader = await cmd.ExecuteReaderAsync())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        if(await reader.ReadAsync())
+                        if (await reader.ReadAsync())
                         {
                             studentDetail.MaID = reader["MaID"].ToString();
                             studentDetail.Hoten = reader["Hoten"].ToString();
@@ -56,7 +56,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                         	DeletedBy = ''
                                         WHERE MaID = @MaID";
 
-            using(var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
                 using (var cmd = new SqlCommand(queryStudentDelete, conn))
@@ -79,14 +79,14 @@ namespace TPS_FullStack.Server.Modules.Admin
             var queryGetAll = @"SELECT hv.MaID, hv.Hoten, hv.Email, hv.Dienthoai
                             FROM dbo.Hocvien hv ";
             var students = new List<StudentGetAllDto>();
-            using(var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
-                using(var cmd = new SqlCommand(queryGetAll, conn))
+                using (var cmd = new SqlCommand(queryGetAll, conn))
                 {
-                    using(var reader = await cmd.ExecuteReaderAsync())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        while(await reader.ReadAsync())
+                        while (await reader.ReadAsync())
                         {
                             students.Add(new StudentGetAllDto
                             {
@@ -102,42 +102,45 @@ namespace TPS_FullStack.Server.Modules.Admin
             return students;
             throw new NotImplementedException();
         }
-        
+
         public async Task<bool> StudentInsertAsync(StudentCreateDto createDto)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryInsert = @"INSERT INTO dbo.Hocvien(MaID, UserId, Hoten, Email, Dienthoai, Ngaysinh, Gioitinh, Diachi, CreatedAt, CreatedBy)
                                 VALUES (@MaID, @MaID,  @Hoten, @Email, @Dienthoai, @Ngaysinh, @Gioitinh, @Diachi, SYSDATETIME(), '')";
             createDto.MaID = Guid.NewGuid().ToString();
-            var user = new AppUser
-            {
-                Id = createDto.MaID,
-                UserName = createDto.Email,
-                PhoneNumber = createDto.Dienthoai,
-                Email = createDto.Email,
-                Kichhoat = false
-            };
-            var result = await _userManager.CreateAsync(user);
 
-            if (!result.Succeeded)
-            {
-                return false;
-            }
 
-            using(var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(connectionString))
             {
-                await conn.OpenAsync();
-                using(var cmd = new SqlCommand(queryInsert, conn))
+                var user = new AppUser
                 {
-                    cmd.Parameters.AddWithValue("@MaID",createDto.MaID);
+                    Id = createDto.MaID,
+                    UserName = createDto.Email,
+                    PhoneNumber = createDto.Dienthoai,
+                    Email = createDto.Email,
+                    Kichhoat = false
+                };
+                var result = await _userManager.CreateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
+                await conn.OpenAsync();
+                using (var cmd = new SqlCommand(queryInsert, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaID", createDto.MaID);
                     cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten);
                     cmd.Parameters.AddWithValue("@Email", createDto.Email);
                     cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
                     cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh);
                     cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh);
                     cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi);
-                    if(await cmd.ExecuteNonQueryAsync() < 0)
+                    if (await cmd.ExecuteNonQueryAsync() < 0)
                     {
+                        var student =await _userManager.FindByIdAsync(createDto.MaID);
+                        await _userManager.DeleteAsync(student);
                         return false;
                     }
                 }
@@ -157,18 +160,18 @@ namespace TPS_FullStack.Server.Modules.Admin
                                         	UpdatedAt = SYSDATETIME(),
                                         	UpdatedBy = ''
                                         WHERE MaID = @MaID";
-            
+
             using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
-                using(var cmd = new SqlCommand(queryStudentUpdate, conn))
+                using (var cmd = new SqlCommand(queryStudentUpdate, conn))
                 {
                     cmd.Parameters.AddWithValue("@Hoten", updateDto.Hoten);
                     cmd.Parameters.AddWithValue("@Email", updateDto.Email);
                     cmd.Parameters.AddWithValue("@Dienthoai", updateDto.Dienthoai);
                     cmd.Parameters.AddWithValue("@MaID", updateDto.MaID);
 
-                    if(await cmd.ExecuteNonQueryAsync() < 0)
+                    if (await cmd.ExecuteNonQueryAsync() < 0)
                     {
                         return false;
                     }

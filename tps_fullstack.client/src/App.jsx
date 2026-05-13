@@ -1,15 +1,31 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AdminLayout from './components/Layout/AdminLayout';
 import TopicManagement from './components/TopicManagement/TopicManagement';
-import './App.css'; // Optional if you have global app styles, otherwise can be removed
+import CourseManagement from './components/CourseManagement/CourseManagement';
+import StudentManagement from './components/StudentManagement/StudentManagement';
+import TeacherManagement from './components/TeacherManagement/TeacherManagement';
+import './App.css'; 
 
 function App() {
   return (
-    <div className="app-layout">
-      {/* Optional: Add a sidebar or navbar here later */}
-      <main className="main-content">
-        <TopicManagement />
-      </main>
-    </div>
+    <Router>
+      <Routes>
+        {/* Main Admin Layout Route */}
+        <Route path="/" element={<AdminLayout />}>
+          {/* Redirect from root to topics or courses */}
+          <Route index element={<Navigate to="/courses" replace />} />
+          
+          <Route path="courses" element={<CourseManagement />} />
+          <Route path="students" element={<StudentManagement />} />
+          <Route path="teachers" element={<TeacherManagement />} />
+          <Route path="topics" element={<TopicManagement />} />
+          
+          {/* Catch-all route to redirect back to courses */}
+          <Route path="*" element={<Navigate to="/courses" replace />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 

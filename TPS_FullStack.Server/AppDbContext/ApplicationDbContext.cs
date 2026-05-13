@@ -32,8 +32,8 @@ namespace TPS_FullStack.Server.AppDbContext
         public DbSet<Chungchi> Chungchi { get; set; }
         public DbSet<Chungchi_Hocvien> Chungchi_Hocvien { get; set; }
         public DbSet<Lichhoc> Lichhoc { get; set; }
-        public DbSet<Lichhoc_Ct> Lichhoc_Ct { get; set; }
-        public DbSet<Lichhoc_Ct_Diemdanh> Lichhoc_Ct_Diemdanh { get; set; }
+        public DbSet<Lichhoc_Hocvien_Diemdanh> Lichhoc_Hocvien_Diemdanh { get; set; }
+        public DbSet<Lichhoc_Giangvien_Diemdanh> Lichhoc_Giangvien_Diemdanh { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -48,30 +48,7 @@ namespace TPS_FullStack.Server.AppDbContext
                         .HasForeignKey(rt => rt.UserId)
                         .OnDelete(DeleteBehavior.Cascade);
             });
-            builder.Entity<Chuyende_Tailieu>(entity =>
-            {
-                entity.HasKey(doc => doc.MaID);
-                entity.HasOne(doc => doc.Chuyende)
-                        .WithMany(topic => topic.Chuyende_Tailieus)
-                        .HasForeignKey(doc => doc.ChuyendeID)
-                        .OnDelete(DeleteBehavior.Cascade);
-            });
-            builder.Entity<Chuyende_Cauhoi>(entity =>
-            {
-                entity.HasKey(ques => ques.MaID);
-                entity.HasOne(ques => ques.Chuyende)
-                        .WithMany(topic => topic.Chuyende_Cauhois)
-                        .HasForeignKey(doc => doc.ChuyendeID)
-                        .OnDelete(DeleteBehavior.Cascade);
-            });
-            builder.Entity<Chuyende_Dapan>(entity =>
-            {
-                entity.HasKey(ans => ans.MaID);
-                entity.HasOne(ans => ans.Chuyende_Cauhoi)
-                        .WithMany(ques => ques.Chuyende_Dapans)
-                        .HasForeignKey(ans => ans.Chuyende_CauhoiID)
-                        .OnDelete(DeleteBehavior.Cascade);
-            });
+            
         }
     }
 }

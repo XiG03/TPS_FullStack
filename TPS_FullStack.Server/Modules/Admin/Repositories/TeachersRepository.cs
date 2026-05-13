@@ -28,23 +28,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<bool> CreateTeacherAsync(TeacherCreateDto createDto)
         {
             createDto.MaID = Guid.NewGuid().ToString();
-            //Step 1: Tao AspNetUser moi // chua verify
-            var user = new AppUser
-            {
-                // Dang ep cho Id cua AspNetUser la MaID cua giang vien // du kien se lam cho hoc vien
-                Id = createDto.MaID,
-                UserName = createDto.Email,
-                PhoneNumber = createDto.Dienthoai,
-                Email = createDto.Email,
-                Kichhoat = false,
-            };
 
-            var result = await _userManager.CreateAsync(user);
-
-            if (!result.Succeeded)
-            {
-                return false;
-            }
             //Step 2: Them giang vien moi -- ADO.NET 
 
             var queryTeacher = @"INSERT INTO dbo.Giangvien(MaID, UserId, Hoten, Ngaysinh, Gioitinh, Email, Diachi, Dienthoai,CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Khongsudung)
@@ -58,6 +42,24 @@ namespace TPS_FullStack.Server.Modules.Admin
 
             using (var conn = new SqlConnection(connectionString))
             {
+                //Step 1: Tao AspNetUser moi // chua verify
+                var user = new AppUser
+                {
+                    // Dang ep cho Id cua AspNetUser la MaID cua giang vien // du kien se lam cho hoc vien
+                    Id = createDto.MaID,
+                    UserName = createDto.Email,
+                    PhoneNumber = createDto.Dienthoai,
+                    Email = createDto.Email,
+                    Kichhoat = false,
+                };
+
+                var result = await _userManager.CreateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
+
                 await conn.OpenAsync();
                 var transaction = conn.BeginTransaction();
                 try
@@ -100,6 +102,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                 }
                 catch (Exception ex)
                 {
+                    var teacher = await _userManager.FindByIdAsync(createDto.MaID);
+                    await _userManager.DeleteAsync(teacher);
                     await transaction.RollbackAsync();
                     _logger.LogError(ex.Message);
                     return false;
@@ -326,7 +330,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                 try
                 {
                     #region // Delete teacher topic when have TeacherId
-                    using (var cmd = new SqlCommand(queryDeleteTeacherTopic, conn,transaction))
+                    using (var cmd = new SqlCommand(queryDeleteTeacherTopic, conn, transaction))
                     {
                         cmd.Parameters.AddWithValue("@GiangvienID", updateDto.MaID);
 
@@ -336,7 +340,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     #region // Insert teacher topic
                     foreach (var teachertopic in updateDto.teacherTopics)
                     {
-                        using (var cmd = new SqlCommand(queryInsertTeacherTopic, conn,transaction))
+                        using (var cmd = new SqlCommand(queryInsertTeacherTopic, conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@MaID", teachertopic.MaID == null ? Guid.NewGuid().ToString()
                                                                                             : teachertopic.MaID);
@@ -351,7 +355,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     }
                     #endregion
                     #region // Update field updatedat in teacher table
-                    using (var cmd = new SqlCommand(queryUpdateTeacher, conn,transaction))
+                    using (var cmd = new SqlCommand(queryUpdateTeacher, conn, transaction))
                     {
                         cmd.Parameters.AddWithValue("@GiangvienID", updateDto.MaID);
                         if (await cmd.ExecuteNonQueryAsync() < 0)
@@ -361,7 +365,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                     }
                     #endregion
                     await transaction.CommitAsync();
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     _logger.LogError(ex.Message);

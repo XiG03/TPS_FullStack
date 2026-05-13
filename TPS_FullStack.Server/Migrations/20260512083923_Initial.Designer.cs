@@ -12,8 +12,8 @@ using TPS_FullStack.Server.AppDbContext;
 namespace TPS_FullStack.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260507023928_#004_Change MaID from string to Guid")]
-    partial class _004_ChangeMaIDfromstringtoGuid
+    [Migration("20260512083923_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,13 +171,13 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("NVARCHAR(450)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -222,7 +222,7 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -250,13 +250,13 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("NVARCHAR(450)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -264,6 +264,10 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<string>("Donvicap")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(500)");
+
+                    b.Property<string>("KhoahocID")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(50)");
 
                     b.Property<bool?>("Khongsudung")
                         .HasColumnType("bit");
@@ -280,7 +284,7 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("DECIMAL(18,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -339,17 +343,16 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
                 {
                     b.Property<string>("MaID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("NVARCHAR(450)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -366,7 +369,7 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -381,7 +384,7 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<string>("MaID")
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<string>("ChuyendeId")
+                    b.Property<string>("ChuyendeID")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
@@ -394,12 +397,18 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
+                    b.HasIndex("ChuyendeID");
+
                     b.ToTable("Chuyende_Cauhoi");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
                 {
-                    b.Property<string>("MaId")
+                    b.Property<string>("MaID")
+                        .HasColumnType("NVARCHAR(50)");
+
+                    b.Property<string>("ChuyendeID")
+                        .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<string>("Chuyende_CauhoiID")
@@ -413,9 +422,31 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(200)");
 
-                    b.HasKey("MaId");
+                    b.HasKey("MaID");
+
+                    b.HasIndex("Chuyende_CauhoiID");
 
                     b.ToTable("Chuyende_Dapan");
+                });
+
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Giangvien", b =>
+                {
+                    b.Property<string>("MaID")
+                        .HasColumnType("NVARCHAR(50)");
+
+                    b.Property<string>("ChuyendeID")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(50)");
+
+                    b.Property<string>("GiangvienID")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(50)");
+
+                    b.HasKey("MaID");
+
+                    b.HasIndex("ChuyendeID");
+
+                    b.ToTable("Chuyende_Giangvien");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
@@ -446,6 +477,8 @@ namespace TPS_FullStack.Server.Migrations
 
                     b.HasKey("MaID");
 
+                    b.HasIndex("ChuyendeID");
+
                     b.ToTable("Chuyende_Tailieu");
                 });
 
@@ -455,13 +488,13 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("NVARCHAR(450)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -486,11 +519,14 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(200)");
 
+                    b.Property<bool?>("Khongsudung")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Ngaysinh")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -512,13 +548,13 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("NVARCHAR(450)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -543,11 +579,14 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(200)");
 
+                    b.Property<bool?>("Khongsudung")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Ngaysinh")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -573,13 +612,13 @@ namespace TPS_FullStack.Server.Migrations
                         .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("NVARCHAR(450)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -590,20 +629,26 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<bool?>("Khongsudung")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LichhocID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)");
-
                     b.Property<string>("Mota")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(500)");
+
+                    b.Property<decimal>("Sobuoihoc")
+                        .HasColumnType("DECIMAL(4,1)");
 
                     b.Property<string>("Ten")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(200)");
 
+                    b.Property<decimal>("Thoigianhoc")
+                        .HasColumnType("DECIMAL(4,1)");
+
+                    b.Property<string>("Thu")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)");
+
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DATETIME");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("NVARCHAR(450)");
@@ -625,6 +670,9 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<string>("KhoahocID")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
+
+                    b.Property<decimal>("slCauhoi")
+                        .HasColumnType("DECIMAL(18,2)");
 
                     b.HasKey("MaID");
 
@@ -696,28 +744,31 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<string>("MaID")
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<decimal>("Sobuoihoc")
-                        .HasColumnType("DECIMAL(4,1)");
+                    b.Property<DateTime>("Dengio")
+                        .HasColumnType("DATETIME");
 
-                    b.Property<decimal>("Thoigianhoc")
-                        .HasColumnType("DECIMAL(4,1)");
-
-                    b.Property<string>("Thu")
+                    b.Property<string>("GiangvienID")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR(100)");
+                        .HasColumnType("NVARCHAR(50)");
+
+                    b.Property<string>("LichhocID")
+                        .HasColumnType("NVARCHAR(50)");
+
+                    b.Property<DateTime>("Ngay")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<DateTime>("Tugio")
+                        .HasColumnType("DATETIME");
 
                     b.HasKey("MaID");
 
                     b.ToTable("Lichhoc");
                 });
 
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Lichhoc_Ct", b =>
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Lichhoc_Giangvien_Diemdanh", b =>
                 {
                     b.Property<string>("MaID")
                         .HasColumnType("NVARCHAR(50)");
-
-                    b.Property<DateTime>("Dengio")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("GiangvienID")
                         .IsRequired()
@@ -727,21 +778,12 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<decimal>("Lichhoc_Thoigianhoc")
-                        .HasColumnType("DECIMAL(4,1)");
-
-                    b.Property<DateTime>("Ngay")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Tugio")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("MaID");
 
-                    b.ToTable("Lichhoc_Ct");
+                    b.ToTable("Lichhoc_Giangvien_Diemdanh");
                 });
 
-            modelBuilder.Entity("TPS_FullStack.Server.Entities.Lichhoc_Ct_Diemdanh", b =>
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Lichhoc_Hocvien_Diemdanh", b =>
                 {
                     b.Property<string>("MaID")
                         .HasColumnType("NVARCHAR(50)");
@@ -750,13 +792,13 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<string>("Lichhoc_CtID")
+                    b.Property<string>("LichhocID")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(50)");
 
                     b.HasKey("MaID");
 
-                    b.ToTable("Lichhoc_Ct_Diemdanh");
+                    b.ToTable("Lichhoc_Hocvien_Diemdanh");
                 });
 
             modelBuilder.Entity("TPS_FullStack.Server.RefreshToken", b =>
@@ -842,6 +884,48 @@ namespace TPS_FullStack.Server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
+                {
+                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", "Chuyende")
+                        .WithMany("Chuyende_Cauhois")
+                        .HasForeignKey("ChuyendeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chuyende");
+                });
+
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Dapan", b =>
+                {
+                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", "Chuyende_Cauhoi")
+                        .WithMany("Chuyende_Dapans")
+                        .HasForeignKey("Chuyende_CauhoiID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chuyende_Cauhoi");
+                });
+
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Giangvien", b =>
+                {
+                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", null)
+                        .WithMany("Chuyende_Giangviens")
+                        .HasForeignKey("ChuyendeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Tailieu", b =>
+                {
+                    b.HasOne("TPS_FullStack.Server.Entities.Chuyende", "Chuyende")
+                        .WithMany("Chuyende_Tailieus")
+                        .HasForeignKey("ChuyendeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chuyende");
+                });
+
             modelBuilder.Entity("TPS_FullStack.Server.Entities.Giangvien", b =>
                 {
                     b.HasOne("TPS_FullStack.Server.Entities.AppUser", "User")
@@ -878,6 +962,20 @@ namespace TPS_FullStack.Server.Migrations
             modelBuilder.Entity("TPS_FullStack.Server.Entities.AppUser", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende", b =>
+                {
+                    b.Navigation("Chuyende_Cauhois");
+
+                    b.Navigation("Chuyende_Giangviens");
+
+                    b.Navigation("Chuyende_Tailieus");
+                });
+
+            modelBuilder.Entity("TPS_FullStack.Server.Entities.Chuyende_Cauhoi", b =>
+                {
+                    b.Navigation("Chuyende_Dapans");
                 });
 #pragma warning restore 612, 618
         }

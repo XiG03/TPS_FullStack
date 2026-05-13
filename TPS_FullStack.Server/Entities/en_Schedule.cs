@@ -7,52 +7,44 @@ namespace TPS_FullStack.Server.Entities
     {
 
     }
-
     public class Lichhoc
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
         public string MaID { get; set; }
 
-        [Column(TypeName = "NVARCHAR(100)")]
-        public string Thu { get; set; }
-
-        [Column(TypeName ="DECIMAL(4,1)")]
-        public decimal Thoigianhoc { get; set; } // Format Decimal(4,1)
-        
-        [Column(TypeName ="DECIMAL(4,1)")]
-        public decimal Sobuoihoc { get; set; } // Format Decimal(18,0)
+        [Column(TypeName = "NVARCHAR(50)")]
+        public string? GiangvienID { get; set; }
+        [Column(TypeName ="DATETIME")]
+        public DateTime? Ngay { get; set; }
+        [Column(TypeName ="DATETIME")]
+        public DateTime? Tugio { get; set; }
+        [Column(TypeName ="DATETIME")]
+        public DateTime? Dengio { get; set; }
     }
-    public class Lichhoc_Ct
+    public class Lichhoc_Hocvien_Diemdanh
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
         public string MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string LichhocID { get; set; }
+        public string? LichhocID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string GiangvienID { get; set; }
-        public DateTime Ngay { get; set; }
-        public DateTime Tugio { get; set; }
-        public DateTime Dengio { get; set; }
-
-        [Column(TypeName ="DECIMAL(4,1)")]
-        public decimal Lichhoc_Thoigianhoc { get; set; } // Format Decimal(4,1)
-
+        public string? HocvienID { get; set; }
     }
-    public class Lichhoc_Ct_Diemdanh
+    public class Lichhoc_Giangvien_Diemdanh
     {
         [Key]
         [Column(TypeName = "NVARCHAR(50)")]
         public string MaID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string Lichhoc_CtID { get; set; }
+        public string? LichhocID { get; set; }
 
         [Column(TypeName = "NVARCHAR(50)")]
-        public string HocvienID { get; set; }
+        public string? GiangvienID { get; set; }
     }
 }
 

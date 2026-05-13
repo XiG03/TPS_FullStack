@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.CodeDom.Compiler;
+using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
@@ -50,27 +51,33 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<CourseDetailDto> CourseGetByIdAsync(string MaID)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            var queryCourseInfo = @"SELECT kh.MaID, kh.Ten, kh.Mota
+            // Missing certification name
+            var queryCourseInfo = @"SELECT kh.MaID, kh.Ten, kh.Mota, kh.Diemdat, kh.Sobuoihoc, kh.Thu, kh.Thoiluonghoc, kh.Thoiluongthi, kh.Socauhoi, kh.Ngaybatdau
                                     FROM dbo.Khoahoc kh
                                     WHERE kh.MaID = @MaID AND kh.Khongsudung = 0";
-            var queryCourseTeachers = @"SELECT gv.MaID, gv.Hoten
+            var queryCourseTeachers = @"SELECT kh_gv.MaID, gv.GiangvienID, gv.Hoten
                                         FROM dbo.Giangvien gv
                                         JOIN Khoahoc_Giangvien kh_gv ON kh_gv.GiangvienID = gv.MaID
                                         WHERE kh_gv.KhoahocID = @MaID";
-            var queryCourseTopics = @"SELECT cd.MaID, cd.Ten
+            var queryCourseTopics = @"SELECT kh_cd.MaID, kh_cd.ChuyendeID , cd.Ten, kh_cd.Socauhoi
                                         FROM dbo.Chuyende cd
                                         JOIN Khoahoc_Chuyende kh_cd ON kh_cd.ChuyendeID = cd.MaID
                                         WHERE kh_cd.KhoahocID = @MaID";
-            var queryCourseStudents = @"SELECT hv.MaID, hv.Hoten
+            var queryCourseStudents = @"SELECT kh_hv.MaID, kh_hv.HocvienID, hv.Hoten
                                         FROM dbo.Hocvien hv
                                         JOIN  Khoahoc_Hocvien kh_hv ON kh_hv.HocvienID = hv.MaID
                                         WHERE kh_hv.KhoahocID = @MaID";
+            var queryCourseSchedules = @"SELECT lh.MaID, lh.Ngaydukien, lh.Ngaythucte, lh.Tugio, lh.Dengio
+                                        FROM dbo.Lichhoc lh
+                                        WHERE lh.KhoahocID = @MaID";
+            // var queryCourseExams -- Lay danh muc cac bai thi da duoc thuc hien
             var courseDetail = new CourseDetailDto
             {
                 courseInfo = new courseInfo(),
                 courseTopics = new List<courseTopics>(),
                 courseTeachers = new List<courseTeachers>(),
                 courseStudents = new List<courseStudents>(),
+                courseSchedules = new List<courseSchedules>()
             };
             using (var conn = new SqlConnection(connectionString))
             {
@@ -87,10 +94,15 @@ namespace TPS_FullStack.Server.Modules.Admin
                             courseDetail.courseInfo.MaID = reader["MaID"].ToString();
                             courseDetail.courseInfo.Ten = reader["Ten"].ToString();
                             courseDetail.courseInfo.Mota = reader["Mota"].ToString();
+                            courseDetail.courseInfo.Sobuoihoc = (decimal)reader["Sobuoihoc"];
+                            courseDetail.courseInfo.Thoiluonghoc = (decimal)reader["Thoiluonghoc"];
+                            courseDetail.courseInfo.Thoiluongthi = (decimal)reader["Thoiluongthi"];
+                            courseDetail.courseInfo.Socauhoi = (decimal)reader["Socauhoi"];
+                            courseDetail.courseInfo.Thu = reader["Thu"].ToString();
+                            courseDetail.courseInfo.Ngaybatdau = (DateTime)reader["Ngaybatdau"];
                         }
                     }
                 }
-
                 //#2 find Teachers
                 using (var cmd = new SqlCommand(queryCourseTeachers, conn))
                 {
@@ -102,7 +114,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                             courseDetail.courseTeachers.Add(new courseTeachers
                             {
                                 MaID = reader["MaID"].ToString(),
-                                Ten = reader["Ten"].ToString()
+                                GiangvienID = reader["GiangvienID"].ToString(),
+                                Hoten = reader["Hoten"].ToString()
                             });
                         }
                     }
@@ -118,7 +131,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                             courseDetail.courseTopics.Add(new courseTopics
                             {
                                 MaID = reader["MaID"].ToString(),
-                                Ten = reader["Ten"].ToString()
+                                ChuyendeID = reader["ChuyendeID"].ToString(),
+                                Ten = reader["Ten"].ToString(),
+                                SoCauhoi = (decimal)reader["SoCauhoi"]
                             });
                         }
                     }
@@ -134,7 +149,27 @@ namespace TPS_FullStack.Server.Modules.Admin
                             courseDetail.courseStudents.Add(new courseStudents
                             {
                                 MaID = reader["MaID"].ToString(),
-                                Ten = reader["Ten"].ToString()
+                                HocvienID = reader["HocvienID"].ToString(),
+                                Hoten = reader["Hoten"].ToString()
+                            });
+                        }
+                    }
+                }
+                //#5 find Schedules
+                using (var cmd = new SqlCommand(queryCourseSchedules, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaID", MaID);
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            courseDetail.courseSchedules.Add(new courseSchedules
+                            {
+                                MaID = reader["MaID"].ToString(),
+                                Ngaydukien = (DateTime)reader["Ngaydukien"],
+                                Ngaythucte = (DateTime)reader["Ngaythucte"],
+                                Tugio = (DateTime)reader["Tugio"],
+                                Dengio = (DateTime)reader["Dengio"]
                             });
                         }
                     }
@@ -170,18 +205,20 @@ namespace TPS_FullStack.Server.Modules.Admin
             return true;
             throw new NotImplementedException();
         }
-
+        // Warning
         public async Task<bool> CourseInsertAsync(CourseCreateDto createDto)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            var queryCourseInsert = @"INSERT INTO dbo.Khoahoc(MaID, Ten, Mota, Diemdat, ChungchiID, LichhocID, Khongsudung, CreatedAt, CreatedBy)
-                                    VALUES (@MaID, @Ten, @Mota, @Diemdat,@ChungchiID, @LichhocID, 0, SYSDATETIME(), '')";
-            var queryCourseTopicInsert = @"INSERT INTO dbo.Khoahoc_Chuyende(MaID, KhoahocID, ChuyendeID)
-                                            VALUES (@MaID, @KhoahocID, @ChuyendeID)";
+            var queryCourseInsert = @"INSERT INTO dbo.Khoahoc(MaID, Ten, Mota, Diemdat, ChungchiID, Khongsudung, CreatedAt, CreatedBy, Ngaybatdau, Thu, Thoiluonghoc, Sobuoihoc, Thoiluongthi, Socauhoi)
+                                    VALUES (@MaID, @Ten, @Mota, @Diemdat, @ChungchiID, 0, SYSDATETIME(), '', @Ngaybatdau, @Thu, @Thoiluonghoc, @Sobuoihoc, @Thoiluongthi, @Socauhoi)";
+            var queryCourseTopicInsert = @"INSERT INTO dbo.Khoahoc_Chuyende(MaID, KhoahocID, ChuyendeID, Socauhoi)
+                                            VALUES (@MaID, @KhoahocID, @ChuyendeID, @Socauhoi)";
             var queryCourseTeacherInsert = @"INSERT INTO dbo.Khoahoc_Giangvien(MaID, KhoahocID, GiangvienID)
                                             VALUES (@MaID, @KhoahocID, @GiangvienID)";
             var queryCourseStudentInsert = @"INSERT INTO dbo.Khoahoc_Hocvien(MaID, KhoahocID, HocvienID)
-                                            VALUES (@MaID, @KhoahocID, @HocvienID)";
+                                            VALUES (@MaID, @KhoahocID, @HocvienID, @Diem, @Hieuchinh)";
+            var queryCourseScheduleInsert = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien, Ngaythucte, Tugio, Dengio)
+                                            VALUES (@MaID, @KhoahocID, @Ngaydukien, @Ngaythucte, @Tugio, @Dengio)";
 
 
             using (var conn = new SqlConnection(connectionString))
@@ -191,7 +228,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                 try
                 {
-                    //Step 1: Insert course
+                    //Step 1: Insert course - mark done 
                     using (var cmd = new SqlCommand(queryCourseInsert, conn, transaction))
                     {
                         createDto.courseDto.MaID = Guid.NewGuid().ToString();
@@ -201,15 +238,19 @@ namespace TPS_FullStack.Server.Modules.Admin
                         cmd.Parameters.AddWithValue("@Mota", createDto.courseDto.Mota);
                         cmd.Parameters.AddWithValue("@Diemdat", createDto.courseDto.Diemdat);
                         cmd.Parameters.AddWithValue("@ChungchiID", createDto.courseDto.ChungchiID);
-                        cmd.Parameters.AddWithValue("@LichhocID", createDto.courseDto.LichhocID);
+                        cmd.Parameters.AddWithValue("@Ngaybatdau", createDto.courseDto.Ngaybatdau);
+                        cmd.Parameters.AddWithValue("@Thu", createDto.courseDto.Thu);
+                        cmd.Parameters.AddWithValue("@Thoiluonghoc", createDto.courseDto.Thoiluonghoc);
+                        cmd.Parameters.AddWithValue("@Sobuoihoc", createDto.courseDto.Sobuoihoc);
+                        cmd.Parameters.AddWithValue("@Thoiluongthi", createDto.courseDto.Thoiluongthi);
+                        cmd.Parameters.AddWithValue("@Socauhoi", createDto.courseDto.Socauhoi);
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
-                            transaction.Rollback();
+                            await transaction.RollbackAsync();
                             return false;
                         }
                     }
-
-                    //Step 2: Insert Topics list
+                    //Step 2: Insert topics 
                     foreach (var topic in createDto.courseTopicDtos)
                     {
                         using (var cmd = new SqlCommand(queryCourseTopicInsert, conn, transaction))
@@ -217,11 +258,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                             cmd.Parameters.AddWithValue("@MaID", topic.MaID == null ? Guid.NewGuid().ToString()
                                                                                     : topic.MaID);
                             cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
-                            cmd.Parameters.AddWithValue("@ChuyendeID", topic.MaID);
+                            cmd.Parameters.AddWithValue("@ChuyendeID", topic.ChuyendeID);
+                            cmd.Parameters.AddWithValue("@Socauhoi", topic.SoCauhoi);
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
                             {
-                                transaction.Rollback();
+                                await transaction.RollbackAsync();
                                 return false;
                             }
                         }
@@ -234,11 +276,11 @@ namespace TPS_FullStack.Server.Modules.Admin
                             cmd.Parameters.AddWithValue("@MaID", teacher.MaID == null ? Guid.NewGuid().ToString()
                                                                                     : teacher.MaID);
                             cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
-                            cmd.Parameters.AddWithValue("@GiangvienID", teacher.MaID);
+                            cmd.Parameters.AddWithValue("@GiangvienID", teacher.GiangvienID);
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
                             {
-                                transaction.Rollback();
+                                await transaction.RollbackAsync();
                                 return false;
                             }
                         }
@@ -251,21 +293,44 @@ namespace TPS_FullStack.Server.Modules.Admin
                             cmd.Parameters.AddWithValue("@MaID", student.MaID == null ? Guid.NewGuid().ToString()
                                                                                     : student.MaID);
                             cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
-                            cmd.Parameters.AddWithValue("@HocvienID", student.MaID);
+                            cmd.Parameters.AddWithValue("@HocvienID", student.HocvienID);
+                            cmd.Parameters.AddWithValue("@Diem", student.Diem);
+                            cmd.Parameters.AddWithValue("@Hieuchinh", student.Hieuchinh);
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
                             {
-                                transaction.Rollback();
+                                await transaction.RollbackAsync();
                                 return false;
                             }
                         }
                     }
+                    //Step 5: Insert Schedules list
+                    foreach (var schedule in createDto.courseScheduleDtos)
+                    {
+                        using (var cmd = new SqlCommand(queryCourseScheduleInsert, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@MaID", schedule.MaID == null ? Guid.NewGuid().ToString()
+                                                                                        : schedule.MaID);
+                            cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
+                            cmd.Parameters.AddWithValue("@Ngaydukien", schedule.Ngaydukien);
+                            cmd.Parameters.AddWithValue("@Ngaythucte", schedule.Ngaythucte);
+                            cmd.Parameters.AddWithValue("@Tugio", schedule.Tugio);
+                            cmd.Parameters.AddWithValue("@Dengio", schedule.Dengio);
+
+                            if (await cmd.ExecuteNonQueryAsync() < 0)
+                            {
+                                await transaction.RollbackAsync();
+                                return false;
+                            }
+                        }
+                    }
+
                     transaction.Commit();
                 }
                 catch (Exception ex)
                 {
 
-                    transaction.Rollback();
+                    await transaction.RollbackAsync();
                     _logger.LogError(ex.Message);
                     return false;
                 }
@@ -283,12 +348,28 @@ namespace TPS_FullStack.Server.Modules.Admin
                                     	Ten = @Ten,
                                     	Mota = @Mota,
                                     	Diemdat = @Diemdat,
+                                        Sobuoihoc = @Sobuoihoc,
+                                        Thu = @Thu,
+                                        Thoiluonghoc = @Thoiluonghoc,
+                                        Ngaybatdau = @Ngaybatdau,
+                                        Thoigianthi = @Thoigianthi,
+                                        Thoiluongthi = @Thoiluongthi,
+                                        Socauhoi = @Socauhoi,
                                     	UpdatedAt = SYSDATETIME(),
                                     	UpdatedBy = ''
                                     WHERE MaID = @MaID";
             var querycourseTopicDelete = @"DELETE dbo.Khoahoc_Chuyende WHERE KhoahocID = @MaID";
             var querycourseTeacherDelete = @"DELETE dbo.Khoahoc_Giangvien WHERE KhoahocID = @MaID";
             var querycourseStudentDelete = @"DELETE dbo.Khoahoc_Hocvien WHERE KhoahocID = @MaID";
+
+            var queryCourseTopicInsert = @"INSERT INTO dbo.Khoahoc_Chuyende(MaID, KhoahocID, ChuyendeID, Socauhoi)
+                                            VALUES (@MaID, @KhoahocID, @ChuyendeID, @Socauhoi)";
+            var queryCourseTeacherInsert = @"INSERT INTO dbo.Khoahoc_Giangvien(MaID, KhoahocID, GiangvienID)
+                                            VALUES (@MaID, @KhoahocID, @GiangvienID)";
+            var queryCourseStudentInsert = @"INSERT INTO dbo.Khoahoc_Hocvien(MaID, KhoahocID, HocvienID)
+                                            VALUES (@MaID, @KhoahocID, @HocvienID, @Diem, @Hieuchinh)";
+            var queryCourseScheduleInsert = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien, Ngaythucte, Tugio, Dengio)
+                                            VALUES (@MaID, @KhoahocID, @Ngaydukien, @Ngaythucte, @Tugio, @Dengio)";
 
             using (var conn = new SqlConnection(connectionString))
             {
@@ -327,21 +408,97 @@ namespace TPS_FullStack.Server.Modules.Admin
                         }
                     }
 
-                    if (await courserelationInsert(conn, transaction, updateDto))
+                    foreach (var topic in updateDto.courseTopics)
                     {
-                        return false;
+                        using (var cmd = new SqlCommand(queryCourseTopicInsert, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@MaID", topic.MaID == null ? Guid.NewGuid().ToString()
+                                                                                    : topic.MaID);
+                            cmd.Parameters.AddWithValue("@KhoahocID", updateDto.courseUpdate.MaID);
+                            cmd.Parameters.AddWithValue("@ChuyendeID", topic.ChuyendeID);
+                            cmd.Parameters.AddWithValue("@Socauhoi", topic.SoCauhoi);
+
+                            if (await cmd.ExecuteNonQueryAsync() < 0)
+                            {
+                                await transaction.RollbackAsync();
+                                return false;
+                            }
+                        }
+                    }
+                    //Step 3: Insert Teachers list
+                    foreach (var teacher in updateDto.courseTeachers)
+                    {
+                        using (var cmd = new SqlCommand(queryCourseTeacherInsert, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@MaID", teacher.MaID == null ? Guid.NewGuid().ToString()
+                                                                                    : teacher.MaID);
+                            cmd.Parameters.AddWithValue("@KhoahocID", updateDto.courseUpdate.MaID);
+                            cmd.Parameters.AddWithValue("@GiangvienID", teacher.GiangvienID);
+
+                            if (await cmd.ExecuteNonQueryAsync() < 0)
+                            {
+                                await transaction.RollbackAsync();
+                                return false;
+                            }
+                        }
+                    }
+                    //Step 4: Insert Students list
+                    foreach (var student in updateDto.courseStudents)
+                    {
+                        using (var cmd = new SqlCommand(queryCourseStudentInsert, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@MaID", student.MaID == null ? Guid.NewGuid().ToString()
+                                                                                    : student.MaID);
+                            cmd.Parameters.AddWithValue("@KhoahocID", updateDto.courseUpdate.MaID);
+                            cmd.Parameters.AddWithValue("@HocvienID", student.HocvienID);
+                            cmd.Parameters.AddWithValue("@Diem", student.Diem);
+                            cmd.Parameters.AddWithValue("@Hieuchinh", student.Hieuchinh);
+
+                            if (await cmd.ExecuteNonQueryAsync() < 0)
+                            {
+                                await transaction.RollbackAsync();
+                                return false;
+                            }
+                        }
+                    }
+                    foreach (var schedule in updateDto.courseScheduleUpdates)
+                    {
+                        using (var cmd = new SqlCommand(queryCourseScheduleInsert, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@MaID", schedule.MaID == null ? Guid.NewGuid().ToString()
+                                                                                        : schedule.MaID);
+                            cmd.Parameters.AddWithValue("@KhoahocID", updateDto.courseUpdate.MaID);
+                            cmd.Parameters.AddWithValue("@Ngaydukien", schedule.Ngaydukien);
+                            cmd.Parameters.AddWithValue("@Ngaythucte", schedule.Ngaythucte);
+                            cmd.Parameters.AddWithValue("@Tugio", schedule.Tugio);
+                            cmd.Parameters.AddWithValue("@Dengio", schedule.Dengio);
+
+                            if (await cmd.ExecuteNonQueryAsync() < 0)
+                            {
+                                await transaction.RollbackAsync();
+                                return false;
+                            }
+                        }
                     }
                     using (var cmd = new SqlCommand(querycourseUpdate, conn, transaction))
                     {
                         cmd.Parameters.AddWithValue("@Ten", updateDto.courseUpdate.Ten);
                         cmd.Parameters.AddWithValue("@Mota", updateDto.courseUpdate.Mota);
                         cmd.Parameters.AddWithValue("@Diemdat", updateDto.courseUpdate.Diemdat);
+                        cmd.Parameters.AddWithValue("@Sobuoihoc", updateDto.courseUpdate.Sobuoihoc);
+                        cmd.Parameters.AddWithValue("@Thu", updateDto.courseUpdate.Thu);
+                        cmd.Parameters.AddWithValue("@Thoiluonghoc", updateDto.courseUpdate.Thoiluonghoc);
+                        cmd.Parameters.AddWithValue("@Ngaybatdau", updateDto.courseUpdate.Ngaybatdau);
+                        cmd.Parameters.AddWithValue("@Thoigianthi", updateDto.courseUpdate.Thoigianthi);
+                        cmd.Parameters.AddWithValue("@Thoiluongthi", updateDto.courseUpdate.Thoiluongthi);
+                        cmd.Parameters.AddWithValue("@Socauhoi", updateDto.courseUpdate.Socauhoi);
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
                             await transaction.RollbackAsync();
                             return false;
                         }
                     }
+
                     await transaction.CommitAsync();
                 }
                 catch (Exception ex)
@@ -354,80 +511,6 @@ namespace TPS_FullStack.Server.Modules.Admin
             return true;
 
             throw new NotImplementedException();
-        }
-        private async Task<bool> courserelationInsert(SqlConnection conn, SqlTransaction transaction, CourseUpdateDto dto)
-        {
-            var queryCourseTopicInsert = @"INSERT INTO dbo.Khoahoc_Chuyende(MaID, KhoahocID, ChuyendeID)
-                                            VALUES (@MaID, @KhoahocID, @ChuyendeID)";
-            var queryCourseTeacherInsert = @"INSERT INTO dbo.Khoahoc_Giangvien(MaID, KhoahocID, GiangvienID)
-                                            VALUES (@MaID, @KhoahocID, @GiangvienID)";
-            var queryCourseStudentInsert = @"INSERT INTO dbo.Khoahoc_Hocvien(MaID, KhoahocID, HocvienID)
-                                            VALUES (@MaID, @KhoahocID, @HocvienID)";
-            try
-            {
-                //Step 1: Insert course
-
-                //Step 2: Insert Topics list
-                foreach (var topic in dto.courseTopics)
-                {
-                    using (var cmd = new SqlCommand(queryCourseTopicInsert, conn, transaction))
-                    {
-                        cmd.Parameters.AddWithValue("@MaID", topic.MaID == null ? Guid.NewGuid().ToString()
-                                                                                : topic.MaID);
-                        cmd.Parameters.AddWithValue("@KhoahocID", dto.courseUpdate.MaID);
-                        cmd.Parameters.AddWithValue("@ChuyendeID", topic.MaID);
-
-                        if (await cmd.ExecuteNonQueryAsync() < 0)
-                        {
-                            transaction.Rollback();
-                            return false;
-                        }
-                    }
-                }
-                //Step 3: Insert Teachers list
-                foreach (var teacher in dto.courseTeachers)
-                {
-                    using (var cmd = new SqlCommand(queryCourseTeacherInsert, conn, transaction))
-                    {
-                        cmd.Parameters.AddWithValue("@MaID", teacher.MaID == null ? Guid.NewGuid().ToString()
-                                                                                : teacher.MaID);
-                        cmd.Parameters.AddWithValue("@KhoahocID", dto.courseUpdate.MaID);
-                        cmd.Parameters.AddWithValue("@GiangvienID", teacher.MaID);
-
-                        if (await cmd.ExecuteNonQueryAsync() < 0)
-                        {
-                            transaction.Rollback();
-                            return false;
-                        }
-                    }
-                }
-                //Step 4: Insert Students list
-                foreach (var student in dto.courseStudents)
-                {
-                    using (var cmd = new SqlCommand(queryCourseStudentInsert, conn, transaction))
-                    {
-                        cmd.Parameters.AddWithValue("@MaID", student.MaID == null ? Guid.NewGuid().ToString()
-                                                                                : student.MaID);
-                        cmd.Parameters.AddWithValue("@KhoahocID", dto.courseUpdate.MaID);
-                        cmd.Parameters.AddWithValue("@HocvienID", student.MaID);
-
-                        if (await cmd.ExecuteNonQueryAsync() < 0)
-                        {
-                            transaction.Rollback();
-                            return false;
-                        }
-                    }
-                }
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            {
-
-                transaction.Rollback();
-                _logger.LogError(ex.Message);
-                return false;
-            }
-            return true;
         }
     }
 
