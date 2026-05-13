@@ -26,6 +26,8 @@
         public string ChungchiID { get; set; }
         public string HocvienID { get; set; }
         public string HocvienTen { get; set; }
+        public DateTime Ngaycap {get; set;}
+        public DateTime Ngayhethan {get; set;}
     }
 
 }
