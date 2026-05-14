@@ -29,7 +29,7 @@ namespace TPS_FullStack.Server.Modules.JWT
             {
                 return new ServiceDefault<string>
                 {
-                    Success = true,
+                    statusCode = StatusCodes.Status200OK,
                     Message = "Complete generate refreshtoken",
                     Data = refreshToken
                 };
@@ -38,7 +38,7 @@ namespace TPS_FullStack.Server.Modules.JWT
             {
                 return new ServiceDefault<string>
                 {
-                    Success = false,
+                    statusCode = StatusCodes.Status500InternalServerError,
                     Message = "Generating refreshtoken fail"
                 };
             }

@@ -81,14 +81,14 @@ namespace TPS_FullStack.Server.Modules.Admin
             {
                 return new ServiceDefault<Chuyende_ChitietDto>
                 {
-                    Success = false,
-                    Message = "Can not found topic detail"
+                    statusCode = StatusCodes.Status400BadRequest,
+                    Message = "Can not find topic detail"
                 };
             }
 
             return new ServiceDefault<Chuyende_ChitietDto>
             {
-                Success = true,
+                statusCode = StatusCodes.Status200OK,
                 Message = "Complete read topic detail of " + MaID,
             };
 
