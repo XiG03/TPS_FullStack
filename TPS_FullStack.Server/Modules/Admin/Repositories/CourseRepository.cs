@@ -55,7 +55,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var queryCourseInfo = @"SELECT kh.MaID, kh.Ten, kh.Mota, kh.Diemdat, kh.Sobuoihoc, kh.Thu, kh.Thoiluonghoc, kh.Thoiluongthi, kh.Socauhoi, kh.Ngaybatdau
                                     FROM dbo.Khoahoc kh
                                     WHERE kh.MaID = @MaID AND kh.Khongsudung = 0";
-            var queryCourseTeachers = @"SELECT kh_gv.MaID, gv.GiangvienID, gv.Hoten
+            var queryCourseTeachers = @"SELECT kh_gv.MaID, gv.MaID, gv.Hoten
                                         FROM dbo.Giangvien gv
                                         JOIN Khoahoc_Giangvien kh_gv ON kh_gv.GiangvienID = gv.MaID
                                         WHERE kh_gv.KhoahocID = @MaID";
@@ -235,8 +235,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     using (var cmd = new SqlCommand(queryCourseInsert, conn, transaction))
                     {
                         createDto.courseDto.MaID = Guid.NewGuid().ToString();
-                        cmd.Parameters.AddWithValue("@MaID", createDto.courseDto.MaID == null ? Guid.NewGuid().ToString()
-                                                                                            : createDto.courseDto.MaID);
+                        cmd.Parameters.AddWithValue("@MaID", createDto.courseDto.MaID = Guid.NewGuid().ToString());
                         cmd.Parameters.AddWithValue("@Ten", createDto.courseDto.Ten);
                         cmd.Parameters.AddWithValue("@Mota", createDto.courseDto.Mota);
                         cmd.Parameters.AddWithValue("@Diemdat", createDto.courseDto.Diemdat);
@@ -258,8 +257,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     {
                         using (var cmd = new SqlCommand(queryCourseTopicInsert, conn, transaction))
                         {
-                            cmd.Parameters.AddWithValue("@MaID", topic.MaID == null ? Guid.NewGuid().ToString()
-                                                                                    : topic.MaID);
+                            cmd.Parameters.AddWithValue("@MaID", topic.MaID = Guid.NewGuid().ToString());
                             cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
                             cmd.Parameters.AddWithValue("@ChuyendeID", topic.ChuyendeID);
                             cmd.Parameters.AddWithValue("@Socauhoi", topic.SoCauhoi);
@@ -293,8 +291,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     {
                         using (var cmd = new SqlCommand(queryCourseStudentInsert, conn, transaction))
                         {
-                            cmd.Parameters.AddWithValue("@MaID", student.MaID == null ? Guid.NewGuid().ToString()
-                                                                                    : student.MaID);
+                            cmd.Parameters.AddWithValue("@MaID", student.MaID = Guid.NewGuid().ToString());
                             cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
                             cmd.Parameters.AddWithValue("@HocvienID", student.HocvienID);
                             cmd.Parameters.AddWithValue("@Diem", student.Diem);
@@ -312,8 +309,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     {
                         using (var cmd = new SqlCommand(queryCourseScheduleInsert, conn, transaction))
                         {
-                            cmd.Parameters.AddWithValue("@MaID", schedule.MaID == null ? Guid.NewGuid().ToString()
-                                                                                        : schedule.MaID);
+                            cmd.Parameters.AddWithValue("@MaID", schedule.MaID = Guid.NewGuid().ToString());
                             cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
                             cmd.Parameters.AddWithValue("@Ngaydukien", schedule.Ngaydukien);
                             cmd.Parameters.AddWithValue("@Ngaythucte", schedule.Ngaythucte);
@@ -467,6 +463,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     }
                     using (var cmd = new SqlCommand(querycourseUpdate, conn, transaction))
                     {
+                        cmd.Parameters.AddWithValue("@MaID", updateDto.courseUpdate.MaID);
                         cmd.Parameters.AddWithValue("@Ten", updateDto.courseUpdate.Ten);
                         cmd.Parameters.AddWithValue("@Mota", updateDto.courseUpdate.Mota);
                         cmd.Parameters.AddWithValue("@Diemdat", updateDto.courseUpdate.Diemdat);

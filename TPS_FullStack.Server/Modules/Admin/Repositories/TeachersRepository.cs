@@ -349,6 +349,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
                             {
+                                await transaction.RollbackAsync();
                                 return false;
                             }
                         }
@@ -360,6 +361,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                         cmd.Parameters.AddWithValue("@GiangvienID", updateDto.MaID);
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
+                            await transaction.RollbackAsync();
                             return false;
                         }
                     }

@@ -1,5 +1,6 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Identity.Client;
@@ -74,27 +75,31 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         public async Task<CourseCreateDto> CourseInsertAsync(CourseCreateDto createDto)
         {
-            try
+            if (createDto.courseDto.Thu != null)
             {
-                // Tach chuoi thu va don no thanh list int
-                var studyDays = new List<int>();
-                foreach (var item in createDto.courseDto.Thu.Split("#"))
+                try
                 {
-                    if (int.TryParse(item, out int number))
+                    // Tach chuoi thu va don no thanh list int
+                    var studyDays = new List<int>();
+                    foreach (var item in createDto.courseDto.Thu.Split("#"))
                     {
-                        studyDays.Add(number);
+                        if (int.TryParse(item, out int number))
+                        {
+                            studyDays.Add(number);
+                        }
                     }
-                }
-                List<CourseScheduleDto> list = new List<CourseScheduleDto>();
-                list = this.createSchedules(list, studyDays, createDto.courseDto.Ngaybatdau, createDto.courseDto.Sobuoihoc, 0);
-                createDto.courseScheduleDtos = list;
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
 
+                    if (studyDays.Count == 0) return null;
+                    List<CourseScheduleDto> list = new List<CourseScheduleDto>();
+                    list = this.createSchedules(list, studyDays, createDto.courseDto.Ngaybatdau, createDto.courseDto.Sobuoihoc, 0);
+                    createDto.courseScheduleDtos = list;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                    return null;
+                }
+            }
             var result = await _courseRepository.CourseInsertAsync(createDto);
             if (!result)
             {
@@ -108,7 +113,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             try
             {
-                if(updateDto.courseUpdate.Ngaybatdau != null)
+                if (updateDto.courseUpdate.Ngaybatdau != null)
                 {
                     return null;
                 }
@@ -120,10 +125,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                         studyDays.Add(number);
                     }
                 }
+                if (studyDays.Count == 0) return null;
                 List<CourseScheduleDto> list = new List<CourseScheduleDto>();
                 list = this.createSchedules(list, studyDays, updateDto.courseUpdate.Ngaybatdau, updateDto.courseUpdate.Sobuoihoc, 0);
                 updateDto.courseScheduleUpdates = list;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
                 return null;

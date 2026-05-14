@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using TPS_FullStack.Server;
 using TPS_FullStack.Server.AppDbContext;
 using TPS_FullStack.Server.Entities;
 using TPS_FullStack.Server.Modules.Admin;
@@ -59,6 +60,8 @@ builder.Services.AddScoped<IStudentsRepository,StudentsRepository>();
 builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddScoped<ICourseRepository,CourseRepository>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
+builder.Services.AddScoped<ICertificateRepository,CertificateRepository>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
 
 
 

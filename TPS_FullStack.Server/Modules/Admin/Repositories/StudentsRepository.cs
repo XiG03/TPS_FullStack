@@ -69,7 +69,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                     }
                 }
                 return studentDetail;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
                 return null;
@@ -144,36 +145,58 @@ namespace TPS_FullStack.Server.Modules.Admin
 
             using (var conn = new SqlConnection(connectionString))
             {
-                var user = new AppUser
-                {
-                    Id = createDto.MaID,
-                    UserName = createDto.Email,
-                    PhoneNumber = createDto.Dienthoai,
-                    Email = createDto.Email,
-                    Kichhoat = false
-                };
-                var result = await _userManager.CreateAsync(user);
 
-                if (!result.Succeeded)
-                {
-                    return false;
-                }
                 await conn.OpenAsync();
-                using (var cmd = new SqlCommand(queryInsert, conn))
+                using var trans = conn.BeginTransaction();
+                try
                 {
-                    cmd.Parameters.AddWithValue("@MaID", createDto.MaID);
-                    cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten);
-                    cmd.Parameters.AddWithValue("@Email", createDto.Email);
-                    cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
-                    if (await cmd.ExecuteNonQueryAsync() < 0)
+                    var user = new AppUser
                     {
-                        var student =await _userManager.FindByIdAsync(createDto.MaID);
-                        await _userManager.DeleteAsync(student);
+                        Id = createDto.MaID,
+                        UserName = createDto.Email,
+                        PhoneNumber = createDto.Dienthoai,
+                        Email = createDto.Email,
+                        Kichhoat = false
+                    };
+                    var result = await _userManager.CreateAsync(user);
+
+                    if (!result.Succeeded)
+                    {
+                        await trans.RollbackAsync();
                         return false;
                     }
+
+                    using (var cmd = new SqlCommand(queryInsert, conn, trans))
+                    {
+                        cmd.Parameters.AddWithValue("@MaID", createDto.MaID);
+                        cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten);
+                        cmd.Parameters.AddWithValue("@Email", createDto.Email);
+                        cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
+                        cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh);
+                        cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh);
+                        cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi);
+                        if (await cmd.ExecuteNonQueryAsync() < 0)
+                        {
+                            var student = await _userManager.FindByIdAsync(createDto.MaID);
+                            await _userManager.DeleteAsync(student);
+                            await trans.RollbackAsync();
+                            return false;
+                        }
+                    }
+                    await trans.CommitAsync();
+                    return true;
                 }
+                catch (Exception ex)
+                {
+                    var student = await _userManager.FindByIdAsync(createDto.MaID);
+                    await _userManager.DeleteAsync(student);
+                    await trans.RollbackAsync();
+                    _logger.LogError(ex.Message);
+                    return false;
+                }
+
+
             }
-            return true;
             throw new NotImplementedException();
         }
 

@@ -95,28 +95,6 @@ namespace TPS_FullStack.Server.Modules.Admin
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceDefault<Chuyende_ChitietDto>> GetTopicDetail(string MaID)
-        {
-            var result = await _topicRepository.GetTopicByID(MaID);
-
-            if (result == null)
-            {
-                return new ServiceDefault<Chuyende_ChitietDto>
-                {
-                    statusCode = StatusCodes.Status400BadRequest,
-                    Message = "Can not find topic detail"
-                };
-            }
-
-            return new ServiceDefault<Chuyende_ChitietDto>
-            {
-                statusCode = StatusCodes.Status200OK,
-                Message = "Complete read topic detail of " + MaID,
-            };
-
-            throw new NotImplementedException();
-        }
-
         public async Task<TopicUpdateDto> UpdateTopicAsync(TopicUpdateDto chuyendeDto)
         {
             var result = await _topicRepository.UpdateTopicAsync(chuyendeDto);
