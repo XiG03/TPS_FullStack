@@ -18,9 +18,9 @@ namespace TPS_FullStack.Server.Entities
         [Column(TypeName ="DATETIME")]
         public DateTime? Ngay { get; set; }
         [Column(TypeName ="DATETIME")]
-        public DateTime? Tugio { get; set; }
+        public DateTime? Batdaudukien { get; set; }
         [Column(TypeName ="DATETIME")]
-        public DateTime? Dengio { get; set; }
+        public DateTime? Ketthucdukien { get; set; }
     }
     public class Lichhoc_Hocvien_Diemdanh
     {

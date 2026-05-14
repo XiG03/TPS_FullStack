@@ -744,7 +744,7 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<string>("MaID")
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<DateTime>("Dengio")
+                    b.Property<DateTime>("Ketthucdukien")
                         .HasColumnType("DATETIME");
 
                     b.Property<string>("GiangvienID")
@@ -757,7 +757,7 @@ namespace TPS_FullStack.Server.Migrations
                     b.Property<DateTime>("Ngay")
                         .HasColumnType("DATETIME");
 
-                    b.Property<DateTime>("Tugio")
+                    b.Property<DateTime>("Batdaudukien")
                         .HasColumnType("DATETIME");
 
                     b.HasKey("MaID");

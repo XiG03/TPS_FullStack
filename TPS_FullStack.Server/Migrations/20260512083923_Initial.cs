@@ -209,8 +209,8 @@ namespace TPS_FullStack.Server.Migrations
                     LichhocID = table.Column<string>(type: "NVARCHAR(50)", nullable: true),
                     GiangvienID = table.Column<string>(type: "NVARCHAR(50)", nullable: false),
                     Ngay = table.Column<DateTime>(type: "DATETIME", nullable: false),
-                    Tugio = table.Column<DateTime>(type: "DATETIME", nullable: false),
-                    Dengio = table.Column<DateTime>(type: "DATETIME", nullable: false)
+                    Batdaudukien = table.Column<DateTime>(type: "DATETIME", nullable: false),
+                    Ketthucdukien = table.Column<DateTime>(type: "DATETIME", nullable: false)
                 },
                 constraints: table =>
                 {
