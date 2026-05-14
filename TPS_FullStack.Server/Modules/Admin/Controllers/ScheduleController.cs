@@ -46,7 +46,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _scheduleService.ScheduleDeleteAsync(MaID);
             return StatusCode(result.statusCode, result);
         }
-        [HttpPost]
+        [HttpPost("teacherattendance")]
         public async Task<IActionResult> TeacherAttendance(ScheduleTeacherAttendanceDto attendanceDto)
         {
             if (!ModelState.IsValid)
@@ -56,7 +56,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _scheduleService.ScheduleTeacherAttendanceAsync(attendanceDto);
             return StatusCode(result.statusCode, result);
         }
-        [HttpPost]
+        [HttpPost("studentattendance")]
         public async Task<IActionResult> StudentAttendance(ScheduleStudentAttendanceDto attendanceDto)
         {
             if (!ModelState.IsValid)

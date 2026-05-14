@@ -78,7 +78,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             }
             return Ok();
         }
-        [HttpPut]
+        [HttpPut("studentscore")]
         public async Task<IActionResult> UpdateStudentScoreAsync(updateStudentScoreDto updateDto)
         {
             if (!ModelState.IsValid)
