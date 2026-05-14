@@ -70,6 +70,9 @@ namespace TPS_FullStack.Server.Modules.Admin
             var queryCourseSchedules = @"SELECT lh.MaID, lh.Ngaydukien, lh.Ngaythucte, lh.Tugio, lh.Dengio
                                         FROM dbo.Lichhoc lh
                                         WHERE lh.KhoahocID = @MaID";
+            // Danh muc cac giang vien va hoc vien diem danh
+            var queryScheduleTeacherAttendance = @"";
+            var queryScheduleStudentAttendance = @"";
             // var queryCourseExams -- Lay danh muc cac bai thi da duoc thuc hien
             var courseDetail = new CourseDetailDto
             {
@@ -358,9 +361,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                                     	UpdatedAt = SYSDATETIME(),
                                     	UpdatedBy = ''
                                     WHERE MaID = @MaID";
-            var querycourseTopicDelete = @"DELETE dbo.Khoahoc_Chuyende WHERE KhoahocID = @MaID";
-            var querycourseTeacherDelete = @"DELETE dbo.Khoahoc_Giangvien WHERE KhoahocID = @MaID";
-            var querycourseStudentDelete = @"DELETE dbo.Khoahoc_Hocvien WHERE KhoahocID = @MaID";
+            var queryDelete =           @"DELETE dbo.Khoahoc_Chuyende WHERE KhoahocID = @MaID;"
+                                        + @"DELETE dbo.Khoahoc_Giangvien WHERE KhoahocID = @MaID;"
+                                        + @"DELETE dbo.Khoahoc_Hocvien WHERE KhoahocID = @MaID;"
+                                        + @"DELETE dbo.Lichhoc_Giangvien_Diemdanh WHERE KhoahocID = @MaID;"
+                                        + @"DELETE dbo.Lichhoc_Hocvien_Diemdanh WHERE KhoahocID = @MaID;"
+                                        + @"DELETE dbo.Lichhoc WHERE KhoahocID = @MaID;";
 
             var queryCourseTopicInsert = @"INSERT INTO dbo.Khoahoc_Chuyende(MaID, KhoahocID, ChuyendeID, Socauhoi)
                                             VALUES (@MaID, @KhoahocID, @ChuyendeID, @Socauhoi)";
@@ -377,7 +383,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                 var transaction = conn.BeginTransaction();
                 try
                 {
-                    using (var cmd = new SqlCommand(querycourseTopicDelete, conn, transaction))
+                    using (var cmd = new SqlCommand(queryDelete, conn, transaction))
                     {
                         cmd.Parameters.AddWithValue("@MaID", updateDto.courseUpdate.MaID);
 
@@ -387,27 +393,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                             return false;
                         }
                     }
-                    using (var cmd = new SqlCommand(querycourseTeacherDelete, conn, transaction))
-                    {
-                        cmd.Parameters.AddWithValue("@MaID", updateDto.courseUpdate.MaID);
-
-                        if (await cmd.ExecuteNonQueryAsync() < 0)
-                        {
-                            await transaction.RollbackAsync();
-                            return false;
-                        }
-                    }
-                    using (var cmd = new SqlCommand(querycourseStudentDelete, conn, transaction))
-                    {
-                        cmd.Parameters.AddWithValue("@MaID", updateDto.courseUpdate.MaID);
-
-                        if (await cmd.ExecuteNonQueryAsync() < 0)
-                        {
-                            await transaction.RollbackAsync();
-                            return false;
-                        }
-                    }
-
                     foreach (var topic in updateDto.courseTopics)
                     {
                         using (var cmd = new SqlCommand(queryCourseTopicInsert, conn, transaction))
