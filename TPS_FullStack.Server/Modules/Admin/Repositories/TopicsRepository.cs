@@ -78,10 +78,11 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                     //using (var transaction = conn.BeginTransaction())
                     //{
+                    using var trans = conn.BeginTransaction();
                     try
                     {
                         // Execute 1: Them chuyen de moi
-                        using (var cmd = new SqlCommand(queryTopicCreate, conn))
+                        using (var cmd = new SqlCommand(queryTopicCreate, conn, trans))
                         {
                             //warning
                             cmd.Parameters.AddWithValue("@MaID", chuyendeDto.MaID);
@@ -90,6 +91,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                             if (await cmd.ExecuteNonQueryAsync() <= 0)
                             {
+                                await trans.RollbackAsync();
                                 return false;
                             }
                         }
@@ -100,7 +102,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 tailieu.MaID = Guid.NewGuid();
                                 tailieu.ChuyendeID = chuyendeDto.MaID;
 
-                                using (var cmd = new SqlCommand(queryDocumentCreate, conn))
+                                using (var cmd = new SqlCommand(queryDocumentCreate, conn, trans))
                                 {
                                     cmd.Parameters.AddWithValue("@MaID", tailieu.MaID);
                                     cmd.Parameters.AddWithValue("@ChuyendeID", tailieu.ChuyendeID);
@@ -110,6 +112,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                                     if (await cmd.ExecuteNonQueryAsync() <= 0)
                                     {
+                                        await trans.RollbackAsync();
                                         return false;
                                     }
                                 }
@@ -131,7 +134,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 cauhoi.MaID = Guid.NewGuid();
                                 cauhoi.ChuyendeID = chuyendeDto.MaID;
 
-                                using (var cmd = new SqlCommand(queryQuestionCreate, conn))
+                                using (var cmd = new SqlCommand(queryQuestionCreate, conn, trans))
                                 {
                                     cmd.Parameters.AddWithValue("@MaID", cauhoi.MaID);
                                     cmd.Parameters.AddWithValue("@ChuyendeID", cauhoi.ChuyendeID);
@@ -140,6 +143,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                                     if (await cmd.ExecuteNonQueryAsync() <= 0)
                                     {
+                                        await trans.RollbackAsync();
                                         return false;
                                     }
                                 }
@@ -151,7 +155,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                     {
                                         dapan.MaID = Guid.NewGuid();
                                         dapan.Chuyende_CauhoiID = cauhoi.MaID;
-                                        using (var cmd = new SqlCommand(queryAnswerCreate, conn))
+                                        using (var cmd = new SqlCommand(queryAnswerCreate, conn, trans))
                                         {
                                             cmd.Parameters.AddWithValue("@MaID", dapan.MaID);
                                             cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
@@ -161,6 +165,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                                             if (await cmd.ExecuteNonQueryAsync() <= 0)
                                             {
+                                                trans.RollbackAsync();
                                                 return false;
                                             }
                                         }
@@ -168,6 +173,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 }
                             }
                         }
+                        await trans.CommitAsync();
                     }
                     catch (Exception ex)
                     {
@@ -386,102 +392,116 @@ namespace TPS_FullStack.Server.Modules.Admin
                 await conn.OpenAsync();
 
                 //Update Topic information
-                using (var cmd = new SqlCommand(queryTopicUpdate, conn))
+                using var trans = conn.BeginTransaction();
+                try
                 {
-                    cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten);
-                    cmd.Parameters.AddWithValue("@Mota", chuyendeDto.Mota);
-                    // cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten); -- Update updated by
-                    cmd.Parameters.AddWithValue("@MaID", chuyendeDto.MaID);
-
-                    if (await cmd.ExecuteNonQueryAsync() < 0)
+                    using (var cmd = new SqlCommand(queryTopicUpdate, conn, trans))
                     {
-                        return false;
-                    }
-                }
-
-                #region //Documents
-
-                //#1 Delete document if have topicID
-                using (var cmd = new SqlCommand(queryDocDelete, conn))
-                {
-                    cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
-
-                    await cmd.ExecuteNonQueryAsync();
-                }
-
-                foreach (var docs in chuyendeDto.DocumentsDto)
-                {
-                    using (var cmd = new SqlCommand(queryDocInsert, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@MaID", docs.MaID == null ? Guid.NewGuid().ToString()
-                                                                                : docs.MaID);
-                        cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
-                        cmd.Parameters.AddWithValue("@Tieude",docs.Tieude);
-                        cmd.Parameters.AddWithValue("@Ngaytao",docs.Ngaytao);
-                        cmd.Parameters.AddWithValue("@Loaitailieu",docs.Loaitailieu);
-                        cmd.Parameters.AddWithValue("@Kichthuoc", docs.Kichthuoc);
+                        cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten);
+                        cmd.Parameters.AddWithValue("@Mota", chuyendeDto.Mota);
+                        // cmd.Parameters.AddWithValue("@Ten", chuyendeDto.Ten); -- Update updated by
+                        cmd.Parameters.AddWithValue("@MaID", chuyendeDto.MaID);
 
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
+                            await trans.RollbackAsync();
                             return false;
                         }
                     }
-                }
 
-                #endregion
+                    #region //Documents
 
-                #region //Questions
-
-                //#1 Delete Ans and Ques
-                using (var cmd = new SqlCommand(queryAnsDelete, conn))
-                {
-                    cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
-                    await cmd.ExecuteNonQueryAsync();
-                }
-                using (var cmd = new SqlCommand(queryQuesDelete, conn))
-                {
-                    cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
-                    await cmd.ExecuteNonQueryAsync();
-                }
-                //#2 Insert Ques
-                foreach (var ques in chuyendeDto.QuestionsDtos)
-                {
-                    using (var cmd = new SqlCommand(queryQuesInsert, conn))
+                    //#1 Delete document if have topicID
+                    using (var cmd = new SqlCommand(queryDocDelete, conn, trans))
                     {
-                        cmd.Parameters.AddWithValue("@MaID", ques.MaID == null ? Guid.NewGuid().ToString()
-                                                                                : ques.MaID);
                         cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
-                        cmd.Parameters.AddWithValue("@Ten",ques.Ten);
-                        cmd.Parameters.AddWithValue("@Diem",ques.Diem);
 
-                        if (await cmd.ExecuteNonQueryAsync() < 0)
-                        {
-                            return false;
-                        }
+                        await cmd.ExecuteNonQueryAsync();
                     }
-                    //#3 Insert Ans - Done
-                    foreach (var ans in ques.AnswersDtos)
+
+                    foreach (var docs in chuyendeDto.DocumentsDto)
                     {
-                        using (var cmd = new SqlCommand(queryAnsInsert, conn))
+                        using (var cmd = new SqlCommand(queryDocInsert, conn, trans))
                         {
-                            cmd.Parameters.AddWithValue("@MaID", ans.MaID == null ? Guid.NewGuid().ToString()
-                                                                                    : ans.MaID);
-                            cmd.Parameters.AddWithValue("@CauhoiID", ques.MaID);
+                            cmd.Parameters.AddWithValue("@MaID", docs.MaID == null ? Guid.NewGuid().ToString()
+                                                                                    : docs.MaID);
                             cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
-                            cmd.Parameters.AddWithValue("@Ten",ans.Ten);
-                            cmd.Parameters.AddWithValue("@Dung",ans.Dung);
+                            cmd.Parameters.AddWithValue("@Tieude", docs.Tieude);
+                            cmd.Parameters.AddWithValue("@Ngaytao", docs.Ngaytao);
+                            cmd.Parameters.AddWithValue("@Loaitailieu", docs.Loaitailieu);
+                            cmd.Parameters.AddWithValue("@Kichthuoc", docs.Kichthuoc);
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
                             {
+                                await trans.RollbackAsync();
                                 return false;
                             }
                         }
                     }
-                }
-                #endregion
-                return true;
-            }
 
+                    #endregion
+
+                    #region //Questions
+
+                    //#1 Delete Ans and Ques
+                    using (var cmd = new SqlCommand(queryAnsDelete, conn, trans))
+                    {
+                        cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                    using (var cmd = new SqlCommand(queryQuesDelete, conn, trans))
+                    {
+                        cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                    //#2 Insert Ques
+                    foreach (var ques in chuyendeDto.QuestionsDtos)
+                    {
+                        using (var cmd = new SqlCommand(queryQuesInsert, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@MaID", ques.MaID == null ? Guid.NewGuid().ToString()
+                                                                                    : ques.MaID);
+                            cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                            cmd.Parameters.AddWithValue("@Ten", ques.Ten);
+                            cmd.Parameters.AddWithValue("@Diem", ques.Diem);
+
+                            if (await cmd.ExecuteNonQueryAsync() < 0)
+                            {
+                                await trans.RollbackAsync();
+                                return false;
+                            }
+                        }
+                        //#3 Insert Ans - Done
+                        foreach (var ans in ques.AnswersDtos)
+                        {
+                            using (var cmd = new SqlCommand(queryAnsInsert, conn, trans))
+                            {
+                                cmd.Parameters.AddWithValue("@MaID", ans.MaID == null ? Guid.NewGuid().ToString()
+                                                                                        : ans.MaID);
+                                cmd.Parameters.AddWithValue("@CauhoiID", ques.MaID);
+                                cmd.Parameters.AddWithValue("@ChuyendeID", chuyendeDto.MaID);
+                                cmd.Parameters.AddWithValue("@Ten", ans.Ten);
+                                cmd.Parameters.AddWithValue("@Dung", ans.Dung);
+
+                                if (await cmd.ExecuteNonQueryAsync() < 0)
+                                {
+                                    await trans.RollbackAsync();
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+                    await trans.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await trans.RollbackAsync();
+                    _logger.LogError(ex.Message);
+                    return false;
+                }
+            }
             return false;
         }
     }

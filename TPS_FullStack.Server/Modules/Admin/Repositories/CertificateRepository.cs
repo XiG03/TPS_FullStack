@@ -330,6 +330,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                             return false;
                         }
                     }
+                    await trans.CommitAsync();
+                    return true;
 
                 }
                 catch (Exception ex)

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
@@ -50,7 +50,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                 return new ServiceDefault<CertificateDetailDto>
                 {
                     statusCode = StatusCodes.Status200OK,
-                    Message = "Server khong tim thay chung chi",
+                    Message = "Server tim thay chung chi " + MaID,
                     Data = result
                 };
             }
@@ -175,7 +175,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                 {
                     statusCode = StatusCodes.Status200OK,
                     Message = "Server update thanh cong",
-                    Data = false
+                    Data = true
                 };
             }
             throw new NotImplementedException();

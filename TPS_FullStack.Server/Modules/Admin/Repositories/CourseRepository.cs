@@ -463,6 +463,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     }
                     using (var cmd = new SqlCommand(querycourseUpdate, conn, transaction))
                     {
+                        cmd.Parameters.AddWithValue("@MaID", updateDto.courseUpdate.MaID);
                         cmd.Parameters.AddWithValue("@Ten", updateDto.courseUpdate.Ten);
                         cmd.Parameters.AddWithValue("@Mota", updateDto.courseUpdate.Mota);
                         cmd.Parameters.AddWithValue("@Diemdat", updateDto.courseUpdate.Diemdat);
