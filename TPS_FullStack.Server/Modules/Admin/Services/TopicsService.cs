@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Identity.Client;
 
@@ -13,7 +14,28 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         public async Task<Chuyende_ChitietDto> CreateTopic(Chuyende_ChitietDto chuyendeDto)
-        {   
+        {
+            #region //Kiem tra so luong dapan dung co bang diem khong?
+            foreach (var cauhoi in chuyendeDto.Chuyende_CauhoiDtos)
+            {
+
+                // Linq var dapandung = cauhoi.Chuyende_DapanDtos.Count(x => x.Dung);
+                #region // foreach voi list
+                var dapandung = 0;
+                foreach (var dapan in cauhoi.Chuyende_DapanDtos)
+                {
+                    if (dapan.Dung)
+                    {
+                        dapandung++;
+                    }
+                }
+                #endregion // end foreach 
+                if (cauhoi.Diem != dapandung)
+                {
+                    return null;
+                }
+            }
+            #endregion
             var result = await _topicRepository.CreateTopicAsync(chuyendeDto);
             if (!result)
             {
@@ -36,24 +58,24 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var result = await _topicRepository.DeleteTopicByIDAsync(MaID);
 
-            if(result == false)
+            if (result == false)
             {
                 return false;
             }
 
-            if(result == true)
+            if (result == true)
             {
                 return true;
             }
 
             throw new NotImplementedException();
         }
-        
+
         public async Task<List<TopicGetAllDto>> GetAllTopicAsync() // Done
         {
             var data = await _topicRepository.GetTopicsAsync();
 
-            if(data != null)
+            if (data != null)
             {
                 return data;
             }
@@ -65,7 +87,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var data = await _topicRepository.GetTopicByID(MaID);
 
-            if(data != null)
+            if (data != null)
             {
                 return data;
             }
@@ -77,7 +99,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var result = await _topicRepository.GetTopicByID(MaID);
 
-            if(result == null)
+            if (result == null)
             {
                 return new ServiceDefault<Chuyende_ChitietDto>
                 {

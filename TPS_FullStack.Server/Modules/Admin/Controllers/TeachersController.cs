@@ -28,12 +28,11 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<IActionResult> TeacherDetail(string MaId)
         {
             var result = await _teacherService.TeacherDetailAsync(MaId);
-            if(result != null)
+            if (result != null)
             {
-                return BadRequest();
+                return Ok(result);
             }
-
-            return Ok(result);
+            return BadRequest();
         }
         [HttpPost("create")]
         public async Task<IActionResult> CreateTeacher(TeacherCreateDto createDto)
@@ -53,9 +52,9 @@ namespace TPS_FullStack.Server.Modules.Admin
 
 
         [HttpDelete("{MaId}")]
-        public async Task<IActionResult> DeleteTeacherId(string MaID)
+        public async Task<IActionResult> DeleteTeacherId(string MaId)
         {
-            var result = await _teacherService.DeleteTeacherAsync(MaID);
+            var result = await _teacherService.DeleteTeacherAsync(MaId);
 
             if (result)
             {
@@ -70,7 +69,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var result = await _teacherService.UpdateTeacherAsync(updateDto);
 
-            if(result == null)
+            if (result == null)
             {
                 return BadRequest("Can not update teacher ");
             }

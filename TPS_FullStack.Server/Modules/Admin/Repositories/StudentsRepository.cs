@@ -109,7 +109,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryGetAll = @"SELECT hv.MaID, hv.Hoten, hv.Email, hv.Dienthoai
-                            FROM dbo.Hocvien hv";
+                            FROM dbo.Hocvien hv ";
             var students = new List<StudentGetAllDto>();
             using (var conn = new SqlConnection(connectionString))
             {
@@ -138,26 +138,26 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<bool> StudentInsertAsync(StudentCreateDto createDto)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            var queryInsert = @"INSERT INTO dbo.Hocvien(MaID, Hoten, Email, Dienthoai, CreatedAt, CreatedBy)
-                                VALUES (@MaID, @Hoten, @Email, @Dienthoai, SYSDATETIME(), '')";
+            var queryInsert = @"INSERT INTO dbo.Hocvien(MaID, UserId, Hoten, Email, Dienthoai, Ngaysinh, Gioitinh, Diachi, CreatedAt, CreatedBy)
+                                VALUES (@MaID, @MaID,  @Hoten, @Email, @Dienthoai, @Ngaysinh, @Gioitinh, @Diachi, SYSDATETIME(), '')";
             createDto.MaID = Guid.NewGuid().ToString();
-            var user = new AppUser
-            {
-                Id = createDto.MaID,
-                UserName = createDto.Email,
-                PhoneNumber = createDto.Dienthoai,
-                Email = createDto.Email,
-                Kichhoat = false
-            };
-            var result = await _userManager.CreateAsync(user);
-
-            if (!result.Succeeded)
-            {
-                return false;
-            }
 
             using (var conn = new SqlConnection(connectionString))
             {
+                var user = new AppUser
+                {
+                    Id = createDto.MaID,
+                    UserName = createDto.Email,
+                    PhoneNumber = createDto.Dienthoai,
+                    Email = createDto.Email,
+                    Kichhoat = false
+                };
+                var result = await _userManager.CreateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
                 await conn.OpenAsync();
                 using (var cmd = new SqlCommand(queryInsert, conn))
                 {
@@ -167,6 +167,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                     cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
                     if (await cmd.ExecuteNonQueryAsync() < 0)
                     {
+                        var student =await _userManager.FindByIdAsync(createDto.MaID);
+                        await _userManager.DeleteAsync(student);
                         return false;
                     }
                 }
