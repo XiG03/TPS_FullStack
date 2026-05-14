@@ -26,7 +26,7 @@ namespace TPS_FullStack.Server.Modules.Auth
             {
                 return new ServiceDefault<TokenResponseDto>
                 {
-                    Success = false,
+                    statusCode = StatusCodes.Status401Unauthorized,
                     Message = "Account not found"
                 };
             }
@@ -37,26 +37,26 @@ namespace TPS_FullStack.Server.Modules.Auth
             {
                 return new ServiceDefault<TokenResponseDto>
                 {
-                    Success = false,
+                    statusCode = StatusCodes.Status401Unauthorized,
                     Message = "Invalid password"
                 };
             }
             var refreshtoken = await _jwtService.GenerateRefreshTokenAsync(user.Id);
             var accessToken = await _jwtService.GenerateAccessTokenAsync(user.Id, null); // Sua role
-            if (!refreshtoken.Success)
+            if (refreshtoken.statusCode != 500)
             {
                 return new ServiceDefault<TokenResponseDto>
                 {
-                    Success = false,
+                    statusCode = StatusCodes.Status500InternalServerError,
                     Message = "Can not gen refresh and access token"
                 };
             }
 
-            if (refreshtoken.Success)
+            if (refreshtoken.statusCode != 500)
             {
                 return new ServiceDefault<TokenResponseDto>
                 {
-                    Success = true,
+                    statusCode = StatusCodes.Status200OK,
                     Message = "Complete generate refresh and access token",
                     Data = new TokenResponseDto
                     {

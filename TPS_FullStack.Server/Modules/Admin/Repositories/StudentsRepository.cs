@@ -10,11 +10,14 @@ namespace TPS_FullStack.Server.Modules.Admin
     {
         private readonly IConfiguration _configuration;
         private readonly UserManager<AppUser> _userManager;
+        private readonly ILogger<AppUser> _logger;
         public StudentsRepository(IConfiguration configuration,
-                                UserManager<AppUser> userManager)
+                                UserManager<AppUser> userManager,
+                                ILogger<AppUser> logger)
         {
             _configuration = configuration;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<StudentDetailDto> GetStudentByIDAsync(string MaID)
@@ -22,28 +25,57 @@ namespace TPS_FullStack.Server.Modules.Admin
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryGetStudentDetail = @"SELECT hv.MaID, hv.Hoten, hv.Email, hv.Dienthoai, hv.Diachi, hv.Gioitinh
                                             FROM dbo.Hocvien hv
-                                            WHERE hv.MaID = @MaID";
-            var studentDetail = new StudentDetailDto();
-            using (var conn = new SqlConnection(connectionString))
+                                            WHERE hv.MaID = @MaID"
+                                        + @"SELECT MaID, Chungchi_Ten, Ngaycap, Ngayhethan
+                                            FROM dbo.Chungchi_Hocvien
+                                            WHERE HocvienID = @MaID AND Khongsudung = 0";
+            var studentDetail = new StudentDetailDto
             {
-                await conn.OpenAsync();
-                using (var cmd = new SqlCommand(queryGetStudentDetail, conn))
+                studentInfo = new StudentInfo(),
+                studentCertificate = new List<StudentCertificate>()
+            };
+            try
+            {
+                using (var conn = new SqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@MaID", MaID);
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
+                    await conn.OpenAsync();
+                    using (var cmd = new SqlCommand(queryGetStudentDetail, conn))
                     {
-                        if (await reader.ReadAsync())
+                        cmd.Parameters.AddWithValue("@MaID", MaID);
+
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            studentDetail.MaID = reader["MaID"].ToString();
-                            studentDetail.Hoten = reader["Hoten"].ToString();
-                            studentDetail.Email = reader["Email"].ToString();
-                            studentDetail.Dienthoai = reader["Dienthoai"].ToString();
+                            if (await reader.ReadAsync())
+                            {
+                                studentDetail.studentInfo.MaID = reader["MaID"].ToString();
+                                studentDetail.studentInfo.Hoten = reader["Hoten"].ToString();
+                                studentDetail.studentInfo.Email = reader["Email"].ToString();
+                                studentDetail.studentInfo.Dienthoai = reader["Dienthoai"].ToString();
+                            }
+                            if (await reader.NextResultAsync())
+                            {
+                                while (await reader.ReadAsync())
+                                {
+                                    studentDetail.studentCertificate.Add(new StudentCertificate
+                                    {
+                                        MaID = reader["MaID"].ToString(),
+                                        Tenchungchi = reader["Chungchi_Ten"].ToString(),
+                                        Ngaycap = (DateTime)reader["Ngaycap"],
+                                        Ngayhethan = (DateTime)reader["Ngayhethan"]
+                                    });
+                                }
+                            }
                         }
                     }
                 }
+                return studentDetail;
+            }catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
             }
-            return studentDetail;
+
+
             throw new NotImplementedException();
         }
 
@@ -110,7 +142,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 VALUES (@MaID, @MaID,  @Hoten, @Email, @Dienthoai, @Ngaysinh, @Gioitinh, @Diachi, SYSDATETIME(), '')";
             createDto.MaID = Guid.NewGuid().ToString();
 
-
             using (var conn = new SqlConnection(connectionString))
             {
                 var user = new AppUser
@@ -134,9 +165,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                     cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten);
                     cmd.Parameters.AddWithValue("@Email", createDto.Email);
                     cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
-                    cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh);
-                    cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh);
-                    cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi);
                     if (await cmd.ExecuteNonQueryAsync() < 0)
                     {
                         var student =await _userManager.FindByIdAsync(createDto.MaID);
