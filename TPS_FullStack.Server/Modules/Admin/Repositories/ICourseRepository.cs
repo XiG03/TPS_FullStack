@@ -7,6 +7,7 @@
         public Task<bool> CourseUpdateAsync(CourseUpdateDto updateDto);
         public Task<bool> CourseDeleteByIdAsync(string MaId);
         public Task<CourseDetailDto> CourseGetByIdAsync(string MaID);
+        public Task<bool> UpdateStudentScoreAsync(updateStudentScoreDto updateDto);
         
     }
 

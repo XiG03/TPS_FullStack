@@ -494,6 +494,33 @@ namespace TPS_FullStack.Server.Modules.Admin
 
             throw new NotImplementedException();
         }
+
+        public async Task<bool> UpdateStudentScoreAsync(updateStudentScoreDto updateDto)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var queryUpdate = @"UPDATE dbo.Khoahoc_Hocvien
+                                SET
+                                	Diem = @Diem,
+                                	Dieuchinh = @Dieuchinh
+                                WHERE MaID = @MaID";
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new SqlCommand(queryUpdate, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaID", updateDto.MaID);
+                    cmd.Parameters.AddWithValue("@Diem", updateDto.Diem);
+                    cmd.Parameters.AddWithValue("@Dieuchinh", updateDto.Dieuchinh);
+
+                    if(await cmd.ExecuteNonQueryAsync() < 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            throw new NotImplementedException();
+        }
     }
 
 }
