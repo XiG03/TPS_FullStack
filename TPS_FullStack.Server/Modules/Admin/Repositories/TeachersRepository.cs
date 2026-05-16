@@ -377,6 +377,11 @@ namespace TPS_FullStack.Server.Modules.Admin
             return true;
             throw new NotImplementedException();
         }
+
+        public Task<bool> UpdateTeacherTopicAsync(TeacherTopic updateDto)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }
