@@ -4,12 +4,16 @@ namespace TPS_FullStack.Server.Modules.Teacher
 {
     public class teacherInformationDto
     {
-
+        public teacherInfo TeacherInfo { get; set; }
+        public List<teacherTopics> TeacherTopics { get; set; }
+        public List<teacherCourses> TeacherCourses { get; set; }
+        public List<teacherSchedules> TeacherSchedules { get; set; }
     }
     public class teacherInfo
     {
         public string MaID { get; set; }
         public string Hoten { get; set; }
+        public DateTime Ngaysinh { get; set; }
         public string Gioitinh { get; set; }
         public string Email { get; set; }
         public string Diachi { get; set; }
@@ -17,19 +21,19 @@ namespace TPS_FullStack.Server.Modules.Teacher
     }
     public class teacherTopics
     {
-        public string KhoahocID{get; set;}
-        public string TenKhoahoc {get; set;}
+        public string KhoahocID { get; set; }
+        public string TenChuyende { get; set; }
     }
     public class teacherCourses
     {
-        public string KhoahocID {get; set;}
-        public string TenKhoahoc {get; set;}
+        public string KhoahocID { get; set; }
+        public string TenKhoahoc { get; set; }
     }
     public class teacherSchedules
     {
-        public string LichhocID {get; set;}
-        public string KhoahocID{get; set;}
-        public string TenKhoahoc {get; set;}
+        public string LichhocID { get; set; }
+        public string KhoahocID { get; set; }
+        public string TenKhoahoc { get; set; }
     }
 }
 
