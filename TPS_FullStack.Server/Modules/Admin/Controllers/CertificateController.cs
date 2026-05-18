@@ -68,6 +68,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _certificateService.CertificateStuAcceptAsync(createDto);
             return StatusCode(result.statusCode, result);
         }
+
         [HttpPut("revoke/{MaID}")]
         public async Task<IActionResult> CertificateStuRevoke(string MaID)
         {

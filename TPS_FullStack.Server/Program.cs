@@ -8,6 +8,7 @@ using TPS_FullStack.Server;
 using TPS_FullStack.Server.AppDbContext;
 using TPS_FullStack.Server.Entities;
 using TPS_FullStack.Server.Modules.Admin;
+using TPS_FullStack.Server.Modules.Teacher;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +68,8 @@ builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 
 // Inject Dependency of Teacher module
-
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
 
 
 // Inject Dependency of Student module
