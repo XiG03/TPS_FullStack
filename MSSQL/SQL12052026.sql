@@ -229,8 +229,8 @@ CREATE TABLE [dbo].[Lichhoc_Ct](
 	[LichhocID] [nvarchar](50) NOT NULL,
 	[GiangvienID] [nvarchar](50) NOT NULL,
 	[Ngay] [datetime2](7) NOT NULL,
-	[Tugio] [datetime2](7) NOT NULL,
-	[Dengio] [datetime2](7) NOT NULL,
+	[Batdaudukien] [datetime2](7) NOT NULL,
+	[Ketthucdukien] [datetime2](7) NOT NULL,
 	[Lichhoc_Thoigianhoc] [decimal](4, 1) NOT NULL,
  CONSTRAINT [PK_Lichhoc_Ct] PRIMARY KEY CLUSTERED 
 (

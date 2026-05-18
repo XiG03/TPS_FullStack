@@ -7,6 +7,7 @@
         public Task<bool> CreateTeacherAsync(TeacherCreateDto createDto);
         public Task<bool> DeleteTeacherAsync(string MaID);
         public Task<bool> UpdateTeacherAsync(TeacherUpdateDto updateDto);
+        public Task<bool> UpdateTeacherTopicAsync(TeacherTopic updateDto);
     }
 
 }

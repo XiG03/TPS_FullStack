@@ -58,7 +58,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
-        [HttpPost("Accept")]
+        [HttpPost("accept")]
         public async Task<IActionResult> CertificateStuAccept(Cert_StudentCreateDto createDto)
         {
             if (!ModelState.IsValid)
@@ -68,7 +68,8 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _certificateService.CertificateStuAcceptAsync(createDto);
             return StatusCode(result.statusCode, result);
         }
-        [HttpPut("Revoke")]
+
+        [HttpPut("revoke/{MaID}")]
         public async Task<IActionResult> CertificateStuRevoke(string MaID)
         {
             var result = await _certificateService.CertificateStuRevokeAsync(MaID);

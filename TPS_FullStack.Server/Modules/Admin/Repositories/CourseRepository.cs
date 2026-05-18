@@ -67,7 +67,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                         FROM dbo.Hocvien hv
                                         JOIN  Khoahoc_Hocvien kh_hv ON kh_hv.HocvienID = hv.MaID
                                         WHERE kh_hv.KhoahocID = @MaID";
-            var queryCourseSchedules = @"SELECT lh.MaID, lh.Ngaydukien, lh.Ngaythucte, lh.Tugio, lh.Dengio
+            var queryCourseSchedules = @"SELECT lh.MaID, lh.Ngaydukien, lh.Ngaythucte, lh.Batdaudukien, lh.Ketthucdukien
                                         FROM dbo.Lichhoc lh
                                         WHERE lh.KhoahocID = @MaID";
             // Danh muc cac giang vien va hoc vien diem danh
@@ -171,8 +171,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 MaID = reader["MaID"].ToString(),
                                 Ngaydukien = (DateTime)reader["Ngaydukien"],
                                 Ngaythucte = (DateTime)reader["Ngaythucte"],
-                                Tugio = (DateTime)reader["Tugio"],
-                                Dengio = (DateTime)reader["Dengio"]
+                                Batdaudukien = (DateTime)reader["Batdaudukien"],
+                                Ketthucdukien = (DateTime)reader["Ketthucdukien"]
                             });
                         }
                     }
@@ -220,8 +220,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                                             VALUES (@MaID, @KhoahocID, @GiangvienID)";
             var queryCourseStudentInsert = @"INSERT INTO dbo.Khoahoc_Hocvien(MaID, KhoahocID, HocvienID)
                                             VALUES (@MaID, @KhoahocID, @HocvienID, @Diem, @Hieuchinh)";
-            var queryCourseScheduleInsert = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien, Ngaythucte, Tugio, Dengio)
-                                            VALUES (@MaID, @KhoahocID, @Ngaydukien, @Ngaythucte, @Tugio, @Dengio)";
+            var queryCourseScheduleInsert = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien, Ngaythucte, Batdaudukien, Ketthucdukien)
+                                            VALUES (@MaID, @KhoahocID, @Ngaydukien, @Ngaythucte, @Batdaudukien, @Ketthucdukien)";
 
 
             using (var conn = new SqlConnection(connectionString))
@@ -313,8 +313,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                             cmd.Parameters.AddWithValue("@KhoahocID", createDto.courseDto.MaID);
                             cmd.Parameters.AddWithValue("@Ngaydukien", schedule.Ngaydukien);
                             cmd.Parameters.AddWithValue("@Ngaythucte", schedule.Ngaythucte);
-                            cmd.Parameters.AddWithValue("@Tugio", schedule.Tugio);
-                            cmd.Parameters.AddWithValue("@Dengio", schedule.Dengio);
+                            cmd.Parameters.AddWithValue("@Batdaudukien", schedule.Batdaudukien);
+                            cmd.Parameters.AddWithValue("@Ketthucdukien", schedule.Ketthucdukien);
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
                             {
@@ -370,8 +370,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                                             VALUES (@MaID, @KhoahocID, @GiangvienID)";
             var queryCourseStudentInsert = @"INSERT INTO dbo.Khoahoc_Hocvien(MaID, KhoahocID, HocvienID)
                                             VALUES (@MaID, @KhoahocID, @HocvienID, @Diem, @Hieuchinh)";
-            var queryCourseScheduleInsert = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien, Ngaythucte, Tugio, Dengio)
-                                            VALUES (@MaID, @KhoahocID, @Ngaydukien, @Ngaythucte, @Tugio, @Dengio)";
+            var queryCourseScheduleInsert = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien, Ngaythucte, Batdaudukien, Ketthucdukien)
+                                            VALUES (@MaID, @KhoahocID, @Ngaydukien, @Ngaythucte, @Batdaudukien, @Ketthucdukien)";
 
             using (var conn = new SqlConnection(connectionString))
             {
@@ -451,8 +451,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                             cmd.Parameters.AddWithValue("@KhoahocID", updateDto.courseUpdate.MaID);
                             cmd.Parameters.AddWithValue("@Ngaydukien", schedule.Ngaydukien);
                             cmd.Parameters.AddWithValue("@Ngaythucte", schedule.Ngaythucte);
-                            cmd.Parameters.AddWithValue("@Tugio", schedule.Tugio);
-                            cmd.Parameters.AddWithValue("@Dengio", schedule.Dengio);
+                            cmd.Parameters.AddWithValue("@Batdaudukien", schedule.Batdaudukien);
+                            cmd.Parameters.AddWithValue("@Ketthucdukien", schedule.Ketthucdukien);
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
                             {
@@ -492,6 +492,33 @@ namespace TPS_FullStack.Server.Modules.Admin
             }
             return true;
 
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> UpdateStudentScoreAsync(updateStudentScoreDto updateDto)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var queryUpdate = @"UPDATE dbo.Khoahoc_Hocvien
+                                SET
+                                	Diem = @Diem,
+                                	Dieuchinh = @Dieuchinh
+                                WHERE MaID = @MaID";
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new SqlCommand(queryUpdate, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaID", updateDto.MaID);
+                    cmd.Parameters.AddWithValue("@Diem", updateDto.Diem);
+                    cmd.Parameters.AddWithValue("@Dieuchinh", updateDto.Dieuchinh);
+
+                    if(await cmd.ExecuteNonQueryAsync() < 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
             throw new NotImplementedException();
         }
     }

@@ -56,8 +56,8 @@ namespace TPS_FullStack.Server.Modules.Admin
         public string MaID { get; set; }
         public DateTime Ngaydukien { get; set; }
         public DateTime Ngaythucte { get; set; }
-        public DateTime Tugio { get; set; }
-        public DateTime Dengio { get; set; }
+        public DateTime Batdaudukien { get; set; }
+        public DateTime Ketthucdukien { get; set; }
     }
 
     public class courseTeacherAttendance

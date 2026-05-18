@@ -80,7 +80,7 @@ namespace TPS_FullStack.Server.Migrations
                 oldType: "NVARCHAR(50)");
 
             migrationBuilder.AlterColumn<DateTime>(
-                name: "Tugio",
+                name: "Batdaudukien",
                 table: "Lichhoc",
                 type: "DATETIME",
                 nullable: true,
@@ -104,7 +104,7 @@ namespace TPS_FullStack.Server.Migrations
                 oldType: "NVARCHAR(50)");
 
             migrationBuilder.AlterColumn<DateTime>(
-                name: "Dengio",
+                name: "Ketthucdukien",
                 table: "Lichhoc",
                 type: "DATETIME",
                 nullable: true,
@@ -644,7 +644,7 @@ namespace TPS_FullStack.Server.Migrations
                 oldNullable: true);
 
             migrationBuilder.AlterColumn<DateTime>(
-                name: "Tugio",
+                name: "Batdaudukien",
                 table: "Lichhoc",
                 type: "DATETIME",
                 nullable: false,
@@ -674,7 +674,7 @@ namespace TPS_FullStack.Server.Migrations
                 oldNullable: true);
 
             migrationBuilder.AlterColumn<DateTime>(
-                name: "Dengio",
+                name: "Ketthucdukien",
                 table: "Lichhoc",
                 type: "DATETIME",
                 nullable: false,

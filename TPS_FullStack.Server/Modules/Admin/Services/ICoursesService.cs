@@ -1,4 +1,6 @@
-﻿namespace TPS_FullStack.Server.Modules.Admin
+﻿using Microsoft.Identity.Client;
+
+namespace TPS_FullStack.Server.Modules.Admin
 {
     public interface ICoursesService
     {
@@ -7,6 +9,7 @@
         public Task<CourseUpdateDto> CourseUpdateAsync(CourseUpdateDto updateDto);
         public Task<bool> CourseDeleteByIdAsync(string MaID);
         public Task<CourseDetailDto> CourseGetByIdAsync(string MaID);
+        public Task<ServiceDefault<updateStudentScoreDto>> updateStudentScoreAsync(updateStudentScoreDto updateDto);
     }
 
 }

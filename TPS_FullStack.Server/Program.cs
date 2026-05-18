@@ -62,7 +62,8 @@ builder.Services.AddScoped<ICourseRepository,CourseRepository>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<ICertificateRepository,CertificateRepository>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
-
+builder.Services.AddScoped<IScheduleRepository,ScheduleRepository>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 
 // Inject Dependency of Teacher module

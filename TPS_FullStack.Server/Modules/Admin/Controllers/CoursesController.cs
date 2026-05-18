@@ -78,6 +78,16 @@ namespace TPS_FullStack.Server.Modules.Admin
             }
             return Ok();
         }
+        [HttpPut("studentscore")]
+        public async Task<IActionResult> UpdateStudentScoreAsync(updateStudentScoreDto updateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result =await _courseService.updateStudentScoreAsync(updateDto);
+            return StatusCode(result.statusCode, result);
+        }
 
 
     }

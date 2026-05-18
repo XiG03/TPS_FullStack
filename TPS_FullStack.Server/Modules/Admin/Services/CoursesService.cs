@@ -143,6 +143,32 @@ namespace TPS_FullStack.Server.Modules.Admin
             return updateDto;
             throw new NotImplementedException();
         }
+
+        public async Task<ServiceDefault<updateStudentScoreDto>> updateStudentScoreAsync(updateStudentScoreDto updateDto)
+        {
+            var result = await _courseRepository.UpdateStudentScoreAsync(updateDto);
+
+            if (!result)
+            {
+                return new ServiceDefault<updateStudentScoreDto>
+                {
+                    statusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Server can't update",
+                    Data = null
+                };
+            }
+            if (result)
+            {
+                return new ServiceDefault<updateStudentScoreDto>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Complete to update student's score",
+                    Data = updateDto
+                };
+            }
+
+            throw new NotImplementedException();
+        }
     }
 
 }

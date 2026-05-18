@@ -2,6 +2,7 @@ using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Update.Internal;
+using Swashbuckle.AspNetCore.Annotations;
 using TPS_FullStack.Server.Entities;
 
 namespace TPS_FullStack.Server.Modules.Admin
@@ -19,6 +20,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         [HttpGet("getall")]
+        
         public async Task<IActionResult> GetAllTopics()
         {
             var data = await _topicService.GetAllTopicAsync();
