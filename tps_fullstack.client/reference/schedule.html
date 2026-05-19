@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#832700",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#d0e1fb",
+                        "background": "#f7f9fb",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-container": "#ffb096",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "primary-container": "#0047bb",
+                        "surface-container": "#eceef0",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary-fixed-dim": "#ffb59c",
+                        "on-primary-container": "#afc1ff",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-fixed": "#00174a",
+                        "surface-container-low": "#f2f4f6",
+                        "primary": "#00328a",
+                        "secondary": "#505f76",
+                        "outline": "#737685",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b3c5ff",
+                        "inverse-surface": "#2d3133",
+                        "secondary-fixed": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-container": "#932d00",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-secondary-container": "#54647a",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-surface": "#191c1e",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-surface-variant": "#434653",
+                        "surface-tint": "#2156ca",
+                        "on-tertiary-fixed": "#390c00",
+                        "outline-variant": "#c3c6d6",
+                        "on-background": "#191c1e",
+                        "tertiary": "#6c1f00",
+                        "on-primary-fixed-variant": "#003ea6",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "display": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "manrope": ["Manrope", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+
+        .font-manrope {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glass-header {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Custom scrollbar for calendar grid */
+        .calendar-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .calendar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .calendar-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .calendar-scroll:hover::-webkit-scrollbar-thumb {
+            background-color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="text-on-surface bg-surface antialiased">
+    <!-- Sidebar Navigation -->
+    <aside
+        class="h-screen w-72 fixed left-0 top-0 bg-surface-container-lowest border-r border-outline-variant/30 flex flex-col p-6 z-50">
+        <div class="flex items-center space-x-3 mb-10">
+            <div class="w-10 h-10 rounded-xl bg-[#0047BB] flex items-center justify-center text-white shadow-sm">
+                <span class="material-symbols-outlined text-[20px]"
+                    style="font-variation-settings: &quot;FILL&quot; 1;">account_balance</span>
+            </div>
+            <div>
+                <h1 class="font-manrope font-extrabold text-on-surface uppercase tracking-wider text-sm">The Ledger</h1>
+                <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-0.5">Academic
+                    Authority</p>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1.5">
+            <a class="flex items-center space-x-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-all font-manrope text-sm font-semibold"
+                href="#">
+                <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                <span class="">Academic Overview</span>
+            </a>
+            <div class="space-y-1">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-all font-manrope text-sm font-semibold">
+                    <div class="flex items-center space-x-3">
+                        <span class="material-symbols-outlined text-[20px]">group</span>
+                        <span class="">Student Registry</span>
+                    </div>
+                    <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                </button>
+            </div>
+            <a class="flex items-center space-x-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-all font-manrope text-sm font-semibold"
+                href="#">
+                <span class="material-symbols-outlined text-[20px]">library_books</span>
+                <span class="">Course Catalog</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 text-[#0047BB] bg-blue-50/50 rounded-xl transition-all font-manrope text-sm font-bold shadow-sm border border-blue-100"
+                href="#">
+                <span class="material-symbols-outlined text-[20px]"
+                    style="font-variation-settings: &quot;FILL&quot; 1;">calendar_month</span>
+                <span class="">Institutional Reports</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-all font-manrope text-sm font-semibold"
+                href="#">
+                <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+                <span class="">Certification Ledger</span>
+            </a>
+        </nav>
+        <div class="pt-6 mt-6 border-t border-outline-variant/30 space-y-1.5">
+            <a class="flex items-center space-x-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-all font-manrope text-sm font-semibold"
+                href="#">
+                <span class="material-symbols-outlined text-[20px]">settings</span>
+                <span class="">Settings</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-all font-manrope text-sm font-semibold"
+                href="#">
+                <span class="material-symbols-outlined text-[20px]">help_outline</span>
+                <span class="">Support</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Main Content Canvas -->
+    <main class="ml-72 min-h-screen">
+        <!-- Top App Bar -->
+        <header
+            class="fixed top-0 right-0 left-72 h-20 glass-header z-40 flex items-center justify-between px-10 border-b border-outline-variant/20">
+            <div class="flex items-center flex-1 max-w-xl">
+                <div class="relative w-full group">
+                    <span
+                        class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline group-focus-within:text-[#0047BB] transition-colors">search</span>
+                    <input
+                        class="w-full pl-12 pr-4 py-2.5 bg-surface-container-low hover:bg-surface-container-highest focus:bg-white border border-transparent focus:border-[#0047BB]/30 rounded-xl text-sm transition-all focus:ring-4 focus:ring-[#0047BB]/5 outline-none font-inter text-on-surface placeholder:text-outline"
+                        placeholder="Tìm kiếm tài liệu hoặc lịch trình..." type="text">
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 pl-6">
+                <button
+                    class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-[22px]">notifications</span>
+                </button>
+                <button
+                    class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-[22px]">history_edu</span>
+                </button>
+                <div class="h-6 w-[1px] bg-outline-variant/50 mx-2"></div>
+                <button class="flex items-center pl-2">
+                    <img alt="Admin Avatar" class="w-9 h-9 rounded-xl border border-outline-variant/30 object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKd3aXQzmcc6CmUOARSA3ZmVfI35AoaT09Zx1NTNFrcCXOvA01o0kypBBUv04WXiBolxuyBpjocRvp7ijzhsE6ei-XDRxBZQMDYGmma6_245B4dvVs6nAc3naUi-M02l4XCm-j_v2qt5xjWMI2nG5tm5Pnz132gbPEbUMGTCckAHEJrgCIp2oLruNl5uw-LVtx_t-AQtho6TwPlT9MUid_Gvfky3KufO4N_4TDqyRfmseGPGLPYXpV1SoliKqDB3_o00YRaNZ6ZVY4">
+                </button>
+            </div>
+        </header>
+        <!-- Content Area -->
+        <div class="pt-28 px-10 pb-20 mx-auto max-w-full">
+            <!-- Header Section -->
+            <div class="flex flex-col xl:flex-row xl:items-end justify-between mb-10 gap-6">
+                <div>
+                    <h2 class="text-3xl font-manrope font-extrabold text-on-surface tracking-tight mb-2">Lịch Đào tạo
+                        Tổng thể</h2>
+                    <p class="text-on-surface-variant font-inter text-sm">Học kỳ Mùa Thu 2024 • Quản lý vận hành giảng
+                        dạy</p>
+                </div>
+                <div class="flex items-center gap-4 flex-wrap">
+                    <!-- Navigation -->
+                    <div
+                        class="flex items-center bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-1 shadow-sm">
+                        <button
+                            class="p-1.5 hover:bg-surface-container-low rounded-lg transition-all text-on-surface-variant hover:text-on-surface">
+                            <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                        </button>
+                        <button
+                            class="px-4 py-1.5 font-manrope font-bold text-sm text-[#0047BB] hover:bg-blue-50/50 rounded-lg transition-all">Hôm
+                            nay</button>
+                        <button
+                            class="p-1.5 hover:bg-surface-container-low rounded-lg transition-all text-on-surface-variant hover:text-on-surface">
+                            <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                        </button>
+                    </div>
+                    <!-- View Switcher -->
+                    <div
+                        class="flex items-center bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-1 shadow-sm">
+                        <button
+                            class="px-4 py-1.5 font-manrope font-semibold text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-all">Ngày</button>
+                        <button
+                            class="px-4 py-1.5 font-manrope font-bold text-sm bg-surface-container-low text-[#0047BB] rounded-lg shadow-sm border border-outline-variant/20 transition-all">Tuần</button>
+                        <button
+                            class="px-4 py-1.5 font-manrope font-semibold text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-all">Tháng</button>
+                    </div>
+                    <button
+                        class="bg-[#0047BB] hover:bg-[#00328a] text-white px-5 py-2.5 rounded-xl font-manrope font-bold text-sm flex items-center space-x-2 transition-all shadow-sm">
+                        <span class="material-symbols-outlined text-[18px]">add</span>
+                        <span class="">Tạo lịch mới</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Main Layout Grid -->
+            <div class="flex flex-wrap gap-4 mb-8">
+                <div
+                    class="flex-1 min-w-[240px] bg-white p-4 rounded-2xl shadow-sm border border-outline-variant/30 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#0047BB] flex items-center justify-center">
+                        <span class="material-symbols-outlined">person_pin</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-manrope font-extrabold text-outline uppercase tracking-wider">Giảng
+                            viên bận</p>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xl font-manrope font-extrabold text-on-surface">12</span>
+                            <span class="text-[10px] font-semibold text-outline">/ 45 Tổng số</span>
+                            <span class="text-[9px] text-green-600 font-bold ml-2">+2 (Hôm nay)</span>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="flex-1 min-w-[240px] bg-white p-4 rounded-2xl shadow-sm border border-outline-variant/30 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#0047BB] flex items-center justify-center">
+                        <span class="material-symbols-outlined">meeting_room</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[10px] font-manrope font-extrabold text-outline uppercase tracking-wider">Phòng
+                            học trống</p>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xl font-manrope font-extrabold text-on-surface">08 <span
+                                    class="text-[10px] text-outline">/ 20</span></span>
+                            <span class="text-[10px] font-bold text-[#0047BB]">40% khả dụng</span>
+                        </div>
+                        <div class="w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-[#0047BB] h-full w-[40%] rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Filters -->
+                <!-- Calendar View Container -->
+                <div
+                    class="flex-1 bg-surface-container-lowest rounded-2xl overflow-hidden flex flex-col border border-outline-variant/30 shadow-sm relative">
+                    <!-- Week Header -->
+                    <div
+                        class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-outline-variant/30 bg-surface-container-low/50 sticky top-0 z-20">
+                        <div class="p-3 border-r border-outline-variant/20 flex items-end justify-center pb-2">
+                            <span class="text-[10px] font-inter font-medium text-outline">Giờ</span>
+                        </div>
+                        <div class="p-3 text-center border-r border-outline-variant/20">
+                            <p class="text-[11px] font-manrope font-bold text-outline uppercase tracking-wider mb-1">Thứ
+                                Hai</p>
+                            <p class="text-xl font-manrope font-extrabold text-on-surface">07</p>
+                        </div>
+                        <div
+                            class="p-3 text-center border-r border-outline-variant/20 bg-blue-50/50 border-b-2 border-b-[#0047BB]">
+                            <p class="text-[11px] font-manrope font-bold text-[#0047BB] uppercase tracking-wider mb-1">
+                                Thứ Ba</p>
+                            <p class="text-xl font-manrope font-extrabold text-[#0047BB]">08</p>
+                        </div>
+                        <div class="p-3 text-center border-r border-outline-variant/20">
+                            <p class="text-[11px] font-manrope font-bold text-outline uppercase tracking-wider mb-1">Thứ
+                                Tư</p>
+                            <p class="text-xl font-manrope font-extrabold text-on-surface">09</p>
+                        </div>
+                        <div class="p-3 text-center border-r border-outline-variant/20">
+                            <p class="text-[11px] font-manrope font-bold text-outline uppercase tracking-wider mb-1">Thứ
+                                Năm</p>
+                            <p class="text-xl font-manrope font-extrabold text-on-surface">10</p>
+                        </div>
+                        <div class="p-3 text-center border-r border-outline-variant/20">
+                            <p class="text-[11px] font-manrope font-bold text-outline uppercase tracking-wider mb-1">Thứ
+                                Sáu</p>
+                            <p class="text-xl font-manrope font-extrabold text-on-surface">11</p>
+                        </div>
+                        <div class="p-3 text-center border-r border-outline-variant/20">
+                            <p class="text-[11px] font-manrope font-bold text-outline uppercase tracking-wider mb-1">Thứ
+                                Bảy</p>
+                            <p class="text-xl font-manrope font-extrabold text-on-surface-variant">12</p>
+                        </div>
+                        <div class="p-3 text-center">
+                            <p class="text-[11px] font-manrope font-bold text-outline uppercase tracking-wider mb-1">Chủ
+                                Nhật</p>
+                            <p class="text-xl font-manrope font-extrabold text-on-surface-variant">13</p>
+                        </div>
+                    </div>
+                    <!-- Scrollable Grid Area -->
+                    <div
+                        class="flex-1 overflow-y-auto max-h-[700px] relative calendar-scroll bg-surface-container-lowest">
+                        <div class="grid grid-cols-[60px_repeat(7,1fr)] min-h-[900px] relative">
+                            <!-- Background Grid Lines -->
+                            <div class="absolute inset-0 grid grid-cols-[60px_repeat(7,1fr)] pointer-events-none">
+                                <div class="border-r border-outline-variant/20 bg-surface-container-low/20"></div>
+                                <div class="border-r border-outline-variant/20"></div>
+                                <div class="border-r border-outline-variant/20 bg-blue-50/10"></div>
+                                <div class="border-r border-outline-variant/20"></div>
+                                <div class="border-r border-outline-variant/20"></div>
+                                <div class="border-r border-outline-variant/20"></div>
+                                <div class="border-r border-outline-variant/20"></div>
+                                <div></div>
+                            </div>
+                            <!-- Horizontal Time Lines -->
+                            <div class="absolute inset-0 grid grid-rows-[repeat(10,90px)] pointer-events-none z-0">
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                                <div class="border-b border-outline-variant/10"></div>
+                            </div>
+                            <!-- Time Column -->
+                            <div class="relative z-10 grid grid-rows-[repeat(10,90px)]">
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    08:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    09:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    10:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    11:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    12:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    13:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    14:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    15:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    16:00</div>
+                                <div class="flex justify-center pt-2 text-[11px] font-inter font-medium text-outline">
+                                    17:00</div>
+                            </div>
+                            <!-- Monday -->
+                            <div class="relative"></div>
+                            <!-- Tuesday -->
+                            <div class="relative">
+                                <!-- EVENT CARD 1: Tuesday 09:00 - 11:00 (Dark Blue/Primary) -->
+                                <!-- 09:00 is row 2 (index 1), so top = 90px. Duration 2 hours = 180px height -->
+                                <div
+                                    class="absolute top-[90px] left-1.5 right-1.5 h-[174px] bg-[#002B7A] text-white rounded-xl p-3 flex flex-col justify-between shadow-md z-10 hover:shadow-lg transition-all cursor-pointer group border border-[#001f5c]">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <span
+                                                class="inline-block px-1.5 py-0.5 rounded text-[9px] font-manrope font-bold uppercase tracking-wider bg-white/20 text-white/90">Chuyên
+                                                đề</span>
+                                            <button class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span class="material-symbols-outlined text-[16px]">more_vert</span>
+                                            </button>
+                                        </div>
+                                        <h4 class="text-[13px] font-manrope font-bold leading-tight mb-1">Data
+                                            Architecture &amp; Systems</h4>
+                                        <p class="text-[10px] font-inter text-blue-200">09:00 - 11:00</p>
+                                    </div>
+                                    <div class="space-y-1 mt-2 pt-2 border-t border-white/20">
+                                        <div class="flex items-center space-x-1.5 text-white/90">
+                                            <span class="material-symbols-outlined text-[14px]">person</span>
+                                            <p class="text-[11px] font-inter truncate">Dr. Elena Rostova</p>
+                                        </div>
+                                        <div class="flex items-center space-x-1.5 text-white/90">
+                                            <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                            <p class="text-[11px] font-inter truncate">Room 102 (Hanoi)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Wednesday -->
+                            <div class="relative">
+                                <!-- EVENT CARD 2: Wednesday 14:00 - 16:00 (Muted Blue/Secondary) -->
+                                <!-- 14:00 is row 7 (index 6), so top = 540px. Duration 2 hours = 180px height -->
+                                <div
+                                    class="absolute top-[540px] left-1.5 right-1.5 h-[174px] bg-[#E8F0FE] text-[#1a3a6e] rounded-xl p-3 flex flex-col justify-between shadow-sm border border-blue-200/60 z-10 hover:shadow-md transition-all cursor-pointer group">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <span
+                                                class="inline-block px-1.5 py-0.5 rounded text-[9px] font-manrope font-bold uppercase tracking-wider bg-[#d0e1fb] text-[#00328a]">Khóa
+                                                học</span>
+                                            <button
+                                                class="opacity-0 group-hover:opacity-100 transition-opacity text-[#00328a]">
+                                                <span class="material-symbols-outlined text-[16px]">more_vert</span>
+                                            </button>
+                                        </div>
+                                        <h4
+                                            class="text-[13px] font-manrope font-bold leading-tight mb-1 text-[#001f5c]">
+                                            Project Management Essentials</h4>
+                                        <p class="text-[10px] font-inter text-[#4a6b9c]">14:00 - 16:00</p>
+                                    </div>
+                                    <div class="space-y-1 mt-2 pt-2 border-t border-blue-200">
+                                        <div class="flex items-center space-x-1.5 text-[#3b5b8c]">
+                                            <span class="material-symbols-outlined text-[14px]">person</span>
+                                            <p class="text-[11px] font-inter truncate">Prof. Julian Vane</p>
+                                        </div>
+                                        <div class="flex items-center space-x-1.5 text-[#3b5b8c]">
+                                            <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                            <p class="text-[11px] font-inter truncate">Lab Alpha</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Thursday -->
+                            <div class="relative"></div>
+                            <!-- Friday -->
+                            <div class="relative">
+                                <!-- EVENT CARD 3: Friday 08:30 - 10:30 (Muted Terra/Tertiary) -->
+                                <!-- 08:30 is row 1 + half (index 0.5), so top = 45px. Duration 2 hours = 180px height -->
+                                <div
+                                    class="absolute top-[45px] left-1.5 right-1.5 h-[174px] bg-[#FFF0EB] text-[#6c1f00] rounded-xl p-3 flex flex-col justify-between shadow-sm border border-[#ffdbcf] z-10 hover:shadow-md transition-all cursor-pointer group">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <span
+                                                class="inline-block px-1.5 py-0.5 rounded text-[9px] font-manrope font-bold uppercase tracking-wider bg-[#ffdbcf] text-[#6c1f00]">Chứng
+                                                chỉ</span>
+                                            <button class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span class="material-symbols-outlined text-[16px]">more_vert</span>
+                                            </button>
+                                        </div>
+                                        <h4
+                                            class="text-[13px] font-manrope font-bold leading-tight mb-1 text-[#390c00]">
+                                            Advanced Cybersecurity Workshop</h4>
+                                        <p class="text-[10px] font-inter text-[#8a4224]">08:30 - 10:30</p>
+                                    </div>
+                                    <div class="space-y-1 mt-2 pt-2 border-t border-[#ffb59c]/40">
+                                        <div class="flex items-center space-x-1.5 text-[#6c1f00]/90">
+                                            <span class="material-symbols-outlined text-[14px]">person</span>
+                                            <p class="text-[11px] font-inter truncate">Dr. Sarah Chen</p>
+                                        </div>
+                                        <div class="flex items-center space-x-1.5 text-[#6c1f00]/90">
+                                            <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                            <p class="text-[11px] font-inter truncate">Virtual Hub 4</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Saturday -->
+                            <div class="relative"></div>
+                            <!-- Sunday -->
+                            <div class="relative"></div>
+                        </div>
+                    </div>
+                    <!-- Integrated Conflict Warning Toast-style (Fixed bottom right of calendar) -->
+                    <div
+                        class="absolute bottom-6 right-6 left-6 md:left-auto md:w-[420px] bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-rose-100 p-4 flex items-start gap-4 z-30 animate-fade-in-up">
+                        <div
+                            class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0 text-rose-600">
+                            <span class="material-symbols-outlined">warning</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-manrope font-bold text-on-surface mb-1">Cảnh báo trùng lịch</h4>
+                            <p class="text-xs font-inter text-on-surface-variant mb-3">Dr. Elena Rostova được xếp lịch 2
+                                lớp cùng lúc vào Thứ 3 (09:00).</p>
+                            <div class="flex gap-2">
+                                <button
+                                    class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg font-manrope font-semibold text-xs transition-colors border border-rose-200">Giải
+                                    quyết</button>
+                                <button
+                                    class="hover:bg-surface-container-low text-on-surface-variant px-3 py-1.5 rounded-lg font-manrope font-semibold text-xs transition-colors">Bỏ
+                                    qua</button>
+                            </div>
+                        </div>
+                        <button class="text-outline hover:text-on-surface">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+</body>
+
+</html>
