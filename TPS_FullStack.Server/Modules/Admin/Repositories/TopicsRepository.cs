@@ -38,7 +38,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             var queryTopicCreate = @"INSERT INTO Chuyende(MaID, Ten, Mota, Khongsudung, UpdatedAt, UpdatedBy, CreatedAt, CreatedBy)
-                                    VALUES (@MaID,@Ten, @Mota,0,SYSDATETIME(), NEWID(),SYSDATETIME(),NEWID())";
+                                    VALUES (@MaID, @Ten, @Mota, 0, SYSDATETIME(), NEWID(),SYSDATETIME(),NEWID())";
 
             var queryDocumentCreate = @"INSERT INTO Chuyende_Tailieu(MaID, ChuyendeID, Tieude, Ngaytao, Loaitailieu, Kichthuoc, Khongsudung)
                                         VALUES (@MaID,@ChuyendeID,@Tieude,SYSDATETIME(), @Loaitailieu, @Kichthuoc, 0)";
@@ -506,3 +506,4 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
     }
 }
+

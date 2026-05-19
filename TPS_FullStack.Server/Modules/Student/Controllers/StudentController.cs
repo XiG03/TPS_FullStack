@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TPS_FullStack.Server.Modules.Student
 {
-    [Route("api/[controller]")]
+    [Route("api/student")]
     [ApiController]
-    public class StudentControlller : ControllerBase
+    public class StudentController : ControllerBase
     {
         private readonly IStudentService _studentService;
-        public StudentControlller(IStudentService studentService)
+        public StudentController(IStudentService studentService)
         {
             _studentService = studentService;
         }
@@ -39,6 +39,14 @@ namespace TPS_FullStack.Server.Modules.Student
             var result = await _studentService.GetStudentCoursesAsync(MaID);
             return StatusCode(result.statusCode, result);
             // Implementation for getting student courses
+        }
+        [HttpGet("courseinfo/{HocvienID}/{KhoahocID}")]
+        
+        public async Task<IActionResult> GetStudentCourseInfo(string HocvienID, string KhoahocID)
+        {
+            var result = await _studentService.GetStudentCourseInfoAsync(HocvienID, KhoahocID);
+            return StatusCode(result.statusCode, result);
+            // Implementation for getting student course info
         }
     }
 }
