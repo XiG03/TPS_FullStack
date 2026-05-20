@@ -3,10 +3,28 @@
     public class StudentService : IStudentService
     {
         private readonly IStudentRepository _studentRepository;
-        public StudentService(IStudentRepository studentRepository)
+        private readonly IStudentExamRepository _studentExamRepository;
+        public StudentService(IStudentRepository studentRepository, IStudentExamRepository studentExamRepository)
         {
             _studentRepository = studentRepository;
+            _studentExamRepository = studentExamRepository;
         }
+
+        public async Task<ServiceDefault<BaithuhoachInfo>> GetFinalExamInfoAsync(string HocvienID, string KhoahocID)
+        {
+            var result = await _studentExamRepository.GetFinalExamInfoAsync(HocvienID, KhoahocID);
+            if (result != null)
+            {
+                return new ServiceDefault<BaithuhoachInfo>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Lấy thông tin bài thi hoạch thành công",
+                    Data = result
+                };
+            }
+            throw new NotImplementedException();
+        }
+
         public async Task<ServiceDefault<studentCourseInfo>> GetStudentCourseInfoAsync(string HocvienID, string KhoahocID)
         {
             var result = await _studentRepository.GetStudentCourseInfoAsync(HocvienID, KhoahocID);
@@ -96,6 +114,26 @@
                 statusCode = StatusCodes.Status400BadRequest,
                 Message = "Điểm danh thất bại",
                 Data = null
+            };
+        }
+
+        public async Task<ServiceDefault<decimal>> SubmitFinalExamAsync(finalExam finalRecord)
+        {
+            var result = await _studentExamRepository.SubmitFinalExamAsync(finalRecord);
+            if (result >= 0)
+            {
+                return new ServiceDefault<decimal>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Nộp bài thi hoạch thành công",
+                    Data = result
+                };
+            }
+            return new ServiceDefault<decimal>
+            {
+                statusCode = StatusCodes.Status400BadRequest,
+                Message = "Nộp bài thi hoạch thất bại",
+                Data = -1
             };
         }
     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Client;
 using TPS_FullStack.Server.Entities;
 using TPS_FullStack.Server.Modules.JWT;
@@ -43,7 +43,8 @@ namespace TPS_FullStack.Server.Modules.Auth
             }
             var refreshtoken = await _jwtService.GenerateRefreshTokenAsync(user.Id);
             var accessToken = await _jwtService.GenerateAccessTokenAsync(user.Id, null); // Sua role
-            if (refreshtoken.statusCode != 500)
+
+            if (refreshtoken.statusCode == StatusCodes.Status500InternalServerError)
             {
                 return new ServiceDefault<TokenResponseDto>
                 {
@@ -52,19 +53,16 @@ namespace TPS_FullStack.Server.Modules.Auth
                 };
             }
 
-            if (refreshtoken.statusCode != 500)
+            return new ServiceDefault<TokenResponseDto>
             {
-                return new ServiceDefault<TokenResponseDto>
+                statusCode = StatusCodes.Status200OK,
+                Message = "Complete generate refresh and access token",
+                Data = new TokenResponseDto
                 {
-                    statusCode = StatusCodes.Status200OK,
-                    Message = "Complete generate refresh and access token",
-                    Data = new TokenResponseDto
-                    {
-                        AccessToken = accessToken,
-                        RefreshToken = refreshtoken.Data
-                    }
-                };
-            }
+                    AccessToken = accessToken,
+                    RefreshToken = refreshtoken.Data
+                }
+            };
 
 
             // if (user.status == Status.NotFound)

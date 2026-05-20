@@ -4,8 +4,8 @@ namespace TPS_FullStack.Server.Modules.Student
 {
     public interface IStudentExamRepository
     {
-        public Task<courseQuestions> GetFinalExamInfo(string KhoahocID);
-        public Task<bool> SubmitFinalExam(finalExam finalRecord);
+        public Task<BaithuhoachInfo> GetFinalExamInfoAsync(string HocvienID, string KhoahocID);
+        public Task<decimal> SubmitFinalExamAsync(finalExam finalRecord);
     }
 
 }

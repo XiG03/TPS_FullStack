@@ -242,6 +242,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         public Task<bool> UpdateFinalExamScoreAsync(finalExamUpdate finalExamUpdate)
         {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
             throw new NotImplementedException();
         }
     }

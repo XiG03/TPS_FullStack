@@ -113,7 +113,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             try
             {
-                if (updateDto.courseUpdate.Ngaybatdau != null)
+                if (updateDto.courseUpdate.Ngaybatdau == null)
                 {
                     return null;
                 }
