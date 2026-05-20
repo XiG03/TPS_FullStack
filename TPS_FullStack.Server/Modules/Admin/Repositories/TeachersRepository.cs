@@ -1,4 +1,4 @@
-﻿
+
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -66,17 +66,23 @@ namespace TPS_FullStack.Server.Modules.Admin
                 {
                     using (var cmd = new SqlCommand(queryTeacher, conn, transaction))
                     {
-                        cmd.Parameters.AddWithValue("@MaID", createDto.MaID);
-                        cmd.Parameters.AddWithValue("@UserId", createDto.MaID);
-                        cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten);
-                        cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh);
-                        cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh);
-                        cmd.Parameters.AddWithValue("@Email", createDto.Email);
-                        cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi);
-                        cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
+                        cmd.Parameters.AddWithValue("@MaID", createDto.MaID ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UserId", createDto.MaID ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Email", createDto.Email ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai ?? (object)DBNull.Value);
 
                         if (await cmd.ExecuteNonQueryAsync() <= 0)
                         {
+                            var teacher = await _userManager.FindByIdAsync(createDto.MaID);
+                            if (teacher != null)
+                            {
+                                await _userManager.DeleteAsync(teacher);
+                            }
+                            await transaction.RollbackAsync();
                             return false;
                         }
                     }
@@ -85,6 +91,10 @@ namespace TPS_FullStack.Server.Modules.Admin
                         var GiangvienID = createDto.MaID;
                         foreach (var topic in createDto.topics)
                         {
+                            if (topic.Picked == false)
+                            {
+                                continue;
+                            }
                             using (var cmd = new SqlCommand(queryTeacherTopic, conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@MaID", Guid.NewGuid().ToString());
@@ -93,6 +103,12 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                                 if (await cmd.ExecuteNonQueryAsync() <= 0)
                                 {
+                                    var teacher = await _userManager.FindByIdAsync(createDto.MaID);
+                                    if (teacher != null)
+                                    {
+                                        await _userManager.DeleteAsync(teacher);
+                                    }
+                                    await transaction.RollbackAsync();
                                     return false;
                                 }
                             }
@@ -103,7 +119,10 @@ namespace TPS_FullStack.Server.Modules.Admin
                 catch (Exception ex)
                 {
                     var teacher = await _userManager.FindByIdAsync(createDto.MaID);
-                    await _userManager.DeleteAsync(teacher);
+                    if (teacher != null)
+                    {
+                        await _userManager.DeleteAsync(teacher);
+                    }
                     await transaction.RollbackAsync();
                     _logger.LogError(ex.Message);
                     return false;
@@ -143,12 +162,11 @@ namespace TPS_FullStack.Server.Modules.Admin
                 _logger.LogError(ex.Message);
                 return false;
             }
-            throw new NotImplementedException();
         }
 
         public async Task<TeacherDetailDto> TeacherDetailAsync(string MaID)
         {
-            var teacherInfo = @"SELECT MaID, HoTen, Gioitinh, Email, Diachi, Dienthoai	
+            var teacherInfo = @"SELECT MaID, Hoten, Gioitinh, Email, Diachi, Dienthoai	
                                 FROM Giangvien
                                 WHERE MaID = @MaID AND Khongsudung = 0";
 
@@ -266,7 +284,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                     return null;
                 }
             }
-            throw new NotImplementedException();
         }
 
         public async Task<List<TeacherGetAllDto>> TeacherGetAllAsync()
@@ -302,7 +319,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                 }
             }
             return list;
-            throw new NotImplementedException();
         }
 
         public async Task<bool> UpdateTeacherAsync(TeacherUpdateDto updateDto) // hien tai dang chi thay doi chuyen de cho giang vien, ve sau can them thi vao day de them

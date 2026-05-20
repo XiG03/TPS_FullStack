@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
@@ -25,7 +25,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryGetStudentDetail = @"SELECT hv.MaID, hv.Hoten, hv.Email, hv.Dienthoai, hv.Diachi, hv.Gioitinh
                                             FROM dbo.Hocvien hv
-                                            WHERE hv.MaID = @MaID"
+                                            WHERE hv.MaID = @MaID;"
                                         + @"SELECT MaID, Chungchi_Ten, Ngaycap, Ngayhethan
                                             FROM dbo.Chungchi_Hocvien
                                             WHERE HocvienID = @MaID AND Khongsudung = 0";
@@ -168,17 +168,20 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                     using (var cmd = new SqlCommand(queryInsert, conn, trans))
                     {
-                        cmd.Parameters.AddWithValue("@MaID", createDto.MaID);
-                        cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten);
-                        cmd.Parameters.AddWithValue("@Email", createDto.Email);
-                        cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai);
-                        cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh);
-                        cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh);
-                        cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi);
+                        cmd.Parameters.AddWithValue("@MaID", createDto.MaID ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Hoten", createDto.Hoten ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Email", createDto.Email ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Dienthoai", createDto.Dienthoai ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Ngaysinh", createDto.Ngaysinh ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Gioitinh", createDto.Gioitinh ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Diachi", createDto.Diachi ?? (object)DBNull.Value);
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
                             var student = await _userManager.FindByIdAsync(createDto.MaID);
-                            await _userManager.DeleteAsync(student);
+                            if (student != null)
+                            {
+                                await _userManager.DeleteAsync(student);
+                            }
                             await trans.RollbackAsync();
                             return false;
                         }
@@ -189,7 +192,10 @@ namespace TPS_FullStack.Server.Modules.Admin
                 catch (Exception ex)
                 {
                     var student = await _userManager.FindByIdAsync(createDto.MaID);
-                    await _userManager.DeleteAsync(student);
+                    if (student != null)
+                    {
+                        await _userManager.DeleteAsync(student);
+                    }
                     await trans.RollbackAsync();
                     _logger.LogError(ex.Message);
                     return false;
@@ -197,7 +203,6 @@ namespace TPS_FullStack.Server.Modules.Admin
 
 
             }
-            throw new NotImplementedException();
         }
 
         public async Task<bool> StudentUpdateAsync(StudentUpdateDto updateDto)

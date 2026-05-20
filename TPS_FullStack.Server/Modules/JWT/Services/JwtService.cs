@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -25,7 +25,7 @@ namespace TPS_FullStack.Server.Modules.JWT
             var refreshToken = GenerateRefreshToken();
             var ExpiryTime = DateTime.UtcNow.AddDays(7);
             var result = _jwtRepo.SaveRefreshToken(UserId, refreshToken, ExpiryTime);
-            if (!result && refreshToken != null)
+            if (result && refreshToken != null)
             {
                 return new ServiceDefault<string>
                 {

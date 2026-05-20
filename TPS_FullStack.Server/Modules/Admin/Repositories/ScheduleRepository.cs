@@ -33,7 +33,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         public async Task<List<ScheduleGetAllDto>> ScheduleGetAllAsync()
         {
-            var connectionString = _configuration.GetConnectionString("DefaulConnection");
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryGetAll = @"SELECT lh.MaID, lh.KhoahocID, kh.Ten, lh.Ngaydukien, lh.Batdaudukien, lh.Ketthucdukien, lh.Ngaythucte, lh.Batdauthucte, lh.Ketthucthucte 
                                 FROM dbo.Lichhoc lh
                                 LEFT JOIN dbo.Khoahoc kh ON kh.MaID = lh.KhoahocID";
