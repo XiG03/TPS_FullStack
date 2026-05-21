@@ -1,10 +1,14 @@
+import { getHeaders } from './httpClient';
+
 const API_BASE_URL = '/api/admin/schedule';
 
 export const getSchedules = async () => {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+        headers: getHeaders()
+    });
     if (!response.ok) throw new Error('Failed to fetch schedules');
-    const data = await response.json();
-    return { data };
+    const responseBody = await response.json();
+    return { data: responseBody.data ?? responseBody.Data ?? responseBody };
 };
 
 export const getScheduleDetail = async (id) => {
@@ -16,7 +20,7 @@ export const getScheduleDetail = async (id) => {
 export const createSchedule = async (payload) => {
     const response = await fetch(API_BASE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(true),
         body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error('Failed to create schedule');
@@ -27,7 +31,7 @@ export const createSchedule = async (payload) => {
 export const updateSchedule = async (payload) => {
     const response = await fetch(API_BASE_URL, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(true),
         body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error('Failed to update schedule');
@@ -37,7 +41,8 @@ export const updateSchedule = async (payload) => {
 
 export const deleteSchedule = async (id) => {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getHeaders()
     });
     if (!response.ok) throw new Error('Failed to delete schedule');
     const data = await response.json();
@@ -47,7 +52,7 @@ export const deleteSchedule = async (id) => {
 export const saveTeacherAttendance = async (attendanceData) => {
     const response = await fetch(`${API_BASE_URL}/teacherattendance`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(true),
         body: JSON.stringify(attendanceData)
     });
     if (!response.ok) throw new Error('Failed to save teacher attendance');
@@ -58,7 +63,7 @@ export const saveTeacherAttendance = async (attendanceData) => {
 export const saveStudentAttendance = async (attendanceData) => {
     const response = await fetch(`${API_BASE_URL}/studentattendance`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(true),
         body: JSON.stringify(attendanceData)
     });
     if (!response.ok) throw new Error('Failed to save student attendance');

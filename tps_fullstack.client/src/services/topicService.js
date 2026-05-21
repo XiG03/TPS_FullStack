@@ -1,14 +1,20 @@
+import { getHeaders } from './httpClient';
+
 const API_BASE_URL = '/api/admin/topic';
 
 export const getTopics = async () => {
-    const response = await fetch(`${API_BASE_URL}/getall`);
+    const response = await fetch(`${API_BASE_URL}/getall`, {
+        headers: getHeaders()
+    });
     if (!response.ok) throw new Error('Failed to fetch topics');
     const data = await response.json();
     return { data };
 };
 
 export const getTopicDetail = async (id) => {
-    const response = await fetch(`${API_BASE_URL}/${id}`);
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+        headers: getHeaders()
+    });
     if (!response.ok) throw new Error('Failed to fetch topic detail');
     const data = await response.json();
     return { data };
@@ -17,7 +23,7 @@ export const getTopicDetail = async (id) => {
 export const createTopic = async (payload) => {
     const response = await fetch(API_BASE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(true),
         body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error('Failed to create topic');
@@ -28,7 +34,7 @@ export const createTopic = async (payload) => {
 export const updateTopic = async (payload) => {
     const response = await fetch(API_BASE_URL, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(true),
         body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error('Failed to update topic');
@@ -38,7 +44,8 @@ export const updateTopic = async (payload) => {
 
 export const deleteTopic = async (id) => {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getHeaders()
     });
     if (!response.ok) throw new Error('Failed to delete topic');
     return { success: true };

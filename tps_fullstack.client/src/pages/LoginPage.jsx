@@ -8,11 +8,9 @@ const LoginPage = () => {
     const handleSubmit = async (credentials) => {
         try {
             await handleLogin(credentials.email, credentials.password, credentials.rememberMe);
-            // Xử lý sau khi đăng nhập thành công (ví dụ: chuyển hướng trang)
-            alert("Đăng nhập thành công!");
+            // navigate('/courses') đã được gọi trong useAuth sau khi lưu token thành công
         } catch (err) {
-            // Lỗi đã được xử lý ở hook, có thể thêm logic phụ nếu cần
-            console.error('Đăng nhập thất bại:', err);
+            // Lỗi đã được xử lý và hiển thị bởi hook useAuth
         }
     };
 

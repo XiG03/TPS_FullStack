@@ -27,7 +27,7 @@ export const useCourse = () => {
     const handleDeleteCourse = async (id) => {
         try {
             await deleteCourse(id);
-            setCourses(prev => prev.filter(c => c.MaID !== id));
+            setCourses(prev => prev.filter(c => c.maID !== id));
             return true;
         } catch (err) {
             console.error(err);

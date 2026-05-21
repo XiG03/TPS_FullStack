@@ -14,6 +14,7 @@ import StudentDetailPage from './pages/StudentDetailPage';
 import TeacherManagementPage from './pages/TeacherManagementPage';
 import TeacherDetailPage from './pages/TeacherDetailPage';
 import LoginPage from './pages/LoginPage';
+import ReportManagementPage from './pages/ReportManagementPage';
 import './App.css'; 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
           <Route path="topics/new" element={<TopicFormPage />} />
           <Route path="topics/:id/edit" element={<TopicFormPage />} />
           <Route path="topics/:id" element={<TopicDetailPage />} />
+          <Route path="reports" element={<ReportManagementPage />} />
           
           {/* Catch-all route to redirect back to courses */}
           <Route path="*" element={<Navigate to="/courses" replace />} />

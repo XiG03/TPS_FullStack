@@ -206,3 +206,10 @@ FROM dbo.Khoahoc kh
 JOIN dbo.Khoahoc_Chuyende khcd ON kh.MaID = khcd.KhoahocID
 JOIN dbo.Chuyende cd ON khcd.ChuyendeID = cd.MaID
 WHERE kh.Ngaybatdau < @Ngay
+
+
+
+
+use TPS_db
+
+SELECT * FROM dbo.AspNetUsers

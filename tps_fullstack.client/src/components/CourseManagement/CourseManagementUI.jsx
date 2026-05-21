@@ -6,8 +6,8 @@ const CourseManagementUI = ({ courses, isLoading, error, onDeleteCourse }) => {
     const navigate = useNavigate();
 
     const filteredCourses = courses.filter(c => 
-        c.Ten?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        c.MaID?.toLowerCase().includes(searchTerm.toLowerCase())
+        c.ten?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        c.maID?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -60,24 +60,24 @@ const CourseManagementUI = ({ courses, isLoading, error, onDeleteCourse }) => {
                         <div className="text-center py-10 font-body text-on-surface-variant">Không tìm thấy khóa học nào.</div>
                     ) : (
                         filteredCourses.map((course) => (
-                            <div key={course.MaID} className="bg-surface-container-lowest rounded-xl p-5 flex items-center shadow-[0_4px_12px_rgba(25,28,30,0.02)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(25,28,30,0.04)] grid grid-cols-[1fr_3fr_3fr_auto] gap-4">
+                            <div key={course.maID} className="bg-surface-container-lowest rounded-xl p-5 flex items-center shadow-[0_4px_12px_rgba(25,28,30,0.02)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(25,28,30,0.04)] grid grid-cols-[1fr_3fr_3fr_auto] gap-4">
                                 <div className="font-label font-bold text-sm text-outline bg-surface-container-highest px-2 py-1 rounded w-max">
-                                    {course.MaID}
+                                    {course.maID}
                                 </div>
                                 <div className="font-headline font-bold text-on-surface text-lg truncate">
-                                    {course.Ten}
+                                    {course.ten}
                                 </div>
-                                <div className="font-body text-sm text-on-surface-variant truncate" title={course.Mota}>
-                                    {course.Mota || 'Không có mô tả'}
+                                <div className="font-body text-sm text-on-surface-variant truncate" title={course.mota}>
+                                    {course.mota || 'Không có mô tả'}
                                 </div>
                                 <div className="flex items-center justify-end gap-1 w-[120px]">
-                                    <button onClick={() => navigate(`/courses/${course.MaID}`)} className="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors" title="View Detail">
+                                    <button onClick={() => navigate(`/courses/${course.maID}`)} className="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors" title="View Detail">
                                         <span className="material-symbols-outlined text-xl">visibility</span>
                                     </button>
-                                    <button onClick={() => navigate(`/courses/${course.MaID}/edit`)} className="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors" title="Edit">
+                                    <button onClick={() => navigate(`/courses/${course.maID}/edit`)} className="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors" title="Edit">
                                         <span className="material-symbols-outlined text-xl">edit</span>
                                     </button>
-                                    <button onClick={() => onDeleteCourse(course.MaID)} className="text-on-surface-variant hover:text-error hover:bg-error-container p-2 rounded-md transition-colors" title="Delete">
+                                    <button onClick={() => onDeleteCourse(course.maID)} className="text-on-surface-variant hover:text-error hover:bg-error-container p-2 rounded-md transition-colors" title="Delete">
                                         <span className="material-symbols-outlined text-xl">delete</span>
                                     </button>
                                 </div>

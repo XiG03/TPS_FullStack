@@ -30,7 +30,7 @@ const StudentManagementPage = () => {
         let success = false;
         
         if (editingStudent) {
-            success = await handleUpdateStudent(editingStudent.MaID, formData);
+            success = await handleUpdateStudent(editingStudent.maID, formData);
         } else {
             success = await handleAddStudent(formData);
         }

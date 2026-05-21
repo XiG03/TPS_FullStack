@@ -16,12 +16,12 @@ const StudentFormModal = ({ isOpen, onClose, onSubmit, isLoading, initialData })
         if (isOpen) {
             if (initialData) {
                 setFormData({
-                    Hoten: initialData.Hoten || '',
-                    Email: initialData.Email || '',
-                    Dienthoai: initialData.Dienthoai || '',
-                    Gioitinh: initialData.Gioitinh || '',
-                    Ngaysinh: initialData.Ngaysinh || '',
-                    Diachi: initialData.Diachi || ''
+                    Hoten: initialData.hoten || '',
+                    Email: initialData.email || '',
+                    Dienthoai: initialData.dienthoai || '',
+                    Gioitinh: initialData.gioitinh || '',
+                    Ngaysinh: initialData.ngaysinh ? initialData.ngaysinh.substring(0, 10) : '',
+                    Diachi: initialData.diachi || ''
                 });
             } else {
                 setFormData({
@@ -43,7 +43,11 @@ const StudentFormModal = ({ isOpen, onClose, onSubmit, isLoading, initialData })
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(formData);
+        const payload = {
+            ...formData,
+            Ngaysinh: formData.Ngaysinh === '' ? null : formData.Ngaysinh
+        };
+        onSubmit(payload);
     };
 
     return (

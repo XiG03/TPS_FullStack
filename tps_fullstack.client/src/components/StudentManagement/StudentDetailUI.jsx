@@ -42,24 +42,24 @@ const StudentDetailUI = ({ detail, isLoading, error }) => {
                     <div className="bg-surface-container-lowest rounded-3xl p-8 shadow-[0_8px_32px_rgba(25,28,30,0.04)] border border-surface-container flex flex-col items-center text-center relative overflow-hidden group">
                         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-primary/20 to-tertiary/20 group-hover:scale-105 transition-transform duration-500"></div>
                         <div className="w-32 h-32 rounded-full bg-surface shadow-md border-4 border-surface flex items-center justify-center text-4xl font-headline font-bold text-primary relative z-10 mb-4 mt-12">
-                            {getInitials(studentInfo.Hoten)}
+                            {getInitials(studentInfo.hoten)}
                         </div>
-                        <h2 className="font-headline text-2xl font-bold text-on-surface mb-1 relative z-10">{studentInfo.Hoten}</h2>
-                        <span className="font-label text-xs font-bold text-outline bg-surface-container-highest px-3 py-1 rounded-full relative z-10 mb-6">{studentInfo.MaID}</span>
+                        <h2 className="font-headline text-2xl font-bold text-on-surface mb-1 relative z-10">{studentInfo.hoten}</h2>
+                        <span className="font-label text-xs font-bold text-outline bg-surface-container-highest px-3 py-1 rounded-full relative z-10 mb-6">{studentInfo.maID}</span>
 
                         <div className="w-full flex flex-col gap-4 text-left relative z-10">
                             <div className="flex items-center gap-3 bg-surface-container-low p-3 rounded-xl">
                                 <span className="material-symbols-outlined text-secondary text-xl">mail</span>
                                 <div className="flex flex-col">
                                     <span className="font-label text-xs text-on-surface-variant font-bold">Email</span>
-                                    <span className="font-body text-sm text-on-surface break-all">{studentInfo.Email}</span>
+                                    <span className="font-body text-sm text-on-surface break-all">{studentInfo.email}</span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 bg-surface-container-low p-3 rounded-xl">
                                 <span className="material-symbols-outlined text-tertiary text-xl">call</span>
                                 <div className="flex flex-col">
                                     <span className="font-label text-xs text-on-surface-variant font-bold">Điện thoại</span>
-                                    <span className="font-body text-sm text-on-surface">{studentInfo.Dienthoai}</span>
+                                    <span className="font-body text-sm text-on-surface">{studentInfo.dienthoai}</span>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -67,14 +67,14 @@ const StudentDetailUI = ({ detail, isLoading, error }) => {
                                     <span className="material-symbols-outlined text-primary text-xl">cake</span>
                                     <div className="flex flex-col">
                                         <span className="font-label text-xs text-on-surface-variant font-bold">Ngày sinh</span>
-                                        <span className="font-body text-sm text-on-surface">{studentInfo.Ngaysinh ? new Date(studentInfo.Ngaysinh).toLocaleDateString('vi-VN') : '---'}</span>
+                                        <span className="font-body text-sm text-on-surface">{studentInfo.ngaysinh ? new Date(studentInfo.ngaysinh).toLocaleDateString('vi-VN') : '---'}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 bg-surface-container-low p-3 rounded-xl">
-                                    <span className="material-symbols-outlined text-primary text-xl">{studentInfo.Gioitinh === 'Nữ' ? 'female' : 'male'}</span>
+                                    <span className="material-symbols-outlined text-primary text-xl">{studentInfo.gioitinh === 'Nữ' ? 'female' : 'male'}</span>
                                     <div className="flex flex-col">
                                         <span className="font-label text-xs text-on-surface-variant font-bold">Giới tính</span>
-                                        <span className="font-body text-sm text-on-surface">{studentInfo.Gioitinh || '---'}</span>
+                                        <span className="font-body text-sm text-on-surface">{studentInfo.gioitinh || '---'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@ const StudentDetailUI = ({ detail, isLoading, error }) => {
                                 <span className="material-symbols-outlined text-error text-xl">location_on</span>
                                 <div className="flex flex-col">
                                     <span className="font-label text-xs text-on-surface-variant font-bold">Địa chỉ</span>
-                                    <span className="font-body text-sm text-on-surface">{studentInfo.Diachi || '---'}</span>
+                                    <span className="font-body text-sm text-on-surface">{studentInfo.diachi || '---'}</span>
                                 </div>
                             </div>
                         </div>
@@ -107,24 +107,24 @@ const StudentDetailUI = ({ detail, isLoading, error }) => {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {certs.map((cert) => (
-                                    <div key={cert.MaID} className="bg-surface-container-low p-5 rounded-2xl border border-surface-container relative overflow-hidden group hover:border-primary/30 transition-colors">
+                                    <div key={cert.maID} className="bg-surface-container-low p-5 rounded-2xl border border-surface-container relative overflow-hidden group hover:border-primary/30 transition-colors">
                                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                             <span className="material-symbols-outlined text-6xl text-primary">military_tech</span>
                                         </div>
                                         <div className="relative z-10 flex flex-col h-full">
                                             <span className="font-label text-[10px] uppercase font-bold text-primary bg-primary/10 w-max px-2 py-0.5 rounded-full mb-2">
-                                                {cert.MaID}
+                                                {cert.maID}
                                             </span>
-                                            <h4 className="font-headline font-bold text-base text-on-surface mb-4">{cert.Tenchungchi}</h4>
+                                            <h4 className="font-headline font-bold text-base text-on-surface mb-4">{cert.tenchungchi}</h4>
                                             
                                             <div className="mt-auto pt-4 border-t border-outline-variant/30 flex flex-col gap-1">
                                                 <div className="flex justify-between items-center text-xs">
                                                     <span className="font-label font-bold text-on-surface-variant">Ngày cấp:</span>
-                                                    <span className="font-body text-on-surface">{new Date(cert.Ngaycap).toLocaleDateString('vi-VN')}</span>
+                                                    <span className="font-body text-on-surface">{new Date(cert.ngaycap).toLocaleDateString('vi-VN')}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center text-xs">
                                                     <span className="font-label font-bold text-on-surface-variant">Ngày hết hạn:</span>
-                                                    <span className="font-body text-on-surface">{new Date(cert.Ngayhethan).toLocaleDateString('vi-VN')}</span>
+                                                    <span className="font-body text-on-surface">{new Date(cert.ngayhethan).toLocaleDateString('vi-VN')}</span>
                                                 </div>
                                             </div>
                                         </div>

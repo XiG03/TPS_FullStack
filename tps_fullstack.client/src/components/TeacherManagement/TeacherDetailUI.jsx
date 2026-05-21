@@ -103,9 +103,9 @@ const TeacherDetailUI = ({ detail, isLoading, error }) => {
                     {teacherCourses && teacherCourses.length > 0 ? (
                         <ul className="space-y-2">
                             {teacherCourses.map(course => (
-                                <li key={course.MaID} className="flex items-center justify-between font-body text-sm text-on-surface-variant bg-surface-container-low px-3 py-2 rounded-lg">
-                                    <span className="truncate">{course.Ten}</span>
-                                    <span className="font-label text-xs font-medium text-outline bg-surface-container-highest px-2 py-0.5 rounded">{course.MaID}</span>
+                                <li key={course.maID} className="flex items-center justify-between font-body text-sm text-on-surface-variant bg-surface-container-low px-3 py-2 rounded-lg">
+                                    <span className="truncate">{course.ten}</span>
+                                    <span className="font-label text-xs font-medium text-outline bg-surface-container-highest px-2 py-0.5 rounded">{course.maID}</span>
                                 </li>
                             ))}
                         </ul>
