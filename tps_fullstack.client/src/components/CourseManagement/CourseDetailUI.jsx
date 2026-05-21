@@ -27,10 +27,10 @@ const CourseDetailUI = ({ detail, isLoading, error }) => {
                     <span className="material-symbols-outlined text-xl">arrow_back</span>
                 </button>
                 <div className="flex flex-col">
-                    <h1 className="font-headline text-3xl font-extrabold text-on-surface tracking-tight">{courseInfo.Ten}</h1>
-                    <span className="font-label text-sm text-on-surface-variant font-bold">Mã Khóa học: {courseInfo.MaID}</span>
+                    <h1 className="font-headline text-3xl font-extrabold text-on-surface tracking-tight">{courseInfo.ten}</h1>
+                    <span className="font-label text-sm text-on-surface-variant font-bold">Mã Khóa học: {courseInfo.maID}</span>
                 </div>
-                <button onClick={() => navigate(`/courses/${courseInfo.MaID}/edit`)} className="ml-auto flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label font-bold hover:bg-primary hover:text-on-primary transition-colors">
+                <button onClick={() => navigate(`/courses/${courseInfo.maID}/edit`)} className="ml-auto flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label font-bold hover:bg-primary hover:text-on-primary transition-colors">
                     <span className="material-symbols-outlined text-[18px]">edit</span>
                     Chỉnh sửa
                 </button>
@@ -43,7 +43,7 @@ const CourseDetailUI = ({ detail, isLoading, error }) => {
                     {/* Thẻ mô tả */}
                     <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-surface-container">
                         <h3 className="font-headline text-lg font-bold text-on-surface mb-3">Mô tả Khóa học</h3>
-                        <p className="font-body text-sm text-on-surface-variant whitespace-pre-wrap">{courseInfo.Mota || 'Không có mô tả chi tiết.'}</p>
+                        <p className="font-body text-sm text-on-surface-variant whitespace-pre-wrap">{courseInfo.mota || 'Không có mô tả chi tiết.'}</p>
                     </div>
 
                     {/* Thẻ cấu hình hệ thống */}
@@ -54,22 +54,22 @@ const CourseDetailUI = ({ detail, isLoading, error }) => {
                                 <div className="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center"><span className="material-symbols-outlined text-sm">calendar_month</span></div>
                                 <div>
                                     <p className="font-label text-[11px] font-bold text-on-surface-variant uppercase">Lịch học</p>
-                                    <p className="font-body text-sm text-on-surface">{courseInfo.Sobuoihoc} buổi • Học thứ {courseInfo.Thu}</p>
+                                    <p className="font-body text-sm text-on-surface">{courseInfo.sobuoihoc} buổi • Học thứ {courseInfo.thu}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded bg-secondary/10 text-secondary flex items-center justify-center"><span className="material-symbols-outlined text-sm">timer</span></div>
                                 <div>
                                     <p className="font-label text-[11px] font-bold text-on-surface-variant uppercase">Thời lượng</p>
-                                    <p className="font-body text-sm text-on-surface">{courseInfo.Thoiluonghoc} phút/buổi</p>
+                                    <p className="font-body text-sm text-on-surface">{courseInfo.thoiluonghoc} phút/buổi</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded bg-tertiary/10 text-tertiary flex items-center justify-center"><span className="material-symbols-outlined text-sm">quiz</span></div>
                                 <div>
                                     <p className="font-label text-[11px] font-bold text-on-surface-variant uppercase">Bài thi cuối khóa</p>
-                                    <p className="font-body text-sm text-on-surface">{courseInfo.Socauhoi} câu hỏi • {courseInfo.Thoiluongthi} phút</p>
-                                    <p className="font-body text-xs text-on-surface-variant mt-1">Điều kiện đạt: {courseInfo.Diemdat} điểm</p>
+                                    <p className="font-body text-sm text-on-surface">{courseInfo.socauhoi} câu hỏi • {courseInfo.thoiluongthi} phút</p>
+                                    <p className="font-body text-xs text-on-surface-variant mt-1">Điều kiện đạt: {courseInfo.diemdat} điểm</p>
                                 </div>
                             </div>
                         </div>
@@ -81,9 +81,9 @@ const CourseDetailUI = ({ detail, isLoading, error }) => {
                         {courseTeachers.length === 0 ? <p className="font-body text-sm text-outline italic">Chưa phân công giảng viên</p> : 
                         <div className="space-y-3">
                             {courseTeachers.map(teacher => (
-                                <div key={teacher.MaID} className="flex items-center gap-3 bg-surface-container-low p-2 rounded-lg">
-                                    <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-xs font-bold">{teacher.Hoten?.substring(0, 2).toUpperCase() || 'GV'}</div>
-                                    <p className="font-body text-sm font-semibold">{teacher.Hoten}</p>
+                                <div key={teacher.maID} className="flex items-center gap-3 bg-surface-container-low p-2 rounded-lg">
+                                    <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-xs font-bold">{teacher.hoten?.substring(0, 2).toUpperCase() || 'GV'}</div>
+                                    <p className="font-body text-sm font-semibold">{teacher.hoten}</p>
                                 </div>
                             ))}
                         </div>}
@@ -102,10 +102,10 @@ const CourseDetailUI = ({ detail, isLoading, error }) => {
                         {courseTopics.length === 0 ? <p className="font-body text-sm text-outline italic">Chưa có chuyên đề.</p> :
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {courseTopics.map(topic => (
-                                <div key={topic.MaID} className="bg-surface-container-low p-4 rounded-xl border border-surface-container-highest">
-                                    <h4 className="font-label font-bold text-sm mb-2">{topic.Ten}</h4>
-                                    <p className="font-body text-xs text-on-surface-variant">ID: {topic.ChuyendeID}</p>
-                                    <p className="font-body text-xs text-on-surface-variant mt-1 text-primary">Trích {topic.SoCauhoi} câu hỏi vào đề thi</p>
+                                <div key={topic.maID} className="bg-surface-container-low p-4 rounded-xl border border-surface-container-highest">
+                                    <h4 className="font-label font-bold text-sm mb-2">{topic.ten}</h4>
+                                    <p className="font-body text-xs text-on-surface-variant">ID: {topic.chuyendeID}</p>
+                                    <p className="font-body text-xs text-on-surface-variant mt-1 text-primary">Trích {topic.soCauhoi} câu hỏi vào đề thi</p>
                                 </div>
                             ))}
                         </div>}
@@ -121,12 +121,12 @@ const CourseDetailUI = ({ detail, isLoading, error }) => {
                         {courseStudents.length === 0 ? <p className="font-body text-sm text-outline italic">Chưa có học viên đăng ký.</p> :
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-2">
                             {courseStudents.map(student => (
-                                <div key={student.MaID} className="flex items-center justify-between bg-surface-container-low p-3 rounded-lg">
+                                <div key={student.maID} className="flex items-center justify-between bg-surface-container-low p-3 rounded-lg">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-xs font-bold">{student.Hoten?.substring(0, 2).toUpperCase() || 'HV'}</div>
+                                        <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-xs font-bold">{student.hoten?.substring(0, 2).toUpperCase() || 'HV'}</div>
                                         <div>
-                                            <p className="font-body text-sm font-semibold">{student.Hoten}</p>
-                                            <p className="font-body text-[11px] text-on-surface-variant">{student.HocvienID}</p>
+                                            <p className="font-body text-sm font-semibold">{student.hoten}</p>
+                                            <p className="font-body text-[11px] text-on-surface-variant">{student.hocvienID}</p>
                                         </div>
                                     </div>
                                     <span className="material-symbols-outlined text-outline text-sm">chevron_right</span>
@@ -145,13 +145,13 @@ const CourseDetailUI = ({ detail, isLoading, error }) => {
                         {courseSchedules.length === 0 ? <p className="font-body text-sm text-outline italic">Chưa khởi tạo lịch học.</p> :
                         <div className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-2">
                             {courseSchedules.map((schedule, idx) => (
-                                <div key={schedule.MaID} className="flex items-center gap-4 bg-surface-container-low py-3 px-4 rounded-lg">
+                                <div key={schedule.maID} className="flex items-center gap-4 bg-surface-container-low py-3 px-4 rounded-lg">
                                     <div className="font-headline font-bold text-lg text-outline w-12 text-center border-r border-outline-variant pr-4">
                                         B{idx + 1}
                                     </div>
                                     <div className="flex-1">
-                                        <p className="font-body font-semibold text-sm">Ngày: {new Date(schedule.Ngaydukien).toLocaleDateString('vi-VN')}</p>
-                                        <p className="font-body text-xs text-on-surface-variant">Thời gian: {new Date(schedule.Batdaudukien).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} - {new Date(schedule.Ketthucdukien).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</p>
+                                        <p className="font-body font-semibold text-sm">Ngày: {new Date(schedule.ngaydukien).toLocaleDateString('vi-VN')}</p>
+                                        <p className="font-body text-xs text-on-surface-variant">Thời gian: {new Date(schedule.batdaudukien).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} - {new Date(schedule.ketthucdukien).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</p>
                                     </div>
                                 </div>
                             ))}

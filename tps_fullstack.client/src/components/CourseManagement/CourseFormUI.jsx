@@ -114,7 +114,20 @@ const CourseFormUI = ({ initialData, onSave, isSaving }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSave(formData);
+        
+        const payload = JSON.parse(JSON.stringify(formData));
+        
+        // Fix for Ngaybatdau empty string issue causing 400 Bad Request
+        if (!payload.courseInfo.Ngaybatdau) {
+            payload.courseInfo.Ngaybatdau = null;
+        }
+        
+        // Fix for Thu formatting mismatch (Backend expects '#' separated but UI says ',')
+        if (payload.courseInfo.Thu) {
+            payload.courseInfo.Thu = payload.courseInfo.Thu.replace(/,/g, '#');
+        }
+
+        onSave(payload);
     };
 
     return (
@@ -283,7 +296,7 @@ const CourseFormUI = ({ initialData, onSave, isSaving }) => {
                                 <select required value={cs.HocvienID} onChange={e => handleStudentChange(idx, e.target.value)}
                                     className="flex-1 bg-surface-container-highest border-none py-2 px-3 rounded-md text-sm outline-none cursor-pointer">
                                     <option value="">-- Chọn học viên --</option>
-                                    {availableStudents.map(t => <option key={t.MaID} value={t.MaID}>{t.Hoten}</option>)}
+                                    {availableStudents.map(t => <option key={t.maID} value={t.maID}>{t.hoten}</option>)}
                                 </select>
                                 <button type="button" onClick={() => handleRemoveStudent(idx)} className="text-error p-1"><span className="material-symbols-outlined text-lg">close</span></button>
                             </div>

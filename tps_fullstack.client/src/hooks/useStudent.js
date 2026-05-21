@@ -38,7 +38,7 @@ export const useStudent = () => {
     const handleUpdateStudent = async (id, data) => {
         try {
             const res = await updateStudent(id, data);
-            setStudents(prev => prev.map(s => s.MaID === id ? { ...s, ...res.data } : s));
+            setStudents(prev => prev.map(s => s.maID === id ? { ...s, ...res.data } : s));
             return true;
         } catch (err) {
             console.error(err);
@@ -49,7 +49,7 @@ export const useStudent = () => {
     const handleDeleteStudent = async (id) => {
         try {
             await deleteStudent(id);
-            setStudents(prev => prev.filter(s => s.MaID !== id));
+            setStudents(prev => prev.filter(s => s.maID !== id));
             return true;
         } catch (err) {
             console.error(err);

@@ -6,8 +6,8 @@ const StudentManagementUI = ({ students, isLoading, error, onAddStudent, onEditS
     const navigate = useNavigate();
 
     const filteredStudents = students.filter(s => 
-        s.Hoten?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        s.Email?.toLowerCase().includes(searchTerm.toLowerCase())
+        (s.hoten || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+        (s.email || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const getInitials = (name) => {
@@ -71,30 +71,30 @@ const StudentManagementUI = ({ students, isLoading, error, onAddStudent, onEditS
                         <div className="text-center py-10 font-body text-on-surface-variant">Không tìm thấy học viên nào.</div>
                     ) : (
                         filteredStudents.map((student) => (
-                            <div key={student.MaID} className="bg-surface-container-lowest rounded-xl p-5 flex items-center shadow-[0_4px_12px_rgba(25,28,30,0.02)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(25,28,30,0.04)] grid grid-cols-[2fr_1.5fr_1fr_auto] gap-4">
+                            <div key={student.maID} className="bg-surface-container-lowest rounded-xl p-5 flex items-center shadow-[0_4px_12px_rgba(25,28,30,0.02)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(25,28,30,0.04)] grid grid-cols-[2fr_1.5fr_1fr_auto] gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline font-bold text-sm shadow-sm flex-shrink-0">
-                                        {getInitials(student.Hoten)}
+                                        {getInitials(student.hoten)}
                                     </div>
                                     <div className="flex flex-col overflow-hidden">
-                                        <span className="font-headline font-bold text-on-surface text-base truncate">{student.Hoten}</span>
-                                        <span className="font-label text-xs font-medium text-outline bg-surface-container-highest px-2 py-0.5 rounded w-max mt-1">{student.MaID}</span>
+                                        <span className="font-headline font-bold text-on-surface text-base truncate">{student.hoten}</span>
+                                        <span className="font-label text-xs font-medium text-outline bg-surface-container-highest px-2 py-0.5 rounded w-max mt-1">{student.maID}</span>
                                     </div>
                                 </div>
                                 <div className="font-body text-sm text-on-surface-variant truncate">
-                                    {student.Email}
+                                    {student.email}
                                 </div>
                                 <div className="font-body text-sm text-on-surface-variant truncate">
-                                    {student.Dienthoai}
+                                    {student.dienthoai}
                                 </div>
                                 <div className="flex items-center justify-end gap-1 w-[120px]">
-                                    <button onClick={() => navigate(`/students/${student.MaID}`)} className="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors" title="View Detail">
+                                    <button onClick={() => navigate(`/students/${student.maID}`)} className="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors" title="View Detail">
                                         <span className="material-symbols-outlined text-xl">visibility</span>
                                     </button>
                                     <button onClick={() => onEditStudent(student)} className="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors" title="Edit">
                                         <span className="material-symbols-outlined text-xl">edit</span>
                                     </button>
-                                    <button onClick={() => onDeleteStudent(student.MaID)} className="text-on-surface-variant hover:text-error hover:bg-error-container p-2 rounded-md transition-colors" title="Delete">
+                                    <button onClick={() => onDeleteStudent(student.maID)} className="text-on-surface-variant hover:text-error hover:bg-error-container p-2 rounded-md transition-colors" title="Delete">
                                         <span className="material-symbols-outlined text-xl">delete</span>
                                     </button>
                                 </div>

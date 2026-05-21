@@ -39,7 +39,7 @@ const TopicDetailUI = ({ detail, isLoading, error }) => {
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                             <h2 className="font-headline text-2xl font-bold text-on-surface">{detail.ten}</h2>
-                            <span className="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded text-xs font-label font-bold">{detail.maID}</span>
+                            {/* <span className="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded text-xs font-label font-bold">{detail.maID}</span> */}
                         </div>
                         <p className="font-body text-on-surface-variant text-sm whitespace-pre-wrap">{detail.mota || 'Không có mô tả chi tiết.'}</p>
                     </div>

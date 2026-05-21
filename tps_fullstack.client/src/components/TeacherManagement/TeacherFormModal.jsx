@@ -67,10 +67,13 @@ const TeacherFormModal = ({ isOpen, onClose, onSubmit, isLoading, initialData })
         // Format payload theo cấu trúc TeacherCreateDto
         const payload = {
             ...formData,
-            topics: mockTopics.map(t => ({
-                MaID: t.id,
-                Picked: formData.Topics.includes(t.id)
-            }))
+            Ngaysinh: formData.Ngaysinh === '' ? null : formData.Ngaysinh,
+            topics: mockTopics
+                .filter(t => formData.Topics.includes(t.id))
+                .map(t => ({
+                    MaID: t.id,
+                    Picked: true
+                }))
         };
         onSubmit(payload);
     };

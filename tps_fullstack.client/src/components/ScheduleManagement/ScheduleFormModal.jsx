@@ -67,7 +67,7 @@ const ScheduleFormModal = ({ isOpen, onClose, onSubmit, isLoading, initialData }
                         <select required name="KhoahocID" value={formData.KhoahocID} onChange={handleChange}
                             className="w-full bg-surface-container-highest text-on-surface border-none rounded-md px-4 py-3 font-body text-sm focus:ring-2 focus:ring-primary/30 outline-none transition-all cursor-pointer">
                             <option value="">-- Chọn khóa học --</option>
-                            {courses.map(c => <option key={c.MaID} value={c.MaID}>{c.Ten}</option>)}
+                            {courses.map(c => <option key={c.maID} value={c.maID}>{c.ten}</option>)}
                         </select>
                     </div>
 

@@ -23,17 +23,17 @@ const ScheduleManagementUI = ({
     let maxHour = 17; // Mặc định 17:00
 
     const currentWeekEvents = schedules.filter(s => {
-        const d = new Date(s.Batdaudukien);
+        const d = new Date(s.batdaudukien);
         return weekDays.some(wd => isSameDay(wd, d));
     });
 
     if (currentWeekEvents.length > 0) {
         currentWeekEvents.forEach(s => {
-            const startH = new Date(s.Batdaudukien).getHours();
-            const endH = new Date(s.Ketthucdukien).getHours();
+            const startH = new Date(s.batdaudukien).getHours();
+            const endH = new Date(s.ketthucdukien).getHours();
             if (startH < minHour) minHour = startH;
             // Nếu kết thúc vào giờ lẻ (ví dụ 18:30) thì làm tròn lên 19:00 để hiển thị grid đầy đủ
-            const endMinutes = new Date(s.Ketthucdukien).getMinutes();
+            const endMinutes = new Date(s.ketthucdukien).getMinutes();
             const adjustedEnd = endMinutes > 0 ? endH + 1 : endH;
             if (adjustedEnd > maxHour) maxHour = adjustedEnd;
         });
@@ -51,13 +51,13 @@ const ScheduleManagementUI = ({
     // Cập nhật hàm renderEventsForDay để tính top dựa trên minHour
     const renderEventsForDay = (date) => {
         const dayEvents = schedules.filter(s => {
-            const eventDate = new Date(s.Batdaudukien);
+            const eventDate = new Date(s.batdaudukien);
             return isSameDay(eventDate, date);
         });
 
         return dayEvents.map(event => {
-            const startDate = new Date(event.Batdaudukien);
-            const endDate = new Date(event.Ketthucdukien);
+            const startDate = new Date(event.batdaudukien);
+            const endDate = new Date(event.ketthucdukien);
             
             // Tính toán vị trí top (px) dựa trên minHour làm mốc 0px
             const startHourValue = startDate.getHours() + startDate.getMinutes() / 60;
@@ -92,19 +92,19 @@ const ScheduleManagementUI = ({
 
             return (
                 <div 
-                    key={event.MaID}
-                    onClick={() => navigate(`/schedules/${event.MaID}`)}
+                    key={event.maID}
+                    onClick={() => navigate(`/schedules/${event.maID}`)}
                     className={`absolute left-1.5 right-1.5 rounded-xl p-3 flex flex-col justify-between shadow-sm z-10 hover:shadow-md transition-all cursor-pointer group border ${bgColor} ${textColor} ${borderColor}`}
                     style={{ top: `${topPx}px`, height: `${heightPx}px` }}
                 >
                     <div>
                         <div className="flex items-center justify-between mb-1.5">
                             <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-manrope font-bold uppercase tracking-wider ${tagBg} ${tagText}`}>
-                                {event.KhoahocID}
+                                {event.khoahocID}
                             </span>
                         </div>
                         <h4 className="text-[13px] font-manrope font-bold leading-tight mb-1 truncate">
-                            {event.TenKhoahoc}
+                            {event.tenKhoahoc}
                         </h4>
                         <p className={`text-[10px] font-inter ${subTextColor}`}>
                             {format(startDate, 'HH:mm')} - {format(endDate, 'HH:mm')}
