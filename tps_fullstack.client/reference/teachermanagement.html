@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Danh sách Giáo viên - The Curated Ledger</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@500;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Design System Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#6c1f00",
+                        "outline-variant": "#c3c6d6",
+                        "surface-container": "#eceef0",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-fixed": "#dbe1ff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-primary-fixed-variant": "#003ea6",
+                        "on-surface": "#191c1e",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "tertiary-fixed": "#ffdbcf",
+                        "tertiary-fixed-dim": "#ffb59c",
+                        "on-primary-fixed": "#00174a",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "inverse-primary": "#b3c5ff",
+                        "on-tertiary-container": "#ffb096",
+                        "on-surface-variant": "#434653",
+                        "on-background": "#191c1e",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2d3133",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "secondary-fixed": "#d3e4fe",
+                        "outline": "#737685",
+                        "on-secondary-container": "#54647a",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "primary-container": "#0047bb",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "primary": "#00328a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "secondary": "#505f76",
+                        "on-primary-container": "#afc1ff",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#d0e1fb",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-tint": "#2156ca",
+                        "on-tertiary-fixed": "#390c00",
+                        "tertiary-container": "#932d00",
+                        "surface-variant": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": [
+                            "Manrope", "sans-serif"
+                        ],
+                        "body": [
+                            "Inter", "sans-serif"
+                        ],
+                        "label": [
+                            "Inter", "sans-serif"
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-surface text-on-surface font-body antialiased flex h-screen overflow-hidden selection:bg-primary-fixed selection:text-on-primary-fixed">
+    <!-- SideNavBar (Shared Component) -->
+    <nav
+        class="h-screen w-64 fixed left-0 top-0 bg-surface-dim flex flex-col p-4 gap-2 border-none shadow-[0px_12px_32px_rgba(25,28,30,0.02)] z-20 transition-transform duration-300 flex-shrink-0">
+        <!-- Header -->
+        <div class="px-4 py-6 flex flex-col gap-2 mb-4">
+            <div class="flex items-center gap-3 text-on-surface font-headline font-extrabold tracking-tight text-xl">
+                <span class="material-symbols-outlined icon-fill text-primary text-2xl">account_balance</span>
+                Admin Ledger
+            </div>
+            <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">Academic Authority</p>
+        </div>
+        <!-- CTA -->
+        <div class="px-2 mb-6">
+            <button
+                class="w-full flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-container text-on-primary py-3 rounded-lg font-semibold shadow-[0px_12px_32px_rgba(25,28,30,0.06)] hover:opacity-90 transition-opacity">
+                <span class="material-symbols-outlined text-sm">add</span>
+                New Faculty
+            </button>
+        </div>
+        <!-- Main Navigation Tabs -->
+        <div class="flex flex-col gap-1 flex-1">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-body text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-all"
+                href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+            <!-- ACTIVE TAB: Instructors -->
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-body text-sm font-semibold bg-surface-container-lowest text-primary shadow-[0px_12px_32px_rgba(25,28,30,0.04)] transition-all"
+                href="#">
+                <span class="material-symbols-outlined icon-fill">school</span>
+                Instructors
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-body text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-all"
+                href="#">
+                <span class="material-symbols-outlined">menu_book</span>
+                Courses
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-body text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-all"
+                href="#">
+                <span class="material-symbols-outlined">verified</span>
+                Certifications
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-body text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-all"
+                href="#">
+                <span class="material-symbols-outlined">terminal</span>
+                System Logs
+            </a>
+        </div>
+        <!-- Footer Navigation -->
+        <div class="flex flex-col gap-1 mt-auto pt-4 border-t border-surface-container-highest/50">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-body text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-all"
+                href="#">
+                <span class="material-symbols-outlined">contact_support</span>
+                Support
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-body text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-all"
+                href="#">
+                <span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+        </div>
+    </nav>
+    <!-- Main Content Area -->
+    <main class="flex-1 ml-64 h-screen overflow-y-auto bg-surface relative z-0 flex flex-col">
+        <!-- Page Header -->
+        <header class="flex justify-between items-end px-12 pt-16 pb-10">
+            <div class="flex flex-col gap-2">
+                <h1 class="font-headline text-4xl font-extrabold text-on-surface tracking-tight">Quản lý Giáo viên</h1>
+                <p class="font-body text-on-surface-variant text-base">Danh sách chuyên gia và giảng viên thuộc hệ
+                    thống.</p>
+            </div>
+            <button
+                class="flex items-center gap-2 bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-3.5 rounded-lg font-body font-semibold shadow-[0px_12px_32px_rgba(25,28,30,0.06)] hover:shadow-md transition-all hover:-translate-y-0.5">
+                <span class="material-symbols-outlined text-xl">person_add</span>
+                + Thêm Giáo viên
+            </button>
+        </header>
+        <!-- Filters Section -->
+        <section class="px-12 pb-8">
+            <div
+                class="bg-surface-container-low rounded-xl p-6 flex items-end gap-6 shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]">
+                <!-- Search Input -->
+                <div class="flex flex-col gap-2 flex-1 max-w-sm">
+                    <label class="font-label text-sm font-semibold text-on-surface-variant" for="search">Tìm theo
+                        tên</label>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                        <input
+                            class="w-full bg-surface-container-highest text-on-surface placeholder:text-outline border-none rounded-md pl-10 pr-4 py-3 font-body text-sm focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/30 outline-none transition-all"
+                            id="search" placeholder="Nhập tên giáo viên..." type="text" />
+                    </div>
+                </div>
+                <!-- Dropdown Filter -->
+                <div class="flex flex-col gap-2 w-64">
+                    <label class="font-label text-sm font-semibold text-on-surface-variant" for="topic">Chuyên
+                        đề</label>
+                    <div class="relative">
+                        <select
+                            class="w-full bg-surface-container-highest text-on-surface border-none rounded-md pl-4 pr-10 py-3 font-body text-sm appearance-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/30 outline-none transition-all cursor-pointer"
+                            id="topic">
+                            <option value="">Tất cả chuyên đề</option>
+                            <option value="data">Data Science</option>
+                            <option value="design">UI/UX Design</option>
+                            <option value="engineering">Software Engineering</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- List View (The Achievement Ledger pattern) -->
+        <section class="px-12 pb-16 flex-1 flex flex-col">
+            <!-- List Header (Semantic roles, no visible lines) -->
+            <div
+                class="grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4 px-6 pb-4 font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                <div>Giáo viên / Email</div>
+                <div>Chuyên đề</div>
+                <div class="text-center">Số lớp đang dạy</div>
+                <div class="text-center">Trạng thái</div>
+                <div class="w-20 text-center">Actions</div>
+            </div>
+            <!-- List Items Container -->
+            <div class="flex flex-col gap-3">
+                <!-- Row 1 -->
+                <div
+                    class="bg-surface-container-lowest rounded-xl p-5 flex items-center shadow-[0_4px_12px_rgba(25,28,30,0.02)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(25,28,30,0.04)] grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4">
+                    <!-- Avatar & Info -->
+                    <div class="flex items-center gap-4">
+                        <img alt="Avatar" class="w-12 h-12 rounded-full object-cover shadow-sm bg-surface-variant"
+                            data-alt="professional headshot of an older female academic with short grey hair wearing a dark blazer against a soft light background"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5LbQNrdyXJD0aBPW8y8_RL_8LP1mJ6Va14iZMyL14LIBjOI7Hz60AmvBLrl0mmarzruGs8C218QgzUPJtxOesovI_TW-W3kpBlvVT20u-TaCU7iOVHUWlrM-fCZJsEUBqlsza7ttq0uZ6Nu59Y7F2RbCX-mAOuEW56p-HM3t7dUTSdIpJJc5r_0e237bHfJB_vtDxrP3MkPhW98lcot0eLlZR8ZBN0Ap7vo1AdfR3uIVDYNBh-i-GiItpBUzwP3Pi84UIFcaP2IKC" />
+                        <div class="flex flex-col">
+                            <span class="font-headline font-bold text-on-surface text-lg">Dr. Elena Rostova</span>
+                            <span class="font-body text-sm text-on-surface-variant">elena.rostova@institution.edu</span>
+                        </div>
+                    </div>
+                    <!-- Specialization -->
+                    <div class="flex items-center">
+                        <span
+                            class="bg-surface-container text-on-surface-variant px-4 py-1.5 rounded-full text-sm font-medium font-label inline-flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            Data Architecture
+                        </span>
+                    </div>
+                    <!-- Classes -->
+                    <div class="flex items-center justify-center">
+                        <span class="font-headline font-extrabold text-on-surface text-xl">4</span>
+                    </div>
+                    <!-- Status -->
+                    <div class="flex items-center justify-center">
+                        <span
+                            class="bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide inline-flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                            Active
+                        </span>
+                    </div>
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-1 w-20">
+                        <button aria-label="Edit"
+                            class="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors">
+                            <span class="material-symbols-outlined text-xl">edit</span>
+                        </button>
+                        <button aria-label="Delete"
+                            class="text-on-surface-variant hover:text-error hover:bg-error-container p-2 rounded-md transition-colors">
+                            <span class="material-symbols-outlined text-xl">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Row 2 -->
+                <div
+                    class="bg-surface-container-lowest rounded-xl p-5 flex items-center shadow-[0_4px_12px_rgba(25,28,30,0.02)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(25,28,30,0.04)] grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4">
+                    <div class="flex items-center gap-4">
+                        <img alt="Avatar" class="w-12 h-12 rounded-full object-cover shadow-sm bg-surface-variant"
+                            data-alt="professional headshot of a middle-aged male corporate trainer in a blue shirt smiling warmly in a bright modern office"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPVxFvm-GUU-WrHVS4rVNrWSxyZKsiCf4oKIR42EuExiQdv29UYLZcQ0C47F10OGMoHGBCeI3bh0mpBjnZkCLMQ9JgTEWdcAcO981aeZ3v8EwVlczHUOQ6vH-Zi6hws9QnRzMD4EeNTH32qOPVmkIlkcDTP2faIjJEDZzWS6PqSzayKZshUpZzGMrbRV_Oeq470yBdczOQqUlCwRMc11jdSI7XHxJS8cYhLQsytyImhmv7p0x294h0Z_WrUsbf8z6O5t_bHve4Ysai" />
+                        <div class="flex flex-col">
+                            <span class="font-headline font-bold text-on-surface text-lg">Marcus Vance</span>
+                            <span class="font-body text-sm text-on-surface-variant">m.vance@institution.edu</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span
+                            class="bg-surface-container text-on-surface-variant px-4 py-1.5 rounded-full text-sm font-medium font-label inline-flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            Leadership &amp; Ethics
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <span class="font-headline font-extrabold text-on-surface text-xl">2</span>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <span
+                            class="bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide inline-flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                            Active
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-end gap-1 w-20">
+                        <button aria-label="Edit"
+                            class="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors">
+                            <span class="material-symbols-outlined text-xl">edit</span>
+                        </button>
+                        <button aria-label="Delete"
+                            class="text-on-surface-variant hover:text-error hover:bg-error-container p-2 rounded-md transition-colors">
+                            <span class="material-symbols-outlined text-xl">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Row 3 (Inactive) -->
+                <div
+                    class="bg-surface-container-lowest opacity-75 rounded-xl p-5 flex items-center shadow-[0_4px_12px_rgba(25,28,30,0.02)] transition-opacity hover:opacity-100 grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline font-bold text-lg shadow-sm">
+                            SK
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-headline font-bold text-on-surface text-lg">Sarah Jenkins</span>
+                            <span class="font-body text-sm text-on-surface-variant">s.jenkins@institution.edu</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span
+                            class="bg-surface-container text-on-surface-variant px-4 py-1.5 rounded-full text-sm font-medium font-label inline-flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+                            Systems Engineering
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <span class="font-headline font-medium text-on-surface-variant text-xl">0</span>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <span
+                            class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide inline-flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px]">pause_circle</span>
+                            Inactive
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-end gap-1 w-20">
+                        <button aria-label="Edit"
+                            class="text-on-surface-variant hover:text-primary hover:bg-surface-container-highest p-2 rounded-md transition-colors">
+                            <span class="material-symbols-outlined text-xl">edit</span>
+                        </button>
+                        <button aria-label="Delete"
+                            class="text-on-surface-variant hover:text-error hover:bg-error-container p-2 rounded-md transition-colors">
+                            <span class="material-symbols-outlined text-xl">delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

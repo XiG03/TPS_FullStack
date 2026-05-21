@@ -1,25 +1,48 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/Layout/AdminLayout';
-import TopicManagement from './components/TopicManagement/TopicManagement';
-import CourseManagement from './components/CourseManagement/CourseManagement';
-import StudentManagement from './components/StudentManagement/StudentManagement';
-import TeacherManagement from './components/TeacherManagement/TeacherManagement';
+import TopicManagementPage from './pages/TopicManagementPage';
+import TopicFormPage from './pages/TopicFormPage';
+import TopicDetailPage from './pages/TopicDetailPage';
+import CourseManagementPage from './pages/CourseManagementPage';
+import CourseFormPage from './pages/CourseFormPage';
+import CourseDetailPage from './pages/CourseDetailPage';
+import ScheduleManagementPage from './pages/ScheduleManagementPage';
+import ScheduleDetailPage from './pages/ScheduleDetailPage';
+import StudentManagementPage from './pages/StudentManagementPage';
+import StudentDetailPage from './pages/StudentDetailPage';
+import TeacherManagementPage from './pages/TeacherManagementPage';
+import TeacherDetailPage from './pages/TeacherDetailPage';
+import LoginPage from './pages/LoginPage';
+import ReportManagementPage from './pages/ReportManagementPage';
 import './App.css'; 
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+
         {/* Main Admin Layout Route */}
         <Route path="/" element={<AdminLayout />}>
-          {/* Redirect from root to topics or courses */}
-          <Route index element={<Navigate to="/courses" replace />} />
-          
-          <Route path="courses" element={<CourseManagement />} />
-          <Route path="students" element={<StudentManagement />} />
-          <Route path="teachers" element={<TeacherManagement />} />
-          <Route path="topics" element={<TopicManagement />} />
+          {/* Nested routes inside AdminLayout */}
+          {/* <Route path="dashboard" element={<AdminDashboard />} /> */}
+          <Route path="courses" element={<CourseManagementPage />} />
+          <Route path="courses/new" element={<CourseFormPage />} />
+          <Route path="courses/:id/edit" element={<CourseFormPage />} />
+          <Route path="courses/:id" element={<CourseDetailPage />} />
+          <Route path="schedules" element={<ScheduleManagementPage />} />
+          <Route path="schedules/:id" element={<ScheduleDetailPage />} />
+          <Route path="students" element={<StudentManagementPage />} />
+          <Route path="students/:id" element={<StudentDetailPage />} />
+          <Route path="teachers" element={<TeacherManagementPage />} />
+          <Route path="teachers/:id" element={<TeacherDetailPage />} />
+          <Route path="topics" element={<TopicManagementPage />} />
+          <Route path="topics/new" element={<TopicFormPage />} />
+          <Route path="topics/:id/edit" element={<TopicFormPage />} />
+          <Route path="topics/:id" element={<TopicDetailPage />} />
+          <Route path="reports" element={<ReportManagementPage />} />
           
           {/* Catch-all route to redirect back to courses */}
           <Route path="*" element={<Navigate to="/courses" replace />} />

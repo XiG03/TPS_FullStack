@@ -1,7 +1,20 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\for_Work\\TPS_FullStack\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{281497D9-5350-8A20-8974-001E3854F362}|TPS_FullStack.Server\\TPS_FullStack.Server.csproj|d:\\for_work\\tps_fullstack\\tps_fullstack.server\\modules\\admin\\repositories\\courserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{281497D9-5350-8A20-8974-001E3854F362}|TPS_FullStack.Server\\TPS_FullStack.Server.csproj|solutionrelative:tps_fullstack.server\\modules\\admin\\repositories\\courserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{281497D9-5350-8A20-8974-001E3854F362}|TPS_FullStack.Server\\TPS_FullStack.Server.csproj|d:\\for_work\\tps_fullstack\\tps_fullstack.server\\modules\\admin\\repositories\\teachersrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{281497D9-5350-8A20-8974-001E3854F362}|TPS_FullStack.Server\\TPS_FullStack.Server.csproj|solutionrelative:tps_fullstack.server\\modules\\admin\\repositories\\teachersrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{281497D9-5350-8A20-8974-001E3854F362}|TPS_FullStack.Server\\TPS_FullStack.Server.csproj|d:\\for_work\\tps_fullstack\\tps_fullstack.server\\modules\\admin\\controllers\\teacherscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{281497D9-5350-8A20-8974-001E3854F362}|TPS_FullStack.Server\\TPS_FullStack.Server.csproj|solutionrelative:tps_fullstack.server\\modules\\admin\\controllers\\teacherscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +22,50 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CourseRepository.cs",
+              "DocumentMoniker": "D:\\for_Work\\TPS_FullStack\\TPS_FullStack.Server\\Modules\\Admin\\Repositories\\CourseRepository.cs",
+              "RelativeDocumentMoniker": "TPS_FullStack.Server\\Modules\\Admin\\Repositories\\CourseRepository.cs",
+              "ToolTip": "D:\\for_Work\\TPS_FullStack\\TPS_FullStack.Server\\Modules\\Admin\\Repositories\\CourseRepository.cs",
+              "RelativeToolTip": "TPS_FullStack.Server\\Modules\\Admin\\Repositories\\CourseRepository.cs",
+              "ViewState": "AgIAALMBAAAAAAAAAAAmwAQCAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T06:53:01.214Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TeachersRepository.cs",
+              "DocumentMoniker": "D:\\for_Work\\TPS_FullStack\\TPS_FullStack.Server\\Modules\\Admin\\Repositories\\TeachersRepository.cs",
+              "RelativeDocumentMoniker": "TPS_FullStack.Server\\Modules\\Admin\\Repositories\\TeachersRepository.cs",
+              "ToolTip": "D:\\for_Work\\TPS_FullStack\\TPS_FullStack.Server\\Modules\\Admin\\Repositories\\TeachersRepository.cs",
+              "RelativeToolTip": "TPS_FullStack.Server\\Modules\\Admin\\Repositories\\TeachersRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFMAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T04:54:39.463Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TeachersController.cs",
+              "DocumentMoniker": "D:\\for_Work\\TPS_FullStack\\TPS_FullStack.Server\\Modules\\Admin\\Controllers\\TeachersController.cs",
+              "RelativeDocumentMoniker": "TPS_FullStack.Server\\Modules\\Admin\\Controllers\\TeachersController.cs",
+              "ToolTip": "D:\\for_Work\\TPS_FullStack\\TPS_FullStack.Server\\Modules\\Admin\\Controllers\\TeachersController.cs",
+              "RelativeToolTip": "TPS_FullStack.Server\\Modules\\Admin\\Controllers\\TeachersController.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T04:54:17.835Z",
+              "EditorCaption": ""
             }
           ]
         }

@@ -48,5 +48,22 @@ namespace TPS_FullStack.Server.Modules.Student
             return StatusCode(result.statusCode, result);
             // Implementation for getting student course info
         }
+
+
+        // Bai thu hoach
+        [HttpGet("finalexaminfo/{HocvienID}/{KhoahocID}")]
+        public async Task<IActionResult> GetFinalExamInfo(string HocvienID, string KhoahocID)
+        {
+            var result = await _studentService.GetFinalExamInfoAsync(HocvienID, KhoahocID);
+            return StatusCode(result.statusCode, result);
+            // Implementation for getting final exam info
+        }
+        [HttpPost("submitfinalexam")]
+        public async Task<IActionResult> SubmitFinalExam(finalExam finalRecord)
+        {
+            var result = await _studentService.SubmitFinalExamAsync(finalRecord);
+            return StatusCode(result.statusCode, result);
+            // Implementation for submitting final exam
+        }
     }
 }

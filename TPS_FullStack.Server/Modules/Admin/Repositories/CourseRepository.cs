@@ -97,12 +97,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                             courseDetail.courseInfo.MaID = reader["MaID"].ToString();
                             courseDetail.courseInfo.Ten = reader["Ten"].ToString();
                             courseDetail.courseInfo.Mota = reader["Mota"].ToString();
-                            courseDetail.courseInfo.Sobuoihoc = (decimal)reader["Sobuoihoc"];
-                            courseDetail.courseInfo.Thoiluonghoc = (decimal)reader["Thoiluonghoc"];
-                            courseDetail.courseInfo.Thoiluongthi = (decimal)reader["Thoiluongthi"];
-                            courseDetail.courseInfo.Socauhoi = (decimal)reader["Socauhoi"];
+                            courseDetail.courseInfo.Sobuoihoc = reader["Sobuoihoc"] != DBNull.Value ? Convert.ToDecimal(reader["Sobuoihoc"]) : 0;
+                            courseDetail.courseInfo.Thoiluonghoc = reader["Thoiluonghoc"] != DBNull.Value ? Convert.ToDecimal(reader["Thoiluonghoc"]) : 0;
+                            courseDetail.courseInfo.Thoiluongthi = reader["Thoiluongthi"] != DBNull.Value ? Convert.ToDecimal(reader["Thoiluongthi"]) : 0;
+                            courseDetail.courseInfo.Socauhoi = reader["Socauhoi"] != DBNull.Value ? Convert.ToDecimal(reader["Socauhoi"]) : 0;
                             courseDetail.courseInfo.Thu = reader["Thu"].ToString();
-                            courseDetail.courseInfo.Ngaybatdau = (DateTime)reader["Ngaybatdau"];
+                            courseDetail.courseInfo.Ngaybatdau = reader["Ngaybatdau"] != DBNull.Value ? (DateTime)reader["Ngaybatdau"] : DateTime.MinValue; 
                         }
                     }
                 }
@@ -136,7 +136,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 MaID = reader["MaID"].ToString(),
                                 ChuyendeID = reader["ChuyendeID"].ToString(),
                                 Ten = reader["Ten"].ToString(),
-                                SoCauhoi = (decimal)reader["SoCauhoi"]
+                                SoCauhoi = reader["SoCauhoi"] != DBNull.Value ? Convert.ToDecimal(reader["SoCauhoi"]) : 0
                             });
                         }
                     }
@@ -169,10 +169,10 @@ namespace TPS_FullStack.Server.Modules.Admin
                             courseDetail.courseSchedules.Add(new courseSchedules
                             {
                                 MaID = reader["MaID"].ToString(),
-                                Ngaydukien = (DateTime)reader["Ngaydukien"],
-                                Ngaythucte = (DateTime)reader["Ngaythucte"],
-                                Batdaudukien = (DateTime)reader["Batdaudukien"],
-                                Ketthucdukien = (DateTime)reader["Ketthucdukien"]
+                                Ngaydukien = reader["Ngaydukien"] != DBNull.Value ? (DateTime)reader["Ngaydukien"] : DateTime.MinValue,
+                                Ngaythucte = reader["Ngaythucte"] != DBNull.Value ? (DateTime)reader["Ngaythucte"] : DateTime.MinValue,
+                                Batdaudukien = reader["Batdaudukien"] != DBNull.Value ? (DateTime)reader["Batdaudukien"] : DateTime.MinValue,
+                                Ketthucdukien = reader["Ketthucdukien"] != DBNull.Value ? (DateTime)reader["Ketthucdukien"] : DateTime.MinValue
                             });
                         }
                     }
