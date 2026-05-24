@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -52,6 +53,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// Decrapted
 // Inject Dependency of Admin module
 builder.Services.AddScoped<ITopicsRepository, TopicsRepository>();
 builder.Services.AddScoped<ITopicsService, TopicsService>();
@@ -60,6 +62,11 @@ builder.Services.AddScoped<ITeachersService, TeachersService>();
 builder.Services.AddScoped<IStudentsRepository,StudentsRepository>();
 builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddScoped<ICourseRepository,CourseRepository>();
+builder.Services.AddScoped<ICoursesRepository, CoursesRepository>();
+builder.Services.AddScoped<ICourseTopicRepository, CourseTopicRepository>();
+builder.Services.AddScoped<ICourseTeacherRepository, CourseTeacherRepository>();
+builder.Services.AddScoped<ICourseStudentRepository, CourseStudentRepository>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<ICertificateRepository,CertificateRepository>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
@@ -67,12 +74,39 @@ builder.Services.AddScoped<IScheduleRepository,ScheduleRepository>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 
+builder.Services.AddScoped<ISchedulesService, SchedulesService>();
+builder.Services.AddScoped<ISchedulesRepository, SchedulesRepository>();
+
+
+
+// Inject Repository Dependency 
+builder.Services.AddScoped<ILabRepository, LabRepository>();
+builder.Services.AddScoped<ILabService, LabService>();
+
+
+
+
+
 // Inject Dependency of Teacher module
-builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
-builder.Services.AddScoped<ITeacherService, TeacherService>();
+// builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+// builder.Services.AddScoped<ITeacherService, TeacherService>();
 
 
-// Inject Dependency of Student module
+// Inject Repository Dependency
+builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<TPS_FullStack.Server.Modules.Admin.ITeacherService, TPS_FullStack.Server.Modules.Admin.TeacherService>();
+
+
+
+
+
+builder.Services.AddScoped<ITopicRepository, TopicRepository>();
+builder.Services.AddScoped<ITopicDocumentRepository, TopicDocumentRepository>();
+builder.Services.AddScoped<ITopicQuestionRepository, TopicQuestionRepository>();
+builder.Services.AddScoped<ITopicAnswerRepository, TopicAnswerRepository>();
+builder.Services.AddScoped<TPS_FullStack.Server.Modules.Admin.ITeacherRepository, TPS_FullStack.Server.Modules.Admin.TeacherRepository>();
+builder.Services.AddScoped<ITopicTeacherRepository, TopicTeacherRepository>();
+
 
 
 
