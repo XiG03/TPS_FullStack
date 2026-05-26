@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useStudentDetail } from '../hooks/useStudentDetail';
 import StudentDetailUI from '../components/StudentManagement/StudentDetailUI';

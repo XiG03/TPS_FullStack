@@ -8,13 +8,14 @@ export const useTeacherDetail = (id) => {
 
     const fetchDetail = useCallback(async () => {
         if (!id) return;
+
         setIsLoading(true);
         setError(null);
         try {
             const res = await getTeacherDetail(id);
             setDetail(res.data);
         } catch (err) {
-            setError('Lỗi khi tải thông tin chi tiết giáo viên.');
+            setError('Lỗi khi tải thông tin chi tiết giảng viên.');
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -22,6 +23,7 @@ export const useTeacherDetail = (id) => {
     }, [id]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchDetail();
     }, [fetchDetail]);
 

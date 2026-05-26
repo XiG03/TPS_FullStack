@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/Layout/AdminLayout';
 import TopicManagementPage from './pages/TopicManagementPage';
@@ -15,6 +14,7 @@ import TeacherManagementPage from './pages/TeacherManagementPage';
 import TeacherDetailPage from './pages/TeacherDetailPage';
 import LoginPage from './pages/LoginPage';
 import ReportManagementPage from './pages/ReportManagementPage';
+import LabCreatePage from './pages/LabCreatePage';
 import './App.css'; 
 
 function App() {
@@ -34,6 +34,8 @@ function App() {
           <Route path="courses/:id" element={<CourseDetailPage />} />
           <Route path="schedules" element={<ScheduleManagementPage />} />
           <Route path="schedules/:id" element={<ScheduleDetailPage />} />
+          <Route path="labs" element={<Navigate to="/labs/new" replace />} />
+          <Route path="labs/new" element={<LabCreatePage />} />
           <Route path="students" element={<StudentManagementPage />} />
           <Route path="students/:id" element={<StudentDetailPage />} />
           <Route path="teachers" element={<TeacherManagementPage />} />

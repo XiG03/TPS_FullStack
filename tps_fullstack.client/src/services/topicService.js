@@ -1,23 +1,45 @@
 import { getHeaders } from './httpClient';
 
-const API_BASE_URL = '/api/admin/topic';
+const API_BASE_URL = '/api/v1/topic';
 
-export const getTopics = async () => {
-    const response = await fetch(`${API_BASE_URL}/getall`, {
-        headers: getHeaders()
-    });
-    if (!response.ok) throw new Error('Failed to fetch topics');
-    const data = await response.json();
-    return { data };
+const readJson = async (response) => {
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
 };
 
-export const getTopicDetail = async (id) => {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+const getApiMessage = (payload, fallback) => {
+    return payload?.message || payload?.Message || fallback;
+};
+
+const unwrapServiceResponse = (payload) => {
+    if (
+        payload &&
+        typeof payload === 'object' &&
+        Object.prototype.hasOwnProperty.call(payload, 'data') &&
+        Object.prototype.hasOwnProperty.call(payload, 'statusCode')
+    ) {
+        return payload.data;
+    }
+
+    return payload;
+};
+
+export const getTopics = async () => {
+    const response = await fetch(`${API_BASE_URL}`, {
         headers: getHeaders()
     });
-    if (!response.ok) throw new Error('Failed to fetch topic detail');
-    const data = await response.json();
-    return { data };
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch topics'));
+    return { data: unwrapServiceResponse(payload) || [] };
+};
+
+export const getTopicDetail = async (MaID) => {
+    const response = await fetch(`${API_BASE_URL}/${MaID}`, {
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch topic detail'));
+    return { data: unwrapServiceResponse(payload) };
 };
 
 export const createTopic = async (payload) => {
@@ -26,9 +48,9 @@ export const createTopic = async (payload) => {
         headers: getHeaders(true),
         body: JSON.stringify(payload)
     });
-    if (!response.ok) throw new Error('Failed to create topic');
-    // Backend returns Created() with no body on success
-    return { success: true };
+    const data = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(data, 'Failed to create topic'));
+    return { data: unwrapServiceResponse(data), message: data?.message };
 };
 
 export const updateTopic = async (payload) => {
@@ -37,16 +59,17 @@ export const updateTopic = async (payload) => {
         headers: getHeaders(true),
         body: JSON.stringify(payload)
     });
-    if (!response.ok) throw new Error('Failed to update topic');
-    const data = await response.json();
-    return { data };
+    const data = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(data, 'Failed to update topic'));
+    return { data: unwrapServiceResponse(data), message: data?.message };
 };
 
-export const deleteTopic = async (id) => {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+export const deleteTopic = async (MaID) => {
+    const response = await fetch(`${API_BASE_URL}/${MaID}`, {
         method: 'DELETE',
         headers: getHeaders()
     });
-    if (!response.ok) throw new Error('Failed to delete topic');
-    return { success: true };
+    const data = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(data, 'Failed to delete topic'));
+    return { data: unwrapServiceResponse(data), message: data?.message };
 };

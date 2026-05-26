@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getStudents, createStudent, updateStudent, deleteStudent } from '../services/studentService';
+import { useCallback, useEffect, useState } from 'react';
+import { createStudent, deleteStudent, getStudents, updateStudent } from '../services/studentService';
 
 export const useStudent = () => {
     const [students, setStudents] = useState([]);
@@ -11,7 +11,7 @@ export const useStudent = () => {
         setError(null);
         try {
             const res = await getStudents();
-            setStudents(res.data);
+            setStudents(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             setError('Lỗi khi tải danh sách học viên.');
             console.error(err);
@@ -21,13 +21,14 @@ export const useStudent = () => {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchStudents();
     }, [fetchStudents]);
 
     const handleAddStudent = async (data) => {
         try {
-            const res = await createStudent(data);
-            setStudents(prev => [...prev, res.data]);
+            await createStudent(data);
+            await fetchStudents();
             return true;
         } catch (err) {
             console.error(err);
@@ -37,8 +38,8 @@ export const useStudent = () => {
 
     const handleUpdateStudent = async (id, data) => {
         try {
-            const res = await updateStudent(id, data);
-            setStudents(prev => prev.map(s => s.maID === id ? { ...s, ...res.data } : s));
+            await updateStudent(id, data);
+            await fetchStudents();
             return true;
         } catch (err) {
             console.error(err);
@@ -49,7 +50,7 @@ export const useStudent = () => {
     const handleDeleteStudent = async (id) => {
         try {
             await deleteStudent(id);
-            setStudents(prev => prev.filter(s => s.maID !== id));
+            setStudents((prev) => prev.filter((student) => student.hocvienID !== id));
             return true;
         } catch (err) {
             console.error(err);

@@ -8,6 +8,7 @@ export const useCourseDetail = (id) => {
 
     const fetchDetail = useCallback(async () => {
         if (!id) return;
+
         setIsLoading(true);
         setError(null);
         try {
@@ -22,6 +23,7 @@ export const useCourseDetail = (id) => {
     }, [id]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchDetail();
     }, [fetchDetail]);
 

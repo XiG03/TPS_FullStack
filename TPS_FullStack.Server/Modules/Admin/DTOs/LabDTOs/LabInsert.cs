@@ -18,7 +18,6 @@
         public string? ThuchanhID { get; set; }
         public string? KhoahocID { get; set; }
         public string? GiangvienID { get; set; }
-        public string? LichhocID { get; set; }
         public string? ChuyendeID { get; set; }
         public string? Diachi { get; set; }
         public decimal? Soluongtoida { get; set; }

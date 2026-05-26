@@ -66,17 +66,7 @@ INSERT INTO dbo.Thuchanh (MaID, KhoahocID, GiangvienID, LichhocID, ChuyendeID, D
 VALUES (@MaID, @KhoahocID, @GiangvienID, @LichhocID, @ChuyendeID, @Diachi, @Soluongtoida)
 
 
+use TPS_db
 
-CREATE PROC dbo.sp_Thongke_Khoahoc_Thang
-(
-    @Ngaydau DATETIME,
-    @Ngaycuoi DATETIME
-)
-AS
-BEGIN
-
-    SELECT 
-    kh.MaID AS KhoahocID, kh.Ten AS TenKhoahoc, 
-    (SELECT COUNT (*) FROM dbo.Khoahoc_Hocvien WHERE))
-    FROM dbo.Khoahoc kh
+SELECT * FROM dbo.Thuchanh
     

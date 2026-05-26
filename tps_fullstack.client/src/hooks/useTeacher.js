@@ -11,9 +11,9 @@ export const useTeacher = () => {
         setError(null);
         try {
             const res = await getTeachers();
-            setTeachers(res.data);
+            setTeachers(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
-            setError('Lỗi khi tải danh sách giáo viên.');
+            setError('Lỗi khi tải danh sách giảng viên.');
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -21,13 +21,14 @@ export const useTeacher = () => {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchTeachers();
     }, [fetchTeachers]);
 
     const handleAddTeacher = async (data) => {
         try {
-            const res = await createTeacher(data);
-            setTeachers(prev => [...prev, res.data]);
+            await createTeacher(data);
+            await fetchTeachers();
             return true;
         } catch (err) {
             console.error(err);
@@ -35,10 +36,10 @@ export const useTeacher = () => {
         }
     };
 
-    const handleUpdateTeacher = async (id, data) => {
+    const handleUpdateTeacher = async (data) => {
         try {
-            const res = await updateTeacher(id, data);
-            setTeachers(prev => prev.map(t => t.MaID === id ? { ...t, ...res.data } : t));
+            await updateTeacher(data);
+            await fetchTeachers();
             return true;
         } catch (err) {
             console.error(err);
@@ -49,7 +50,7 @@ export const useTeacher = () => {
     const handleDeleteTeacher = async (id) => {
         try {
             await deleteTeacher(id);
-            setTeachers(prev => prev.filter(t => t.MaID !== id));
+            setTeachers((prev) => prev.filter((teacher) => teacher.maID !== id));
             return true;
         } catch (err) {
             console.error(err);
