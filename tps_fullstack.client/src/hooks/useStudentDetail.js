@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getStudentDetail } from '../services/studentService';
 
 export const useStudentDetail = (id) => {
@@ -22,6 +22,7 @@ export const useStudentDetail = (id) => {
     }, [id]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchDetail();
     }, [fetchDetail]);
 

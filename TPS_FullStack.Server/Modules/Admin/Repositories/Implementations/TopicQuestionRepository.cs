@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Data.SqlClient;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
@@ -84,6 +85,28 @@ namespace TPS_FullStack.Server.Modules.Admin
                 return result;
             }
             // throw new NotImplementedException();
+        }
+
+        public async Task<List<QuestionTopicModel>> GetByTopicIdAsync(SqlConnection conn, string? ChuyendeID)
+        {
+            var query = @"SELECT * FROM dbo.Chuyende_Cauhoi WHERE ChuyendeID = @ChuyendeID";
+            using (var cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@ChuyendeID", ChuyendeID);
+                using var reader = await cmd.ExecuteReaderAsync();
+                var result = new List<QuestionTopicModel>();
+                while (await reader.ReadAsync())
+                {
+                    result.Add(new QuestionTopicModel
+                    {
+                        MaID = reader["MaID"].ToString(),
+                        ChuyendeID = reader["ChuyendeID"].ToString(),
+                        Ten = reader["Ten"].ToString()
+                    });
+                }
+                return result;
+            }
+            throw new NotImplementedException();
         }
 
         public async Task UpdateAsync(SqlConnection conn, SqlTransaction trans, string MaID, string ChuyendeID, string Ten)

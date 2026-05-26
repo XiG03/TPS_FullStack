@@ -1,155 +1,263 @@
-import React from 'react';
-import { format, isSameDay, getDay } from 'date-fns';
+import { format, getDay, isSameDay } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 
-const ScheduleManagementUI = ({ 
-    schedules, isLoading, error, onAddSchedule,
-    weekDays, currentDate, nextWeek, prevWeek, goToday 
+const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
+const getValue = (source, ...keys) => {
+    for (const key of keys) {
+        if (source?.[key] !== undefined && source?.[key] !== null) return source[key];
+    }
+    return undefined;
+};
+
+const toDate = (value) => {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const formatTime = (value) => {
+    const date = toDate(value);
+    return date ? format(date, 'HH:mm') : '--:--';
+};
+
+const combineDateAndTime = (dateValue, timeValue) => {
+    const date = toDate(dateValue);
+    if (!date) return toDate(timeValue);
+
+    const combined = new Date(date);
+    const time = toDate(timeValue);
+
+    if (time) {
+        combined.setHours(time.getHours(), time.getMinutes(), 0, 0);
+    }
+
+    return combined;
+};
+
+const getEventStart = (schedule) => (
+    combineDateAndTime(
+        getValue(schedule, 'ngaydukien', 'Ngaydukien'),
+        getValue(schedule, 'batdaudukien', 'Batdaudukien')
+    )
+);
+
+const getEventEnd = (schedule) => (
+    combineDateAndTime(
+        getValue(schedule, 'ngaydukien', 'Ngaydukien'),
+        getValue(schedule, 'ketthucdukien', 'Ketthucdukien', 'kethucdukien', 'Kethucdukien') ||
+            getValue(schedule, 'batdaudukien', 'Batdaudukien')
+    )
+);
+
+const normalizeSchedule = (schedule) => ({
+    raw: schedule,
+    id: getValue(schedule, 'lichhocID', 'LichhocID', 'maID', 'MaID'),
+    courseId: getValue(schedule, 'khoahocID', 'KhoahocID'),
+    courseName: getValue(schedule, 'tenKhoahoc', 'TenKhoahoc') || 'Khóa học chưa đặt tên',
+    topicId: getValue(schedule, 'chuyendeID', 'ChuyendeID'),
+    topicName: getValue(schedule, 'tenChuyende', 'TenChuyende'),
+    teacherId: getValue(schedule, 'giangvienID', 'GiangvienID'),
+    teacherName: getValue(schedule, 'tenGiangvien', 'TenGiangvien'),
+    expectedDate: getValue(schedule, 'ngaydukien', 'Ngaydukien'),
+    expectedStart: getValue(schedule, 'batdaudukien', 'Batdaudukien'),
+    expectedEnd: getValue(schedule, 'ketthucdukien', 'Ketthucdukien', 'kethucdukien', 'Kethucdukien'),
+    actualStart: getValue(schedule, 'batdauthucte', 'Batdauthucte'),
+    actualEnd: getValue(schedule, 'ketthucthucte', 'Ketthucthucte', 'kethucthucte', 'Kethucthucte')
+});
+
+const getCourseColor = (courseKey = '') => {
+    const palette = [
+        {
+            bgColor: 'bg-[#0B4AA2]',
+            textColor: 'text-white',
+            tagBg: 'bg-white/20',
+            tagText: 'text-white',
+            subTextColor: 'text-blue-100',
+            borderColor: 'border-[#083A80]'
+        },
+        {
+            bgColor: 'bg-[#F2F7FF]',
+            textColor: 'text-[#123B73]',
+            tagBg: 'bg-[#DCEBFF]',
+            tagText: 'text-[#0B4AA2]',
+            subTextColor: 'text-[#4B678A]',
+            borderColor: 'border-[#C7DBF7]'
+        },
+        {
+            bgColor: 'bg-[#FFF3ED]',
+            textColor: 'text-[#6F2C12]',
+            tagBg: 'bg-[#FFE0D1]',
+            tagText: 'text-[#7D2B0C]',
+            subTextColor: 'text-[#8D5138]',
+            borderColor: 'border-[#FFD1BC]'
+        },
+        {
+            bgColor: 'bg-[#F0F7F3]',
+            textColor: 'text-[#164A2E]',
+            tagBg: 'bg-[#D7EEE0]',
+            tagText: 'text-[#166236]',
+            subTextColor: 'text-[#4D755D]',
+            borderColor: 'border-[#C5E3D1]'
+        }
+    ];
+
+    const key = String(courseKey || '');
+    const index = Math.abs(key.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0)) % palette.length;
+    return palette[index];
+};
+
+const ScheduleManagementUI = ({
+    schedules,
+    isLoading,
+    error,
+    onAddSchedule,
+    onEditSchedule,
+    onDeleteSchedule,
+    weekDays,
+    currentDate,
+    nextWeek,
+    prevWeek,
+    goToday
 }) => {
     const navigate = useNavigate();
-
-    // Lấy tên tháng năm cho Header
     const monthYearStr = format(currentDate, "'Tháng' M, yyyy", { locale: vi });
+    const normalizedSchedules = schedules.map(normalizeSchedule);
 
-    // Hàm phụ trợ map tên thứ tiếng Việt
-    const getVietnameseDay = (date) => {
-        const dayMap = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-        return dayMap[getDay(date)];
-    };
+    let minHour = 8;
+    let maxHour = 17;
 
-    // Tìm khung giờ nhỏ nhất và lớn nhất dựa trên dữ liệu lịch học của tuần
-    let minHour = 8; // Mặc định 08:00
-    let maxHour = 17; // Mặc định 17:00
+    const currentWeekEvents = normalizedSchedules
+        .filter((schedule) => {
+            const startDate = getEventStart(schedule.raw);
+            return startDate && weekDays.some((weekDay) => isSameDay(weekDay, startDate));
+        })
+        .sort((a, b) => getEventStart(a.raw) - getEventStart(b.raw));
 
-    const currentWeekEvents = schedules.filter(s => {
-        const d = new Date(s.batdaudukien);
-        return weekDays.some(wd => isSameDay(wd, d));
+    currentWeekEvents.forEach((schedule) => {
+        const startDate = getEventStart(schedule.raw);
+        const endDate = getEventEnd(schedule.raw) || startDate;
+        if (!startDate) return;
+
+        const startHour = startDate.getHours();
+        const adjustedEnd = endDate.getHours() + (endDate.getMinutes() > 0 ? 1 : 0);
+
+        minHour = Math.min(minHour, startHour);
+        maxHour = Math.max(maxHour, adjustedEnd);
     });
 
-    if (currentWeekEvents.length > 0) {
-        currentWeekEvents.forEach(s => {
-            const startH = new Date(s.batdaudukien).getHours();
-            const endH = new Date(s.ketthucdukien).getHours();
-            if (startH < minHour) minHour = startH;
-            // Nếu kết thúc vào giờ lẻ (ví dụ 18:30) thì làm tròn lên 19:00 để hiển thị grid đầy đủ
-            const endMinutes = new Date(s.ketthucdukien).getMinutes();
-            const adjustedEnd = endMinutes > 0 ? endH + 1 : endH;
-            if (adjustedEnd > maxHour) maxHour = adjustedEnd;
-        });
-    }
-
-    // Đảm bảo có ít nhất 1 giờ đệm ở cuối
-    maxHour = Math.min(23, maxHour + 1);
+    maxHour = Math.min(23, Math.max(minHour + 1, maxHour + 1));
 
     const timeSlots = [];
-    for (let i = minHour; i <= maxHour; i++) {
-        timeSlots.push(`${i.toString().padStart(2, '0')}:00`);
+    for (let hour = minHour; hour <= maxHour; hour += 1) {
+        timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
     }
+
     const numRows = timeSlots.length;
+    const completedEvents = currentWeekEvents.filter((event) => event.actualStart || event.actualEnd).length;
 
-    // Cập nhật hàm renderEventsForDay để tính top dựa trên minHour
-    const renderEventsForDay = (date) => {
-        const dayEvents = schedules.filter(s => {
-            const eventDate = new Date(s.batdaudukien);
-            return isSameDay(eventDate, date);
-        });
+    const renderEventCard = (event) => {
+        const startDate = getEventStart(event.raw);
+        const endDate = getEventEnd(event.raw) || (startDate ? new Date(startDate.getTime() + 60 * 60 * 1000) : null);
+        if (!startDate || !endDate) return null;
 
-        return dayEvents.map(event => {
-            const startDate = new Date(event.batdaudukien);
-            const endDate = new Date(event.ketthucdukien);
-            
-            // Tính toán vị trí top (px) dựa trên minHour làm mốc 0px
-            const startHourValue = startDate.getHours() + startDate.getMinutes() / 60;
-            const topPx = (startHourValue - minHour) * 90;
+        const startHourValue = startDate.getHours() + startDate.getMinutes() / 60;
+        const topPx = Math.max(0, (startHourValue - minHour) * 88);
+        const durationHours = Math.max(0.75, (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60));
+        const heightPx = Math.min(Math.max(durationHours * 88, 68), 180);
+        const color = getCourseColor(event.courseId || event.courseName);
+        const title = event.topicName || event.courseName;
 
-            const durationHours = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-            const heightPx = durationHours * 90;
-
-            // Xác định màu sắc theo ID khóa học
-            let bgColor = 'bg-[#002B7A]';
-            let textColor = 'text-white';
-            let tagBg = 'bg-white/20';
-            let tagText = 'text-white/90';
-            let subTextColor = 'text-blue-200';
-            let borderColor = 'border-[#001f5c]';
-
-            if (event.KhoahocID === 'C002') {
-                bgColor = 'bg-[#E8F0FE]';
-                textColor = 'text-[#1a3a6e]';
-                tagBg = 'bg-[#d0e1fb]';
-                tagText = 'text-[#00328a]';
-                subTextColor = 'text-[#4a6b9c]';
-                borderColor = 'border-blue-200/60';
-            } else if (event.KhoahocID === 'C003') {
-                bgColor = 'bg-[#FFF0EB]';
-                textColor = 'text-[#6c1f00]';
-                tagBg = 'bg-[#ffdbcf]';
-                tagText = 'text-[#6c1f00]';
-                subTextColor = 'text-[#8a4224]';
-                borderColor = 'border-[#ffdbcf]';
-            }
-
-            return (
-                <div 
-                    key={event.maID}
-                    onClick={() => navigate(`/schedules/${event.maID}`)}
-                    className={`absolute left-1.5 right-1.5 rounded-xl p-3 flex flex-col justify-between shadow-sm z-10 hover:shadow-md transition-all cursor-pointer group border ${bgColor} ${textColor} ${borderColor}`}
-                    style={{ top: `${topPx}px`, height: `${heightPx}px` }}
-                >
-                    <div>
-                        <div className="flex items-center justify-between mb-1.5">
-                            <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-manrope font-bold uppercase tracking-wider ${tagBg} ${tagText}`}>
-                                {event.khoahocID}
+        return (
+            <div
+                key={event.id}
+                onClick={() => navigate(`/schedules/${event.id}`)}
+                className={`absolute left-1.5 right-1.5 rounded-lg p-3 shadow-sm z-10 hover:shadow-md transition-all cursor-pointer group border ${color.bgColor} ${color.textColor} ${color.borderColor}`}
+                style={{ top: `${topPx}px`, height: `${heightPx}px` }}
+            >
+                <div className="flex h-full min-h-0 flex-col justify-between gap-2">
+                    <div className="min-w-0">
+                        <div className="mb-1.5 flex items-center justify-between gap-2">
+                            <span className={`inline-flex px-1.5 py-0.5 rounded text-[9px] font-label font-bold uppercase ${color.tagBg} ${color.tagText}`}>
+                                {event.actualStart || event.actualEnd ? 'Đã học' : 'Dự kiến'}
                             </span>
+                            <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                <button
+                                    type="button"
+                                    onClick={(clickEvent) => {
+                                        clickEvent.stopPropagation();
+                                        onEditSchedule(event.raw);
+                                    }}
+                                    className="w-6 h-6 rounded bg-white/20 flex items-center justify-center hover:bg-white/30"
+                                    title="Chỉnh sửa"
+                                >
+                                    <span className="material-symbols-outlined text-[14px]">edit</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={(clickEvent) => {
+                                        clickEvent.stopPropagation();
+                                        onDeleteSchedule(event.id);
+                                    }}
+                                    className="w-6 h-6 rounded bg-white/20 flex items-center justify-center hover:bg-white/30"
+                                    title="Xóa"
+                                >
+                                    <span className="material-symbols-outlined text-[14px]">delete</span>
+                                </button>
+                            </div>
                         </div>
-                        <h4 className="text-[13px] font-manrope font-bold leading-tight mb-1 truncate">
-                            {event.tenKhoahoc}
+                        <h4 className="text-[13px] font-headline font-bold leading-tight truncate" title={title}>
+                            {title}
                         </h4>
-                        <p className={`text-[10px] font-inter ${subTextColor}`}>
-                            {format(startDate, 'HH:mm')} - {format(endDate, 'HH:mm')}
+                        <p className={`mt-1 text-[10px] font-body truncate ${color.subTextColor}`} title={event.courseName}>
+                            {event.courseName}
                         </p>
                     </div>
+                    <div className={`text-[10px] font-body ${color.subTextColor}`}>
+                        <p>{formatTime(event.expectedStart || event.expectedDate)} - {formatTime(event.expectedEnd)}</p>
+                        <p className="truncate">{event.teacherName || (event.teacherId ? 'Đã phân công giảng viên' : 'Chưa phân công giảng viên')}</p>
+                    </div>
                 </div>
-            );
-        });
+            </div>
+        );
     };
 
-    // Không còn cứng 10 timeSlots nữa
+    const renderEventsForDay = (date) => {
+        const dayEvents = currentWeekEvents.filter((schedule) => {
+            const eventDate = getEventStart(schedule.raw);
+            return eventDate && isSameDay(eventDate, date);
+        });
+
+        return dayEvents.map(renderEventCard);
+    };
+
     return (
-        <div className="pt-8 px-10 pb-20 mx-auto max-w-full">
-            {/* Header Section */}
-            <div className="flex flex-col xl:flex-row xl:items-end justify-between mb-10 gap-6">
-                <div>
-                    <h2 className="text-3xl font-headline font-extrabold text-on-surface tracking-tight mb-2">
-                        Lịch Đào tạo Tổng thể
+        <div className="mx-auto flex max-w-full flex-col px-4 pb-20 pt-6 sm:px-6 lg:px-10">
+            <div className="mb-8 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+                <div className="min-w-0">
+                    <h2 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface">
+                        Lịch dạy học
                     </h2>
-                    <p className="text-on-surface-variant font-body text-sm">
-                        {monthYearStr} • Quản lý vận hành giảng dạy
+                    <p className="mt-2 font-body text-sm text-on-surface-variant">
+                        {monthYearStr} - theo dõi các buổi học trong tuần
                     </p>
                 </div>
-                <div className="flex items-center gap-4 flex-wrap">
-                    {/* Navigation */}
-                    <div className="flex items-center bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-1 shadow-sm">
-                        <button onClick={prevWeek} className="p-1.5 hover:bg-surface-container-low rounded-lg transition-all text-on-surface-variant hover:text-on-surface">
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center rounded-lg border border-outline-variant/30 bg-surface-container-lowest p-1 shadow-sm">
+                        <button onClick={prevWeek} className="p-1.5 hover:bg-surface-container-low rounded-md transition-all text-on-surface-variant hover:text-on-surface" title="Tuần trước">
                             <span className="material-symbols-outlined text-[20px]">chevron_left</span>
                         </button>
-                        <button onClick={goToday} className="px-4 py-1.5 font-headline font-bold text-sm text-[#0047BB] hover:bg-blue-50/50 rounded-lg transition-all">
+                        <button onClick={goToday} className="px-4 py-1.5 font-label font-bold text-sm text-[#0B4AA2] hover:bg-blue-50 rounded-md transition-all">
                             Hôm nay
                         </button>
-                        <button onClick={nextWeek} className="p-1.5 hover:bg-surface-container-low rounded-lg transition-all text-on-surface-variant hover:text-on-surface">
+                        <button onClick={nextWeek} className="p-1.5 hover:bg-surface-container-low rounded-md transition-all text-on-surface-variant hover:text-on-surface" title="Tuần sau">
                             <span className="material-symbols-outlined text-[20px]">chevron_right</span>
                         </button>
                     </div>
-                    {/* View Switcher */}
-                    <div className="flex items-center bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-1 shadow-sm">
-                        <button className="px-4 py-1.5 font-headline font-semibold text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-all">Ngày</button>
-                        <button className="px-4 py-1.5 font-headline font-bold text-sm bg-surface-container-low text-[#0047BB] rounded-lg shadow-sm border border-outline-variant/20 transition-all">Tuần</button>
-                        <button className="px-4 py-1.5 font-headline font-semibold text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-all">Tháng</button>
-                    </div>
-                    <button 
+                    <button
                         onClick={onAddSchedule}
-                        className="bg-[#0047BB] hover:bg-[#00328a] text-white px-5 py-2.5 rounded-xl font-headline font-bold text-sm flex items-center space-x-2 transition-all shadow-sm"
+                        className="flex items-center gap-2 rounded-lg bg-[#0B4AA2] px-5 py-2.5 text-sm font-label font-bold text-white shadow-sm transition-all hover:bg-[#083A80]"
                     >
                         <span className="material-symbols-outlined text-[18px]">add</span>
                         <span>Tạo lịch mới</span>
@@ -157,100 +265,144 @@ const ScheduleManagementUI = ({
                 </div>
             </div>
 
-            {/* Stat Cards */}
-            <div className="flex flex-wrap gap-4 mb-8">
-                <div className="flex-1 min-w-[240px] bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-outline-variant/30 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0047BB] flex items-center justify-center">
-                        <span className="material-symbols-outlined">person_pin</span>
+            <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+                <div className="flex items-center gap-4 rounded-lg border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-[#0B4AA2]">
+                        <span className="material-symbols-outlined">event</span>
                     </div>
                     <div>
-                        <p className="text-[10px] font-headline font-extrabold text-outline uppercase tracking-wider">Giảng viên bận</p>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-xl font-headline font-extrabold text-on-surface">12</span>
-                            <span className="text-[10px] font-semibold text-outline">/ 45 Tổng số</span>
-                            <span className="text-[9px] text-green-600 font-bold ml-2">+2 (Hôm nay)</span>
-                        </div>
+                        <p className="font-label text-[10px] font-extrabold uppercase text-outline">Buổi học trong tuần</p>
+                        <span className="font-headline text-xl font-extrabold text-on-surface">{currentWeekEvents.length}</span>
                     </div>
                 </div>
-                <div className="flex-1 min-w-[240px] bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-outline-variant/30 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0047BB] flex items-center justify-center">
-                        <span className="material-symbols-outlined">meeting_room</span>
+                <div className="flex items-center gap-4 rounded-lg border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 text-[#166236]">
+                        <span className="material-symbols-outlined">task_alt</span>
                     </div>
-                    <div className="flex-1">
-                        <p className="text-[10px] font-headline font-extrabold text-outline uppercase tracking-wider">Phòng học trống</p>
-                        <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xl font-headline font-extrabold text-on-surface">
-                                08 <span className="text-[10px] text-outline">/ 20</span>
-                            </span>
-                            <span className="text-[10px] font-bold text-[#0047BB]">40% khả dụng</span>
-                        </div>
-                        <div className="w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#0047BB] h-full w-[40%] rounded-full"></div>
-                        </div>
+                    <div>
+                        <p className="font-label text-[10px] font-extrabold uppercase text-outline">Đã cập nhật thực tế</p>
+                        <span className="font-headline text-xl font-extrabold text-on-surface">{completedEvents}</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-4 rounded-lg border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant">
+                        <span className="material-symbols-outlined">database</span>
+                    </div>
+                    <div>
+                        <p className="font-label text-[10px] font-extrabold uppercase text-outline">Tổng lịch học</p>
+                        <span className="font-headline text-xl font-extrabold text-on-surface">{schedules.length}</span>
                     </div>
                 </div>
             </div>
 
-            {isLoading && <div className="text-center font-body text-on-surface-variant mb-4">Đang tải dữ liệu...</div>}
-            {error && <div className="text-center font-body text-error mb-4">{error}</div>}
+            {isLoading && <div className="mb-4 rounded-lg bg-surface-container-lowest p-4 text-center font-body text-on-surface-variant">Đang tải dữ liệu...</div>}
+            {error && <div className="mb-4 rounded-lg bg-error-container p-4 text-center font-body text-error">{error}</div>}
 
-            {/* Calendar Custom Grid */}
-            <div className="flex-1 bg-surface-container-lowest rounded-2xl overflow-hidden flex flex-col border border-outline-variant/30 shadow-sm relative">
-                {/* Header (Thứ) */}
-                <div className="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-outline-variant/30 bg-surface-container-low/50 sticky top-0 z-20">
-                    <div className="p-3 border-r border-outline-variant/20 flex items-end justify-center pb-2">
-                        <span className="text-[10px] font-body font-medium text-outline">Giờ</span>
-                    </div>
-                    {weekDays && weekDays.map((date, idx) => {
-                        const isToday = isSameDay(date, new Date());
-                        return (
-                            <div key={idx} className={`p-3 text-center ${idx < 6 ? 'border-r border-outline-variant/20' : ''} ${isToday ? 'bg-blue-50/50 border-b-2 border-b-[#0047BB]' : ''}`}>
-                                <p className={`text-[11px] font-headline font-bold uppercase tracking-wider mb-1 ${isToday ? 'text-[#0047BB]' : 'text-outline'}`}>
-                                    {getVietnameseDay(date)}
-                                </p>
-                                <p className={`text-xl font-headline font-extrabold ${isToday ? 'text-[#0047BB]' : 'text-on-surface'}`}>
-                                    {format(date, 'dd')}
-                                </p>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {/* Grid Body */}
-                <div className="flex-1 overflow-y-auto max-h-[700px] relative calendar-scroll bg-surface-container-lowest">
-                    <div className="grid grid-cols-[60px_repeat(7,1fr)] relative" style={{ minHeight: `${numRows * 90}px` }}>
-                        {/* Background Lines */}
-                        <div className="absolute inset-0 grid grid-cols-[60px_repeat(7,1fr)] pointer-events-none">
-                            <div className="border-r border-outline-variant/20 bg-surface-container-low/20"></div>
-                            {weekDays && weekDays.map((date, idx) => (
-                                <div key={idx} className={`border-r border-outline-variant/20 ${isSameDay(date, new Date()) ? 'bg-blue-50/10' : ''}`}></div>
-                            ))}
-                        </div>
-
-                        {/* Horizontal Time Lines */}
-                        <div className="absolute inset-0 grid pointer-events-none z-0" style={{ gridTemplateRows: `repeat(${numRows}, 90px)` }}>
-                            {timeSlots.map((_, i) => (
-                                <div key={i} className="border-b border-outline-variant/10"></div>
-                            ))}
-                        </div>
-
-                        {/* Time Column (Dynamic) */}
-                        <div className="relative z-10 grid" style={{ gridTemplateRows: `repeat(${numRows}, 90px)` }}>
-                            {timeSlots.map((time, i) => (
-                                <div key={i} className="flex justify-center pt-2 text-[11px] font-body font-medium text-outline">
-                                    {time}
+            <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
+                <div className="rounded-lg border border-outline-variant/30 bg-surface-container-lowest shadow-sm">
+                    <div className="overflow-x-auto calendar-scroll">
+                        <div className="min-w-[980px]">
+                            <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-outline-variant/30 bg-surface-container-low/50">
+                                <div className="flex items-end justify-center border-r border-outline-variant/20 p-3 pb-2">
+                                    <span className="font-body text-[10px] font-medium text-outline">Giờ</span>
                                 </div>
-                            ))}
-                        </div>
-
-                        {/* Events Columns */}
-                        {weekDays && weekDays.map((date, idx) => (
-                            <div key={idx} className="relative">
-                                {renderEventsForDay(date)}
+                                {weekDays.map((date, index) => {
+                                    const isToday = isSameDay(date, new Date());
+                                    return (
+                                        <div key={date.toISOString()} className={`p-3 text-center ${index < 6 ? 'border-r border-outline-variant/20' : ''} ${isToday ? 'bg-blue-50 border-b-2 border-b-[#0B4AA2]' : ''}`}>
+                                            <p className={`mb-1 font-label text-[11px] font-bold uppercase ${isToday ? 'text-[#0B4AA2]' : 'text-outline'}`}>
+                                                {dayNames[getDay(date)]}
+                                            </p>
+                                            <p className={`font-headline text-xl font-extrabold ${isToday ? 'text-[#0B4AA2]' : 'text-on-surface'}`}>
+                                                {format(date, 'dd')}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        ))}
+
+                            <div className="relative bg-surface-container-lowest" style={{ minHeight: `${numRows * 88}px` }}>
+                                <div className="absolute inset-0 grid grid-cols-[64px_repeat(7,1fr)] pointer-events-none">
+                                    <div className="border-r border-outline-variant/20 bg-surface-container-low/20"></div>
+                                    {weekDays.map((date) => (
+                                        <div key={date.toISOString()} className={`border-r border-outline-variant/20 ${isSameDay(date, new Date()) ? 'bg-blue-50/20' : ''}`}></div>
+                                    ))}
+                                </div>
+
+                                <div className="absolute inset-0 grid pointer-events-none" style={{ gridTemplateRows: `repeat(${numRows}, 88px)` }}>
+                                    {timeSlots.map((time) => (
+                                        <div key={time} className="border-b border-outline-variant/10"></div>
+                                    ))}
+                                </div>
+
+                                <div className="absolute inset-y-0 left-0 z-10 grid w-16" style={{ gridTemplateRows: `repeat(${numRows}, 88px)` }}>
+                                    {timeSlots.map((time) => (
+                                        <div key={time} className="flex justify-center pt-2 font-body text-[11px] font-medium text-outline">
+                                            {time}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="absolute inset-y-0 left-16 right-0 grid grid-cols-7">
+                                    {weekDays.map((date) => (
+                                        <div key={date.toISOString()} className="relative">
+                                            {renderEventsForDay(date)}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {!isLoading && currentWeekEvents.length === 0 && (
+                                    <div className="absolute inset-0 left-16 flex items-center justify-center">
+                                        <div className="rounded-lg border border-dashed border-outline-variant bg-surface/90 px-6 py-5 text-center shadow-sm">
+                                            <p className="font-headline font-bold text-on-surface">Chưa có buổi học trong tuần này</p>
+                                            <p className="mt-1 font-body text-sm text-on-surface-variant">Tạo lịch mới hoặc chuyển sang tuần khác để xem dữ liệu.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <aside className="rounded-lg border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                        <h3 className="font-headline text-lg font-bold text-on-surface">Buổi học trong tuần</h3>
+                        <span className="rounded-full bg-surface-container-high px-3 py-1 font-label text-xs font-bold text-on-surface-variant">
+                            {currentWeekEvents.length}
+                        </span>
+                    </div>
+                    {currentWeekEvents.length === 0 ? (
+                        <p className="rounded-lg bg-surface-container-low p-4 font-body text-sm text-on-surface-variant">Không có lịch học để hiển thị.</p>
+                    ) : (
+                        <div className="max-h-[680px] space-y-3 overflow-y-auto pr-1 calendar-scroll">
+                            {currentWeekEvents.map((event) => {
+                                const expectedDate = toDate(event.expectedDate);
+                                return (
+                                    <button
+                                        key={event.id}
+                                        type="button"
+                                        onClick={() => navigate(`/schedules/${event.id}`)}
+                                        className="w-full rounded-lg border border-surface-container-highest bg-surface-container-low p-3 text-left transition-colors hover:bg-surface-container-high"
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <p className="truncate font-label text-sm font-bold text-on-surface">{event.topicName || event.courseName}</p>
+                                                <p className="mt-1 truncate font-body text-xs text-on-surface-variant">{event.courseName}</p>
+                                            </div>
+                                            <span className="shrink-0 rounded bg-surface px-2 py-1 font-label text-[10px] font-bold text-on-surface-variant">
+                                                {expectedDate ? format(expectedDate, 'dd/MM') : '--/--'}
+                                            </span>
+                                        </div>
+                                        <div className="mt-3 flex items-center justify-between gap-3 font-body text-xs text-on-surface-variant">
+                                            <span>{formatTime(event.expectedStart || event.expectedDate)} - {formatTime(event.expectedEnd)}</span>
+                                            <span className="truncate">{event.teacherName || 'Chưa phân công'}</span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                </aside>
             </div>
 
             <style jsx="true">{`

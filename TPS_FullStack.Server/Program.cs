@@ -95,18 +95,15 @@ builder.Services.AddScoped<ILabService, LabService>();
 // Inject Repository Dependency
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<TPS_FullStack.Server.Modules.Admin.ITeacherService, TPS_FullStack.Server.Modules.Admin.TeacherService>();
-
-
-
-
-
 builder.Services.AddScoped<ITopicRepository, TopicRepository>();
 builder.Services.AddScoped<ITopicDocumentRepository, TopicDocumentRepository>();
 builder.Services.AddScoped<ITopicQuestionRepository, TopicQuestionRepository>();
 builder.Services.AddScoped<ITopicAnswerRepository, TopicAnswerRepository>();
 builder.Services.AddScoped<TPS_FullStack.Server.Modules.Admin.ITeacherRepository, TPS_FullStack.Server.Modules.Admin.TeacherRepository>();
 builder.Services.AddScoped<ITopicTeacherRepository, TopicTeacherRepository>();
-
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<ICertificateStudentRepository, CertificateStudentRepository>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getScheduleDetail, saveAttendance } from '../services/scheduleService';
+import { getScheduleDetail } from '../services/scheduleService';
 
 export const useScheduleDetail = (id) => {
     const [detail, setDetail] = useState(null);
@@ -8,13 +8,14 @@ export const useScheduleDetail = (id) => {
 
     const fetchDetail = useCallback(async () => {
         if (!id) return;
+
         setIsLoading(true);
         setError(null);
         try {
             const res = await getScheduleDetail(id);
             setDetail(res.data);
         } catch (err) {
-            setError('Lỗi khi tải thông tin chi tiết điểm danh.');
+            setError('Lỗi khi tải thông tin chi tiết lịch dạy học.');
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -22,25 +23,14 @@ export const useScheduleDetail = (id) => {
     }, [id]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchDetail();
     }, [fetchDetail]);
 
-    const handleSaveAttendance = async (attendanceData) => {
-        try {
-            await saveAttendance(id, attendanceData);
-            return true;
-        } catch (err) {
-            console.error(err);
-            return false;
-        }
-    };
-
     return {
         detail,
-        setDetail, // allow local optimistic updates
         isLoading,
         error,
-        refetch: fetchDetail,
-        handleSaveAttendance
+        refetch: fetchDetail
     };
 };

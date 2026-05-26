@@ -1,59 +1,86 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSchedule } from '../hooks/useSchedule';
 import ScheduleManagementUI from '../components/ScheduleManagement/ScheduleManagementUI';
 import ScheduleFormModal from '../components/ScheduleManagement/ScheduleFormModal';
 
 const ScheduleManagementPage = () => {
-    const { 
-        schedules, isLoading, error, handleAddSchedule, handleUpdateSchedule,
-        weekDays, currentDate, nextWeek, prevWeek, goToday 
+    const {
+        schedules,
+        isLoading,
+        error,
+        handleAddSchedule,
+        handleUpdateSchedule,
+        handleDeleteSchedule,
+        weekDays,
+        currentDate,
+        nextWeek,
+        prevWeek,
+        goToday
     } = useSchedule();
-    
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingSchedule, setEditingSchedule] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
 
     const openAddModal = () => {
+        setEditingSchedule(null);
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (schedule) => {
+        setEditingSchedule(schedule);
         setIsModalOpen(true);
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
+        setEditingSchedule(null);
     };
 
     const handleSubmit = async (formData) => {
         setIsSaving(true);
-        let success = false;
-        
-        success = await handleAddSchedule(formData);
-        
+        const success = editingSchedule
+            ? await handleUpdateSchedule(formData)
+            : await handleAddSchedule(formData);
+
         setIsSaving(false);
         if (success) {
             closeModal();
-            alert("Thêm mới lịch học thành công!");
+            alert(editingSchedule ? 'Cập nhật lịch dạy học thành công!' : 'Thêm mới lịch dạy học thành công!');
         } else {
-            alert("Đã có lỗi xảy ra. Vui lòng thử lại.");
+            alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
         }
+    };
+
+    const confirmDelete = async (id) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa lịch dạy học này?')) return;
+
+        const success = await handleDeleteSchedule(id);
+        alert(success ? 'Đã xóa lịch dạy học thành công.' : 'Đã có lỗi xảy ra khi xóa.');
     };
 
     return (
         <>
-            <ScheduleManagementUI 
+            <ScheduleManagementUI
                 schedules={schedules}
                 isLoading={isLoading}
                 error={error}
                 onAddSchedule={openAddModal}
+                onEditSchedule={openEditModal}
+                onDeleteSchedule={confirmDelete}
                 weekDays={weekDays}
                 currentDate={currentDate}
                 nextWeek={nextWeek}
                 prevWeek={prevWeek}
                 goToday={goToday}
             />
-            
-            <ScheduleFormModal 
+
+            <ScheduleFormModal
                 isOpen={isModalOpen}
                 onClose={closeModal}
                 onSubmit={handleSubmit}
                 isLoading={isSaving}
+                initialData={editingSchedule}
             />
         </>
     );

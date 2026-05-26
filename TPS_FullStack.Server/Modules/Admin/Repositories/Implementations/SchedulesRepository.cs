@@ -81,18 +81,35 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<List<ScheduleModel>> GetAllAsync(SqlConnection conn)
         {
             var query = @"
-                SELECT
-                    MaID,
-                    KhoahocID,
-                    ChuyendeID,
-                    GiangvienID,
-                    Ngaydukien,
-                    Batdaudukien,
-                    Ketthucdukien,
-                    Ngaythucte,
-                    Batdauthucte,
-                    Ketthucthucte
-                FROM dbo.Lichhoc";
+        SELECT 
+            lh.MaID,
+
+            lh.KhoahocID,
+            kh.Ten AS TenKhoahoc,
+
+            lh.ChuyendeID,
+            cd.Ten AS TenChuyende,
+
+            lh.GiangvienID,
+            gv.Hoten AS TenGiangvien,
+
+            lh.Ngaydukien,
+            lh.Batdaudukien,
+            lh.Ketthucdukien,
+
+            lh.Ngaythucte,
+            lh.Batdauthucte,
+            lh.Ketthucthucte
+
+        FROM dbo.Lichhoc lh
+        LEFT JOIN dbo.Khoahoc kh 
+            ON kh.MaID = lh.KhoahocID
+
+        LEFT JOIN dbo.Chuyende cd 
+            ON cd.MaID = lh.ChuyendeID
+
+        LEFT JOIN dbo.Giangvien gv 
+            ON gv.MaID = lh.GiangvienID";
 
             using var cmd = new SqlCommand(query, conn);
             using var reader = await cmd.ExecuteReaderAsync();
@@ -104,9 +121,15 @@ namespace TPS_FullStack.Server.Modules.Admin
                 list.Add(new ScheduleModel
                 {
                     LichhocID = reader["MaID"]?.ToString(),
+
                     KhoahocID = reader["KhoahocID"]?.ToString(),
+                    TenKhoahoc = reader["TenKhoahoc"]?.ToString(),
+
                     ChuyendeID = reader["ChuyendeID"]?.ToString(),
+                    TenChuyende = reader["TenChuyende"]?.ToString(),
+
                     GiangvienID = reader["GiangvienID"]?.ToString(),
+                    TenGiangvien = reader["TenGiangvien"]?.ToString(),
 
                     Ngaydukien = reader["Ngaydukien"] == DBNull.Value
                         ? null
@@ -138,27 +161,48 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         public async Task<ScheduleModel?> GetByIDAsync(
-            SqlConnection conn,
-            string? LichhocID)
+    SqlConnection conn,
+    string? LichhocID)
         {
             var query = @"
-                SELECT TOP 1
-                    MaID,
-                    KhoahocID,
-                    ChuyendeID,
-                    GiangvienID,
-                    Ngaydukien,
-                    Batdaudukien,
-                    Ketthucdukien,
-                    Ngaythucte,
-                    Batdauthucte,
-                    Ketthucthucte
-                FROM dbo.Lichhoc
-                WHERE MaID = @LichhocID";
+        SELECT TOP 1
+            lh.MaID,
+
+            lh.KhoahocID,
+            kh.Ten AS TenKhoahoc,
+
+            lh.ChuyendeID,
+            cd.Ten AS TenChuyende,
+
+            lh.GiangvienID,
+            gv.Hoten AS TenGiangvien,
+
+            lh.Ngaydukien,
+            lh.Batdaudukien,
+            lh.Ketthucdukien,
+
+            lh.Ngaythucte,
+            lh.Batdauthucte,
+            lh.Ketthucthucte
+
+        FROM dbo.Lichhoc lh
+
+        LEFT JOIN dbo.Khoahoc kh
+            ON kh.MaID = lh.KhoahocID
+
+        LEFT JOIN dbo.Chuyende cd
+            ON cd.MaID = lh.ChuyendeID
+
+        LEFT JOIN dbo.Giangvien gv
+            ON gv.MaID = lh.GiangvienID
+
+        WHERE lh.MaID = @LichhocID";
 
             using var cmd = new SqlCommand(query, conn);
 
-            cmd.Parameters.AddWithValue("@LichhocID", LichhocID ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue(
+                "@LichhocID",
+                LichhocID ?? (object)DBNull.Value);
 
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -167,9 +211,15 @@ namespace TPS_FullStack.Server.Modules.Admin
                 return new ScheduleModel
                 {
                     LichhocID = reader["MaID"]?.ToString(),
+
                     KhoahocID = reader["KhoahocID"]?.ToString(),
+                    TenKhoahoc = reader["TenKhoahoc"]?.ToString(),
+
                     ChuyendeID = reader["ChuyendeID"]?.ToString(),
+                    TenChuyende = reader["TenChuyende"]?.ToString(),
+
                     GiangvienID = reader["GiangvienID"]?.ToString(),
+                    TenGiangvien = reader["TenGiangvien"]?.ToString(),
 
                     Ngaydukien = reader["Ngaydukien"] == DBNull.Value
                         ? null

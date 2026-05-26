@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { BookOpen, Users, UserCog, FileText, Menu, X, CalendarDays, ClipboardCheck } from 'lucide-react';
+import { BookOpen, Users, UserCog, FileText, Menu, X, CalendarDays, ClipboardCheck, FlaskConical } from 'lucide-react';
 import './AdminLayout.css';
 
 const AdminLayout = () => {
@@ -12,6 +12,7 @@ const AdminLayout = () => {
 
   const navItems = [
     { path: '/schedules', name: 'Schedules', icon: <CalendarDays size={20} /> },
+    { path: '/labs/new', name: 'Labs', icon: <FlaskConical size={20} /> },
     { path: '/courses', name: 'Courses', icon: <BookOpen size={20} /> },
     { path: '/students', name: 'Students', icon: <Users size={20} /> },
     { path: '/teachers', name: 'Teachers', icon: <UserCog size={20} /> },

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useTopicDetail } from '../hooks/useTopicDetail';
 import TopicDetailUI from '../components/TopicManagement/TopicDetailUI';

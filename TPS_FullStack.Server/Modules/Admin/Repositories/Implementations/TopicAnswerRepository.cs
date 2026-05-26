@@ -8,7 +8,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var queryCreate = @"INSERT INTO dbo.Chuyende_Dapan (MaID, ChuyendeID, Chuyende_CauhoiID, Ten, Dung)
                                 VALUES (@MaID, @ChuyendeID, @Chuyende_CauhoiID, @Ten, @Dung)";
-            using(var cmd = new SqlCommand(queryCreate, conn, trans))
+            using (var cmd = new SqlCommand(queryCreate, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@ChuyendeID", (object?)ChuyendeID ?? DBNull.Value);
@@ -25,7 +25,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var queryDelete = @"DELETE dbo.Chuyende_Dapan
                                 WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
-            using(var cmd = new SqlCommand(queryDelete, conn, trans))
+            using (var cmd = new SqlCommand(queryDelete, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@ChuyendeID", (object?)ChuyendeID ?? DBNull.Value);
@@ -40,7 +40,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var queryGetAll = @"SELECT MaID, ChuyendeID, Chuyende_CauhoiID, Ten, Dung
                                 FROM dbo.Chuyende_Dapan";
-            using(var cmd = new SqlCommand(queryGetAll, conn))
+            using (var cmd = new SqlCommand(queryGetAll, conn))
             {
                 using var reader = await cmd.ExecuteReaderAsync();
 
@@ -90,6 +90,30 @@ namespace TPS_FullStack.Server.Modules.Admin
             // throw new NotImplementedException();
         }
 
+        public async Task<List<TopicAnswerModel>> GetByTopicIdAsync(SqlConnection conn, string? ChuyendeID)
+        {
+            var query = @"SELECT MaID, ChuyendeID, Chuyende_CauhoiID, Ten, Dung FROM dbo.Chuyende_Dapan
+                                WHERE  ChuyendeID = @ChuyendeID";
+            using (var cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@ChuyendeID", (object?)ChuyendeID ?? DBNull.Value);
+                using var reader = await cmd.ExecuteReaderAsync();
+                var result = new List<TopicAnswerModel>();
+                while (await reader.ReadAsync())
+                {
+                    result.Add(new TopicAnswerModel
+                    {
+                        MaID = reader["MaID"].ToString(),
+                        ChuyendeID = reader["ChuyendeID"].ToString(),
+                        Chuyende_CauhoiID = reader["Chuyende_CauhoiID"].ToString(),
+                        Ten = reader["Ten"].ToString(),
+                        Dung = Convert.ToBoolean(reader["Dung"])
+                    });
+                }
+            }
+            throw new NotImplementedException();
+        }
+
         public async Task UpdateAsync(SqlConnection conn, SqlTransaction trans, string MaID, string ChuyendeID, string Chuyende_CauhoiID, string Ten, bool Dung)
         {
             var queryUpdate = @"UPDATE dbo.Chuyende_Dapan
@@ -98,7 +122,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                     Dung = @Dung
                                 WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
 
-            using(var cmd = new SqlCommand(queryUpdate, conn, trans))
+            using (var cmd = new SqlCommand(queryUpdate, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@ChuyendeID", (object?)ChuyendeID ?? DBNull.Value);

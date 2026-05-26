@@ -12,6 +12,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public string? ChungchiID { get; set; }
         public string? Thu { get; set; }
         public decimal? Thoiluonghoc { get; set; }
+        public DateTime? Batdaudukien { get; set; }
         public decimal? Sobuoihoc { get; set; }
         public DateTime? Ngaybatdau { get; set; }
         public decimal? Thoiluongthi { get; set; }

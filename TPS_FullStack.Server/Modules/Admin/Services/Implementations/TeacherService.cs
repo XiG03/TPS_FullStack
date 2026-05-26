@@ -206,6 +206,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                     };
                 }
 
+                var existingMappings = await _topicTeacherRepository.GetByTeacherIDAsync(conn, updateResquest.GiangvienID);
+
                 using (var trans = conn.BeginTransaction())
                 {
                     try
@@ -216,8 +218,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                             null, null, DateTime.UtcNow, "Admin", null, null);
 
                         // 3. Xử lý map Chuyên đề (Topic) bằng Diffing (Không LINQ)
-                        var existingMappings = await _topicTeacherRepository.GetByTeacherIDAsync(conn, updateResquest.GiangvienID);
-
                         // Xóa các Topic mapping cũ bị lược bỏ
                         foreach (var oldMap in existingMappings)
                         {

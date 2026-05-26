@@ -6,8 +6,11 @@ namespace TPS_FullStack.Server.Modules.Admin
     {
         public string? LichhocID { get; set; }
         public string? KhoahocID {get; set;}
+        public string? TenKhoahoc {get; set ;}
         public string? ChuyendeID {get; set;}
-        public string GiangvienID {get; set;}
+        public string? TenChuyende {get; set;}
+        public string? GiangvienID {get; set;}
+        public string? TenGiangvien{get; set;}
         public DateTime? Ngaydukien { get; set; }
         public DateTime? Batdaudukien { get; set; }
         public DateTime? Ketthucdukien { get; set; }

@@ -112,8 +112,11 @@ namespace TPS_FullStack.Server.Modules.Admin
                     var res = new ScheduleResponse();
                     res.LichhocID = item.LichhocID;
                     res.KhoahocID = item.KhoahocID;
+                    res.TenKhoahoc = item.TenKhoahoc;
                     res.ChuyendeID = item.ChuyendeID;
+                    res.TenChuyende = item.TenChuyende;
                     res.GiangvienID = item.GiangvienID;
+                    res.TenGiangvien = item.TenGiangvien;
                     res.Ngaydukien = item.Ngaydukien;
                     res.Batdaudukien = item.Batdaudukien;
                     res.Ketthucdukien = item.Ketthucdukien;
@@ -154,8 +157,11 @@ namespace TPS_FullStack.Server.Modules.Admin
                 var detail = new ScheduleDetailResponse();
                 detail.LichhocID = item.LichhocID;
                 detail.KhoahocID = item.KhoahocID;
+                detail.TenKhoahoc = item.TenKhoahoc;
                 detail.ChuyendeID = item.ChuyendeID;
+                detail.TenChuyende = item.TenChuyende;
                 detail.GiangvienID = item.GiangvienID;
+                detail.TenGiangvien = item.TenGiangvien;
                 detail.Ngaydukien = item.Ngaydukien;
                 detail.Batdaudukien = item.Batdaudukien;
                 detail.Ketthucdukien = item.Ketthucdukien;

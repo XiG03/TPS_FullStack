@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
@@ -6,10 +7,12 @@ namespace TPS_FullStack.Server.Modules.Admin
     {
         private readonly IConfiguration _configuration;
         private readonly ILabRepository _labrepository;
-        public LabService(IConfiguration configuration, ILabRepository labRepository)
+        private readonly ISchedulesRepository _scheduleRepository;
+        public LabService(IConfiguration configuration, ILabRepository labRepository, ISchedulesRepository scheduleRepository)
         {
             _configuration = configuration;
             _labrepository = labRepository;
+            _scheduleRepository = scheduleRepository;
         }
         public async Task<ServiceDefault<LabInsert>> CreateLabAsync(LabInsert labInsert)
         {
@@ -21,11 +24,16 @@ namespace TPS_FullStack.Server.Modules.Admin
                 {
                     try
                     {
+                         
+                        labInsert.schedule.LichhocID = Guid.NewGuid().ToString();
+                        await _scheduleRepository.CreateAsync(conn, trans, labInsert.schedule.LichhocID, labInsert.schedule.KhoahocID,labInsert.lab.ChuyendeID, 
+                                                            labInsert.lab.GiangvienID,labInsert.schedule.Ngaydukien, labInsert.schedule.Batdaudukien,labInsert.schedule.Ketthucdukien,
+                                                            null, null, null);
                         // Create lab Id
                         labInsert.lab.ThuchanhID = Guid.NewGuid().ToString();
 
                         // insert lab to database
-                        await _labrepository.LabInsertAsync(conn, trans, labInsert.lab.ThuchanhID,
+                        await _labrepository.CreateAsync(conn, trans, labInsert.lab.ThuchanhID,
                                                             labInsert.lab.KhoahocID, labInsert.lab.GiangvienID, labInsert.schedule.LichhocID,
                                                             labInsert.lab.ChuyendeID, labInsert.lab.Diachi, labInsert.lab.Soluongtoida);
 
@@ -36,7 +44,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                             Message = "Tao buoi thuc hanh thanh cong",
                             Data = labInsert
                         };
-                    }catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         await trans.RollbackAsync();
                         return new ServiceDefault<LabInsert>

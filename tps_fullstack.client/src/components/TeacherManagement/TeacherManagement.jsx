@@ -1,5 +1,3 @@
-import React from 'react';
-
 const TeacherManagement = () => {
   return (
     <div className="management-container">

@@ -247,6 +247,22 @@ namespace TPS_FullStack.Server.Modules.Admin
                     };
                 }
 
+                var allDocs = await _documentRepository.GetAllAsync(conn);
+                var existingDocs = new List<TopicDocumentModel>();
+                foreach (var d in allDocs)
+                {
+                    if (d.ChuyendeID == updateRequest.ChuyendeID) existingDocs.Add(d);
+                }
+
+                var allQuestions = await _questionRepository.GetAllAsync(conn);
+                var allAnswers = await _answerRepository.GetAllAsync(conn);
+
+                var existingQuestions = new List<QuestionTopicModel>();
+                foreach (var q in allQuestions) if (q.ChuyendeID == updateRequest.ChuyendeID) existingQuestions.Add(q);
+
+                var existingAnswers = new List<TopicAnswerModel>();
+                foreach (var a in allAnswers) if (a.ChuyendeID == updateRequest.ChuyendeID) existingAnswers.Add(a);
+
                 using (var trans = conn.BeginTransaction())
                 {
                     try
@@ -255,13 +271,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                         await _topicRepository.UpdateAsync(conn, trans, updateRequest.ChuyendeID, updateRequest.Ten, updateRequest.Mota, DateTime.UtcNow, "Admin");
 
                         // --- Xu ly Documents ---
-                        var allDocs = await _documentRepository.GetAllAsync(conn);
-                        var existingDocs = new List<TopicDocumentModel>();
-                        foreach (var d in allDocs)
-                        {
-                            if (d.ChuyendeID == updateRequest.ChuyendeID) existingDocs.Add(d);
-                        }
-
                         // Xoa cac Document bi mat (Co trong db nhung khong co trong request)
                         foreach (var oldDoc in existingDocs)
                         {
@@ -296,15 +305,6 @@ namespace TPS_FullStack.Server.Modules.Admin
 
 
                         // --- Xu ly Questions & Answers ---
-                        var allQuestions = await _questionRepository.GetAllAsync(conn);
-                        var allAnswers = await _answerRepository.GetAllAsync(conn);
-
-                        var existingQuestions = new List<QuestionTopicModel>();
-                        foreach (var q in allQuestions) if (q.ChuyendeID == updateRequest.ChuyendeID) existingQuestions.Add(q);
-
-                        var existingAnswers = new List<TopicAnswerModel>();
-                        foreach (var a in allAnswers) if (a.ChuyendeID == updateRequest.ChuyendeID) existingAnswers.Add(a);
-
                         // Xoa cau hoi bi mat
                         foreach (var oldQ in existingQuestions)
                         {

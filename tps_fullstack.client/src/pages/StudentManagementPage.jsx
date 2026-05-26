@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useStudent } from '../hooks/useStudent';
-import StudentManagementUI from '../components/StudentManagement/StudentManagementUI';
+import { useState } from 'react';
 import StudentFormModal from '../components/StudentManagement/StudentFormModal';
+import StudentManagementUI from '../components/StudentManagement/StudentManagementUI';
+import { useStudent } from '../hooks/useStudent';
 
 const StudentManagementPage = () => {
     const { students, isLoading, error, handleAddStudent, handleUpdateStudent, handleDeleteStudent } = useStudent();
-    
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -27,37 +27,29 @@ const StudentManagementPage = () => {
 
     const handleSubmit = async (formData) => {
         setIsSaving(true);
-        let success = false;
-        
-        if (editingStudent) {
-            success = await handleUpdateStudent(editingStudent.maID, formData);
-        } else {
-            success = await handleAddStudent(formData);
-        }
-        
+        const success = editingStudent
+            ? await handleUpdateStudent(editingStudent.hocvienID, formData)
+            : await handleAddStudent(formData);
+
         setIsSaving(false);
         if (success) {
             closeModal();
-            alert(editingStudent ? "Cập nhật thành công!" : "Thêm mới thành công!");
+            alert(editingStudent ? 'Cập nhật học viên thành công!' : 'Thêm mới học viên thành công!');
         } else {
-            alert("Đã có lỗi xảy ra. Vui lòng thử lại.");
+            alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
         }
     };
 
     const confirmDelete = async (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xoá học viên này?")) {
-            const success = await handleDeleteStudent(id);
-            if (success) {
-                alert("Đã xoá thành công.");
-            } else {
-                alert("Đã có lỗi xảy ra khi xoá.");
-            }
-        }
+        if (!window.confirm('Bạn có chắc chắn muốn xóa học viên này?')) return;
+
+        const success = await handleDeleteStudent(id);
+        alert(success ? 'Đã xóa học viên thành công.' : 'Đã có lỗi xảy ra khi xóa.');
     };
 
     return (
         <>
-            <StudentManagementUI 
+            <StudentManagementUI
                 students={students}
                 isLoading={isLoading}
                 error={error}
@@ -65,8 +57,8 @@ const StudentManagementPage = () => {
                 onEditStudent={openEditModal}
                 onDeleteStudent={confirmDelete}
             />
-            
-            <StudentFormModal 
+
+            <StudentFormModal
                 isOpen={isModalOpen}
                 onClose={closeModal}
                 onSubmit={handleSubmit}

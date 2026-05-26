@@ -75,6 +75,33 @@ namespace TPS_FullStack.Server.Modules.Admin
             return list;
         }
 
+        public async Task<List<CourseTopicModel>> GetByCourseIDAsync(SqlConnection conn, string? KhoahocID)
+        {
+            var query = @"SELECT MaID, KhoahocID, ChuyendeID, Socauhoi
+                        FROM dbo.Khoahoc_Chuyende WHERE KhoahocID = @KhoahocID";
+            using (var cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@KhoahocID", KhoahocID);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+                var list = new List<CourseTopicModel>();
+                while (await reader.ReadAsync())
+                {
+                    list.Add(new CourseTopicModel
+                    {
+                        MaID = reader["MaID"]?.ToString(),
+                        KhoahocID = reader["KhoahocID"]?.ToString(),
+                        ChuyendeID = reader["ChuyendeID"]?.ToString(),
+                        Socauhoi = reader["Socauhoi"] == DBNull.Value
+                        ? null
+                        : Convert.ToDecimal(reader["Socauhoi"])
+                    });
+                }
+                return list;
+            }
+            throw new NotImplementedException();
+        }
+
         public async Task<CourseTopicModel?> GetByIDAsync(
             SqlConnection conn,
             string? MaID)

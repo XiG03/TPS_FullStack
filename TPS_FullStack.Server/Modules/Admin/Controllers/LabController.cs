@@ -5,7 +5,7 @@ using Microsoft.Identity.Client;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/lab")]
     [ApiController]
     public class LabController : ControllerBase
     {

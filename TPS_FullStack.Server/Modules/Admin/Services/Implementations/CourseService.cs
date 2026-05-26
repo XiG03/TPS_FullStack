@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,22 +16,24 @@ namespace TPS_FullStack.Server.Modules.Admin
         private readonly ICourseTopicRepository _courseTopicRepository;
         private readonly ICourseTeacherRepository _courseTeacherRepository;
         private readonly ICourseStudentRepository _courseStudentRepository;
+        private readonly ISchedulesRepository _scheduleRepository;
         private readonly ILogger<CourseService> _logger;
 
         public CourseService(IConfiguration configuration, ICoursesRepository coursesRepository,
                              ICourseTopicRepository courseTopicRepository, ICourseTeacherRepository courseTeacherRepository,
-                             ICourseStudentRepository courseStudentRepository, ILogger<CourseService> logger)
+                             ICourseStudentRepository courseStudentRepository, ISchedulesRepository scheduleRepository, ILogger<CourseService> logger)
         {
             _configuration = configuration;
             _coursesRepository = coursesRepository;
             _courseTopicRepository = courseTopicRepository;
             _courseTeacherRepository = courseTeacherRepository;
             _courseStudentRepository = courseStudentRepository;
+            _scheduleRepository = scheduleRepository;
             _logger = logger;
         }
 
         // Logic đệ quy tính toán danh sách lịch học dựa vào file code cũ
-        private List<ScheduleModel> CreateSchedules(List<ScheduleModel> schedules, List<int> studyDays, DateTime ngayHienTai, decimal soBuoiHoc, int count, string khoahocID)
+        private List<ScheduleModel> CreateSchedules(List<ScheduleModel> schedules, List<int> studyDays, DateTime Thoigianbatdau, DateTime Thoigianketthuc, DateTime ngayHienTai, decimal soBuoiHoc, int count, string khoahocID)
         {
             if (count >= soBuoiHoc)
             {
@@ -42,6 +45,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                 LichhocID = Guid.NewGuid().ToString(),
                 KhoahocID = khoahocID,
                 Ngaydukien = ngayHienTai,
+                Batdaudukien = Thoigianbatdau,
+                Ketthucdukien = Thoigianketthuc
             });
 
             int loca = count % studyDays.Count;
@@ -49,7 +54,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                                             ? studyDays[0] - studyDays[loca] + 7
                                                             : studyDays[loca + 1] - studyDays[loca]);
 
-            return CreateSchedules(schedules, studyDays, ngayTiepTheo, soBuoiHoc, count + 1, khoahocID);
+            return CreateSchedules(schedules, studyDays,Thoigianbatdau, Thoigianketthuc, ngayTiepTheo, soBuoiHoc, count + 1, khoahocID);
         }
 
         public async Task<ServiceDefault<CourseCreateResponse>> CreateCourseAsync(CourseCreateRequest createRequest)
@@ -98,18 +103,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                             if (studyDays.Count > 0)
                             {
                                 var schedules = new List<ScheduleModel>();
-                                schedules = CreateSchedules(schedules, studyDays, createRequest.Ngaybatdau.Value, createRequest.Sobuoihoc.Value, 0, courseId);
+                                var Ketthucdukien = createRequest.Batdaudukien.AddMinutes((int)createRequest.Thoiluonghoc);
+                                schedules = CreateSchedules(schedules, studyDays, createRequest.Batdaudukien,Ketthucdukien, createRequest.Ngaybatdau.Value, createRequest.Sobuoihoc.Value, 0, courseId);
 
                                 foreach (var sch in schedules)
                                 {
-                                    var querySchedule = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien) VALUES (@MaID, @KhoahocID, @Ngaydukien)";
-                                    using (var cmd = new SqlCommand(querySchedule, conn, trans))
-                                    {
-                                        cmd.Parameters.AddWithValue("@MaID", sch.LichhocID);
-                                        cmd.Parameters.AddWithValue("@KhoahocID", sch.KhoahocID);
-                                        cmd.Parameters.AddWithValue("@Ngaydukien", sch.Ngaydukien ?? (object)DBNull.Value);
-                                        await cmd.ExecuteNonQueryAsync();
-                                    }
+                                    await _scheduleRepository.CreateAsync(conn, trans, sch.LichhocID, sch.KhoahocID, sch.ChuyendeID, sch.GiangvienID, sch.Ngaydukien, sch.Batdaudukien, sch.Ketthucdukien, null, null, null);
                                 }
                             }
                         }
@@ -150,6 +149,18 @@ namespace TPS_FullStack.Server.Modules.Admin
                     return new ServiceDefault<CourseUpdateResponse> { statusCode = StatusCodes.Status404NotFound, Message = "Không tìm thấy khóa học", Data = null };
                 }
 
+                var allTopics = await _courseTopicRepository.GetAllAsync(conn);
+                var oldTopics = new List<CourseTopicModel>();
+                foreach (var t in allTopics) if (t.KhoahocID == updateRequest.KhoahocID) oldTopics.Add(t);
+
+                var allTeachers = await _courseTeacherRepository.GetAllAsync(conn);
+                var oldTeachers = new List<CourseTeacherModel>();
+                foreach (var t in allTeachers) if (t.KhoahocID == updateRequest.KhoahocID) oldTeachers.Add(t);
+
+                var allStudents = await _courseStudentRepository.GetAllAsync(conn);
+                var oldStudents = new List<CourseStudentModel>();
+                foreach (var s in allStudents) if (s.KhoahocID == updateRequest.KhoahocID) oldStudents.Add(s);
+
                 using (var trans = conn.BeginTransaction())
                 {
                     try
@@ -165,9 +176,6 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                         // --- Cập nhật Mappings (Diffing) ---
                         // Topics
-                        var allTopics = await _courseTopicRepository.GetAllAsync(conn);
-                        var oldTopics = new List<CourseTopicModel>();
-                        foreach (var t in allTopics) if (t.KhoahocID == updateRequest.KhoahocID) oldTopics.Add(t);
                         foreach (var oldT in oldTopics)
                         {
                             bool isFound = false;
@@ -184,9 +192,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                         }
 
                         // Teachers
-                        var allTeachers = await _courseTeacherRepository.GetAllAsync(conn);
-                        var oldTeachers = new List<CourseTeacherModel>();
-                        foreach (var t in allTeachers) if (t.KhoahocID == updateRequest.KhoahocID) oldTeachers.Add(t);
                         foreach (var oldT in oldTeachers)
                         {
                             bool isFound = false;
@@ -203,9 +208,6 @@ namespace TPS_FullStack.Server.Modules.Admin
                         }
 
                         // Students
-                        var allStudents = await _courseStudentRepository.GetAllAsync(conn);
-                        var oldStudents = new List<CourseStudentModel>();
-                        foreach (var s in allStudents) if (s.KhoahocID == updateRequest.KhoahocID) oldStudents.Add(s);
                         foreach (var oldS in oldStudents)
                         {
                             bool isFound = false;
@@ -240,18 +242,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                             if (studyDays.Count > 0)
                             {
                                 var schedules = new List<ScheduleModel>();
-                                schedules = CreateSchedules(schedules, studyDays, updateRequest.Ngaybatdau.Value, updateRequest.Sobuoihoc.Value, 0, updateRequest.KhoahocID);
+                                var Ketthucdukien = updateRequest.Batdaudukien.AddMinutes((int)updateRequest.Thoiluonghoc);
+                                schedules = CreateSchedules(schedules, studyDays,updateRequest.Batdaudukien, Ketthucdukien ,updateRequest.Ngaybatdau.Value, updateRequest.Sobuoihoc.Value, 0, updateRequest.KhoahocID);
 
                                 foreach (var sch in schedules)
                                 {
-                                    var querySchedule = @"INSERT INTO dbo.Lichhoc (MaID, KhoahocID, Ngaydukien) VALUES (@MaID, @KhoahocID, @Ngaydukien)";
-                                    using (var cmd = new SqlCommand(querySchedule, conn, trans))
-                                    {
-                                        cmd.Parameters.AddWithValue("@MaID", sch.LichhocID);
-                                        cmd.Parameters.AddWithValue("@KhoahocID", sch.KhoahocID);
-                                        cmd.Parameters.AddWithValue("@Ngaydukien", sch.Ngaydukien ?? (object)DBNull.Value);
-                                        await cmd.ExecuteNonQueryAsync();
-                                    }
+                                    await _scheduleRepository.CreateAsync(conn, trans, sch.LichhocID, sch.KhoahocID, sch.ChuyendeID, sch.GiangvienID, sch.Ngaydukien, sch.Batdaudukien, sch.Ketthucdukien, null, null, null);
                                 }
                             }
                         }
@@ -316,6 +312,19 @@ namespace TPS_FullStack.Server.Modules.Admin
                     Ngaybatdau = course.Ngaybatdau,
                     Socauhoi = course.Socauhoi
                 };
+
+                var schedules = await _scheduleRepository.GetAllAsync(conn);
+                ScheduleModel? firstSchedule = null;
+                foreach (var schedule in schedules)
+                {
+                    if (schedule.KhoahocID != KhoahocID || !schedule.Batdaudukien.HasValue) continue;
+
+                    if (firstSchedule == null || schedule.Ngaydukien < firstSchedule.Ngaydukien)
+                    {
+                        firstSchedule = schedule;
+                    }
+                }
+                detail.Batdaudukien = firstSchedule?.Batdaudukien;
 
                 var topics = await _courseTopicRepository.GetAllAsync(conn);
                 foreach (var t in topics) if (t.KhoahocID == KhoahocID) detail.Topics.Add(new CourseTopicResponse { MaID = t.MaID, ChuyendeID = t.ChuyendeID, Socauhoi = t.Socauhoi });

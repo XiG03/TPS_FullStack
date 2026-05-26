@@ -9,8 +9,12 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             _configuration = configuration;
         }
+        public Task DeleteAsync(SqlConnection conn, SqlTransaction trans, string? ThuchanhID)
+        {
+            throw new NotImplementedException();
+        }
 
-        public async Task LabInsertAsync(SqlConnection conn, SqlTransaction trans,
+        public async Task CreateAsync(SqlConnection conn, SqlTransaction trans,
                                         string ThuchanhID, string KhoahocID, string GiangvienID,
                                         string LichhocID, string ChuyendeID, string Diachi, decimal? Soluongtoida)
         {
@@ -31,6 +35,11 @@ namespace TPS_FullStack.Server.Modules.Admin
 
             }
 
+        }
+
+        public Task UpdateAsync(SqlConnection conn, SqlTransaction trans, string ThuchanhID, string KhoahocID, string GiangvienID, string LichhocID, string ChuyendeID, string Diachi, decimal? Soluongtoida)
+        {
+            throw new NotImplementedException();
         }
     }
 

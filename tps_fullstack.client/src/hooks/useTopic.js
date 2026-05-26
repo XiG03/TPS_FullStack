@@ -11,7 +11,7 @@ export const useTopic = () => {
         setError(null);
         try {
             const res = await getTopics();
-            setTopics(res.data);
+            setTopics(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             setError('Lỗi khi tải danh sách chuyên đề.');
             console.error(err);
@@ -21,13 +21,14 @@ export const useTopic = () => {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchTopics();
     }, [fetchTopics]);
 
     const handleDeleteTopic = async (id) => {
         try {
             await deleteTopic(id);
-            setTopics(prev => prev.filter(t => t.maID !== id));
+            setTopics((prev) => prev.filter((topic) => topic.chuyendeID !== id));
             return true;
         } catch (err) {
             console.error(err);

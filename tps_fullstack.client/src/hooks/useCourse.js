@@ -11,7 +11,7 @@ export const useCourse = () => {
         setError(null);
         try {
             const res = await getCourses();
-            setCourses(res.data);
+            setCourses(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             setError('Lỗi khi tải danh sách khóa học.');
             console.error(err);
@@ -21,13 +21,14 @@ export const useCourse = () => {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchCourses();
     }, [fetchCourses]);
 
     const handleDeleteCourse = async (id) => {
         try {
             await deleteCourse(id);
-            setCourses(prev => prev.filter(c => c.maID !== id));
+            setCourses((prev) => prev.filter((course) => course.khoahocID !== id));
             return true;
         } catch (err) {
             console.error(err);

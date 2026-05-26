@@ -1,71 +1,93 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useTeacher } from '../hooks/useTeacher';
+import { getTopics } from '../services/topicService';
+import { getTeacherDetail } from '../services/teacherService';
 import TeacherManagementUI from '../components/TeacherManagement/TeacherManagementUI';
 import TeacherFormModal from '../components/TeacherManagement/TeacherFormModal';
-import { useState } from 'react';
 
 const TeacherManagementPage = () => {
     const { teachers, isLoading, error, handleAddTeacher, handleUpdateTeacher, handleDeleteTeacher } = useTeacher();
+    const [topicOptions, setTopicOptions] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTeacher, setEditingTeacher] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const openModal = (teacher = null) => {
-        setEditingTeacher(teacher);
+    useEffect(() => {
+        const fetchTopics = async () => {
+            try {
+                const res = await getTopics();
+                setTopicOptions(Array.isArray(res.data) ? res.data : []);
+            } catch (err) {
+                console.error(err);
+                setTopicOptions([]);
+            }
+        };
+
+        fetchTopics();
+    }, []);
+
+    const openModal = async (teacher = null) => {
+        if (!teacher) {
+            setEditingTeacher(null);
+            setIsModalOpen(true);
+            return;
+        }
+
         setIsModalOpen(true);
+        setEditingTeacher(teacher);
+        try {
+            const res = await getTeacherDetail(teacher.maID);
+            setEditingTeacher(res.data || teacher);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setTimeout(() => setEditingTeacher(null), 300); // wait for animation
+        setEditingTeacher(null);
     };
 
     const submitTeacher = async (data) => {
         setIsSubmitting(true);
-        let success = false;
-        
-        if (editingTeacher) {
-            success = await handleUpdateTeacher(editingTeacher.MaID, data);
-        } else {
-            success = await handleAddTeacher(data);
-        }
+        const success = editingTeacher
+            ? await handleUpdateTeacher(data)
+            : await handleAddTeacher(data);
 
         setIsSubmitting(false);
         if (success) {
             closeModal();
         } else {
-            alert("Đã xảy ra lỗi khi lưu thông tin giáo viên.");
+            alert('Đã xảy ra lỗi khi lưu thông tin giảng viên.');
         }
     };
 
-    const handleEditTeacher = (teacher) => {
-        openModal(teacher);
-    };
+    const confirmDelete = async (id) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa giảng viên này?')) return;
 
-    const confirmDelete = (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xoá giáo viên này?")) {
-            handleDeleteTeacher(id);
-            alert("Đã gửi yêu cầu xoá (đang giả lập).");
-        }
+        const success = await handleDeleteTeacher(id);
+        alert(success ? 'Đã xóa giảng viên thành công.' : 'Đã xảy ra lỗi khi xóa giảng viên.');
     };
 
     return (
         <>
-            <TeacherManagementUI 
+            <TeacherManagementUI
                 teachers={teachers}
                 isLoading={isLoading}
                 error={error}
+                topicOptions={topicOptions}
                 onAddTeacher={() => openModal(null)}
-                onEditTeacher={handleEditTeacher}
+                onEditTeacher={openModal}
                 onDeleteTeacher={confirmDelete}
             />
-            
-            <TeacherFormModal 
-                isOpen={isModalOpen} 
-                onClose={closeModal} 
-                onSubmit={submitTeacher} 
-                isLoading={isSubmitting} 
+
+            <TeacherFormModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={submitTeacher}
+                isLoading={isSubmitting}
                 initialData={editingTeacher}
+                topicOptions={topicOptions}
             />
         </>
     );
