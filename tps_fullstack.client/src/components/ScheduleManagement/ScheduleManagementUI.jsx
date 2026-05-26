@@ -1,6 +1,5 @@
 import { format, getDay, isSameDay } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
 
 const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
@@ -113,6 +112,7 @@ const ScheduleManagementUI = ({
     isLoading,
     error,
     onAddSchedule,
+    onViewSchedule,
     onEditSchedule,
     onDeleteSchedule,
     weekDays,
@@ -121,7 +121,6 @@ const ScheduleManagementUI = ({
     prevWeek,
     goToday
 }) => {
-    const navigate = useNavigate();
     const monthYearStr = format(currentDate, "'Tháng' M, yyyy", { locale: vi });
     const normalizedSchedules = schedules.map(normalizeSchedule);
 
@@ -172,7 +171,7 @@ const ScheduleManagementUI = ({
         return (
             <div
                 key={event.id}
-                onClick={() => navigate(`/schedules/${event.id}`)}
+                onClick={() => onViewSchedule(event.raw)}
                 className={`absolute left-1.5 right-1.5 rounded-lg p-3 shadow-sm z-10 hover:shadow-md transition-all cursor-pointer group border ${color.bgColor} ${color.textColor} ${color.borderColor}`}
                 style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             >
@@ -381,7 +380,7 @@ const ScheduleManagementUI = ({
                                     <button
                                         key={event.id}
                                         type="button"
-                                        onClick={() => navigate(`/schedules/${event.id}`)}
+                                        onClick={() => onViewSchedule(event.raw)}
                                         className="w-full rounded-lg border border-surface-container-highest bg-surface-container-low p-3 text-left transition-colors hover:bg-surface-container-high"
                                     >
                                         <div className="flex items-start justify-between gap-3">

@@ -23,5 +23,5 @@ SELECT Top 1 * FROM dbo.Chuyende_Cauhoi
 WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)
 
 
-
+use TPS_db
 SELECT * FROM dbo.Lichhoc

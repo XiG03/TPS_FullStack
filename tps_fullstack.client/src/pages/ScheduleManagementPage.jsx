@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSchedule } from '../hooks/useSchedule';
 import ScheduleManagementUI from '../components/ScheduleManagement/ScheduleManagementUI';
 import ScheduleFormModal from '../components/ScheduleManagement/ScheduleFormModal';
+import ScheduleDetailModal from '../components/ScheduleManagement/ScheduleDetailModal';
 
 const ScheduleManagementPage = () => {
     const {
@@ -20,6 +21,7 @@ const ScheduleManagementPage = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState(null);
+    const [viewingSchedule, setViewingSchedule] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
 
     const openAddModal = () => {
@@ -30,6 +32,14 @@ const ScheduleManagementPage = () => {
     const openEditModal = (schedule) => {
         setEditingSchedule(schedule);
         setIsModalOpen(true);
+    };
+
+    const openDetailModal = (schedule) => {
+        setViewingSchedule(schedule);
+    };
+
+    const closeDetailModal = () => {
+        setViewingSchedule(null);
     };
 
     const closeModal = () => {
@@ -66,6 +76,7 @@ const ScheduleManagementPage = () => {
                 isLoading={isLoading}
                 error={error}
                 onAddSchedule={openAddModal}
+                onViewSchedule={openDetailModal}
                 onEditSchedule={openEditModal}
                 onDeleteSchedule={confirmDelete}
                 weekDays={weekDays}
@@ -81,6 +92,13 @@ const ScheduleManagementPage = () => {
                 onSubmit={handleSubmit}
                 isLoading={isSaving}
                 initialData={editingSchedule}
+            />
+
+            <ScheduleDetailModal
+                schedule={viewingSchedule}
+                onClose={closeDetailModal}
+                onEditSchedule={openEditModal}
+                onDeleteSchedule={confirmDelete}
             />
         </>
     );
