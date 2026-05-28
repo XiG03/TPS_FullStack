@@ -20,27 +20,18 @@ namespace TPS_FullStack.Server.Modules.JWT
             _jwtRepo = jwtRepo;
             _configuration = configuration;
         }
-        public async Task<ServiceDefault<string>> GenerateRefreshTokenAsync(string UserId)
+        public async Task<string> GenerateRefreshTokenAsync(string UserId)
         {
             var refreshToken = GenerateRefreshToken();
             var ExpiryTime = DateTime.UtcNow.AddDays(7);
             var result = _jwtRepo.SaveRefreshToken(UserId, refreshToken, ExpiryTime);
             if (result && refreshToken != null)
             {
-                return new ServiceDefault<string>
-                {
-                    statusCode = StatusCodes.Status200OK,
-                    Message = "Complete generate refreshtoken",
-                    Data = refreshToken
-                };
+                return refreshToken;
             }
             else
             {
-                return new ServiceDefault<string>
-                {
-                    statusCode = StatusCodes.Status500InternalServerError,
-                    Message = "Generating refreshtoken fail"
-                };
+                return null;
             }
             throw new NotImplementedException();
         }

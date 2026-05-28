@@ -5,7 +5,7 @@ namespace TPS_FullStack.Server.Modules.JWT
 {
     public interface IJwtService
     {
-        public Task<ServiceDefault<string>> GenerateRefreshTokenAsync(string UserId);
+        public Task<string> GenerateRefreshTokenAsync(string UserId);
         public string GenerateRefreshToken();
 
         public Task<string> GenerateAccessTokenAsync(string UserId, string role);

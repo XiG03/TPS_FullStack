@@ -21,7 +21,8 @@ namespace TPS_FullStack.Server.Modules.JWT
             {
                 conn.Open();
 
-                var query = "";
+                var query = @"INSERT INTO dbo.RefreshToken(Id, UserId, refreshToken, ExpiryTime, IsRevoked, CreatedAt)
+                            VALUES (@MaId, @UserId, @refreshToken, ExpiryTime, IsRevoked, CreatedAt)";   
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {

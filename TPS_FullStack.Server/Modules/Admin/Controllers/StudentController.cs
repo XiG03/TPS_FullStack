@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using TPS_FullStack.Server.Entities;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
@@ -57,6 +58,24 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<IActionResult> Delete(string HocvienID)
         {
             var result = await _studentService.StudentDeleteAsync(HocvienID);
+            return StatusCode(result.statusCode, result);
+        }
+        [HttpGet("me/schedules")]
+        public async Task<IActionResult> GetSchedules(string? HocvienID)
+        {
+            var result = await _studentService.StudentGetScheduleByIDAsync(HocvienID);
+            return StatusCode(result.statusCode, result);
+        }
+        [HttpGet("me/schedule/{LichhocID}")]
+        public async Task<IActionResult> GetScheduleDetail(string? HocvienID, string? LichhocID)
+        {
+            var result = await _studentService.StudentGetScheduleDetailAsync(HocvienID, LichhocID);
+            return StatusCode(result.statusCode, result);
+        }
+        [HttpPost("me/schedule/{LichhocID}/checkin")]
+        public async Task<IActionResult> Checkin(string? HocvienID, string? LichhocID)
+        {
+            var result = await _studentService.StudentCheckinAsync(HocvienID, LichhocID);
             return StatusCode(result.statusCode, result);
         }
     }

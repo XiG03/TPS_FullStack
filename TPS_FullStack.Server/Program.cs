@@ -104,6 +104,8 @@ builder.Services.AddScoped<ITopicTeacherRepository, TopicTeacherRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ICertificateStudentRepository, CertificateStudentRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IScheduleTeacherAttendanceRepository, ScheduleTeacherAttendanceRepository>();
+builder.Services.AddScoped<IScheduleStudentAttendanceRepository, ScheduleStudentAttendanceRepository>();
 
 
 

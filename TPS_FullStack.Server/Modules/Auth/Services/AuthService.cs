@@ -19,101 +19,65 @@ namespace TPS_FullStack.Server.Modules.Auth
             _jwtService = jwtService;
             _userManager = userManager;
         }
-        public async Task<ServiceDefault<TokenResponseDto>> LoginAsync(LoginDto request)
+        public async Task<ServiceDefault<LoginResponse>> LoginAsync(LoginRequest request)
         {
-            var user = await _authRepo.GetAccountAsync(request.Username);
-            if (user == null)
+            try
             {
-                return new ServiceDefault<TokenResponseDto>
+                var user = await _userManager.FindByNameAsync(request.Username);
+                if (user == null)
                 {
-                    statusCode = StatusCodes.Status401Unauthorized,
-                    Message = "Account not found"
-                };
-            }
+                    return new ServiceDefault<LoginResponse>
+                    {
+                        statusCode = StatusCodes.Status401Unauthorized,
+                        Message = "Account not found",
+                        Data = null
+                    };
+                }
 
-            var isValid = await _userManager.CheckPasswordAsync(user, request.Password);
-
-            if (!isValid)
-            {
-                return new ServiceDefault<TokenResponseDto>
+                var isValidPassword = await _userManager.CheckPasswordAsync(user, request.Password);
+                if (!isValidPassword)
                 {
-                    statusCode = StatusCodes.Status401Unauthorized,
-                    Message = "Invalid password"
-                };
-            }
-            var refreshtoken = await _jwtService.GenerateRefreshTokenAsync(user.Id);
-            var accessToken = await _jwtService.GenerateAccessTokenAsync(user.Id, null); // Sua role
+                    return new ServiceDefault<LoginResponse>
+                    {
+                        statusCode = StatusCodes.Status401Unauthorized,
+                        Message = "Incorrect Password",
+                        Data = null
+                    };
+                }
+                if (isValidPassword && user.Kichhoat == false)
+                {
+                    return new ServiceDefault<LoginResponse>
+                    {
+                        statusCode = StatusCodes.Status200OK,
+                        Message = "First login",
+                        Data = new LoginResponse
+                        {
+                            TempToken = "First_Login"
+                        }
+                    };
+                }
 
-            if (refreshtoken.statusCode == StatusCodes.Status500InternalServerError)
+                return new ServiceDefault<LoginResponse>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Complete generate refresh and access token",
+                    Data = new LoginResponse
+                    {
+                        RefreshToken = await _jwtService.GenerateRefreshTokenAsync(user.Id),
+                        AccessToken = await _jwtService.GenerateAccessTokenAsync(user.Id, null)
+                    }
+                };
+            } catch(Exception ex)
             {
-                return new ServiceDefault<TokenResponseDto>
+                return new ServiceDefault<LoginResponse>
                 {
                     statusCode = StatusCodes.Status500InternalServerError,
-                    Message = "Can not gen refresh and access token"
+                    Message = "Server error" + ex.Message,
+                    Data = null
                 };
             }
-
-            return new ServiceDefault<TokenResponseDto>
-            {
-                statusCode = StatusCodes.Status200OK,
-                Message = "Complete generate refresh and access token",
-                Data = new TokenResponseDto
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshtoken.Data
-                }
-            };
-
-
-            // if (user.status == Status.NotFound)
-            // {
-            //     return new ServiceDefault<TokenResponseDto>
-            //     {
-            //         Success = false,
-            //         Message = "Account Not Found"
-            //     };
-            // }
-
-            // if (user.status == Status.Invalid)
-            // {
-            //     return new ServiceDefault<TokenResponseDto>
-            //     {
-            //         Success = false,
-            //         Message = "Invalid Username or Password"
-            //     };
-            // }
-
-            // if (user.Success == true && user.Data != null)
-            // {
-            //     var refreshtoken = await _jwtService.GenerateRefreshTokenAsync(user.Data.Id);
-            //     var accessToken = await _jwtService.GenerateAccessTokenAsync(user.Data.Id, null); // Sua role
-            //     if (!refreshtoken.Success)
-            //     {
-            //         return new ServiceDefault<TokenResponseDto>
-            //         {
-            //             Success = false,
-            //             Message = "Can not gen refresh and access token"
-            //         };
-            //     }
-
-            //     if (refreshtoken.Success)
-            //     {
-            //         return new ServiceDefault<TokenResponseDto>
-            //         {
-            //             Success = true,
-            //             Message = "Complete generate refresh and access token",
-            //             Data = new TokenResponseDto
-            //             {
-            //                 AccessToken = accessToken,
-            //                 RefreshToken = refreshtoken.Data
-            //             }
-            //         };
-            //     }
             throw new NotImplementedException();
         }
-
-
-
     }
 }
 

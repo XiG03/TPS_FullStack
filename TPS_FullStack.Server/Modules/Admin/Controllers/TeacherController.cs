@@ -59,5 +59,30 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _teacherService.TeacherDeleteAsync(MaID);
             return StatusCode(result.statusCode, result);
         }
+
+        [HttpGet("me/schedules")]
+        public async Task<IActionResult> GetSchedules(string? GiangvienID)
+        {
+            var result = await _teacherService.TeacherGetScheduleByIDAsync(GiangvienID);
+            return StatusCode(result.statusCode, result);
+        }
+        [HttpGet("me/schedule/{LichhocID}")]
+        public async Task<IActionResult> GetScheduleDetail(string? GiangvienID, string? LichhocID)
+        {
+            var result = await _teacherService.TeacherGetScheduleDetailAsync(GiangvienID, LichhocID);
+            return StatusCode(result.statusCode, result);
+        }
+        [HttpPost("me/schedule/{LichhocID}/checkin")]
+        public async Task<IActionResult> Checkin(string? GiangvienID, string? LichhocID)
+        {
+            var result = await _teacherService.TeacherCheckinAsync(GiangvienID, LichhocID);
+            return StatusCode(result.statusCode, result);
+        }
+        [HttpPost("me/schedule/{LichhocID}/checkout")]
+        public async Task<IActionResult> Checkout(string? GiangvienID, string? LichhocID)
+        {
+            var result = await _teacherService.TeacherCheckoutAsync(GiangvienID, LichhocID);
+            return StatusCode(result.statusCode, result);
+        }
     }
 }

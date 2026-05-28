@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Identity.Client;
+using Microsoft.OpenApi.Services;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace TPS_FullStack.Server.Modules.Admin
@@ -12,13 +16,19 @@ namespace TPS_FullStack.Server.Modules.Admin
         private readonly IConfiguration _configuration;
         private readonly ITeacherRepository _teacherRepository;
         private readonly ITopicTeacherRepository _topicTeacherRepository;
+        private readonly ISchedulesRepository _scheduleRepository;
+        private readonly IScheduleTeacherAttendanceRepository _attendanceRepository;
 
-        public TeacherService(IConfiguration configuration, ITeacherRepository teacherRepository, ITopicTeacherRepository topicTeacherRepository)
+        public TeacherService(IConfiguration configuration, ITeacherRepository teacherRepository, ITopicTeacherRepository topicTeacherRepository, ISchedulesRepository scheduleRepository,
+                            IScheduleTeacherAttendanceRepository attendanceRepository)
         {
             _configuration = configuration;
             _teacherRepository = teacherRepository;
             _topicTeacherRepository = topicTeacherRepository;
+            _scheduleRepository = scheduleRepository;
+            _attendanceRepository = attendanceRepository;
         }
+
 
         public async Task<ServiceDefault<TeacherCreateResponse>> TeacherCreateAsync(TeacherCreateResquest createResquest)
         {
@@ -187,6 +197,122 @@ namespace TPS_FullStack.Server.Modules.Admin
             }
         }
 
+        public async Task<ServiceDefault<List<ScheduleResponse>>> TeacherGetScheduleByIDAsync(string? GiangvienID)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var result = new List<ScheduleResponse>();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                var list = await _scheduleRepository.GetAllAsync(conn);
+                foreach (var schedule in list)
+                {
+                    if (schedule.GiangvienID == GiangvienID)
+                    {
+                        result.Add(new ScheduleResponse
+                        {
+                            LichhocID = schedule.LichhocID,
+                            KhoahocID = schedule.KhoahocID,
+                            TenKhoahoc = schedule.TenKhoahoc,
+                            ChuyendeID = schedule.ChuyendeID,
+                            TenChuyende = schedule.TenChuyende,
+                            GiangvienID = schedule.TenGiangvien,
+                            Ngaydukien = schedule.Ngaydukien,
+                            Batdaudukien = schedule.Batdaudukien,
+                            Ketthucdukien = schedule.Ketthucdukien,
+                            Ngaythucte = schedule.Ngaythucte,
+                            Batdauthucte = schedule.Batdauthucte,
+                            Ketthucthucte = schedule.Ketthucthucte,
+                        });
+                    }
+                }
+
+                return new ServiceDefault<List<ScheduleResponse>>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Tim thanh cong",
+                    Data = result
+                };
+            }
+            throw new NotImplementedException();
+        }
+
+        public async Task<ServiceDefault<ScheduleDetailResponse>> TeacherGetScheduleDetailAsync(string? GiangvienID, string? LichhocID)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                var schedule = await _scheduleRepository.GetByIDAsync(conn, LichhocID);
+
+                if (schedule != null)
+                {
+                    return new ServiceDefault<ScheduleDetailResponse>
+                    {
+                        statusCode = StatusCodes.Status200OK,
+                        Message = "Tim thanh cong",
+                        Data = new ScheduleDetailResponse
+                        {
+                            LichhocID = schedule.LichhocID,
+                            KhoahocID = schedule.KhoahocID,
+                            TenKhoahoc = schedule.TenKhoahoc,
+                            ChuyendeID = schedule.ChuyendeID,
+                            TenChuyende = schedule.TenChuyende,
+                            GiangvienID = schedule.GiangvienID,
+                            TenGiangvien = schedule.TenGiangvien,
+                            Ngaydukien = schedule.Ngaydukien,
+                            Batdaudukien = schedule.Batdaudukien,
+                            Ketthucdukien = schedule.Ketthucdukien,
+                            Ngaythucte = schedule.Ngaythucte,
+                            Batdauthucte = schedule.Batdauthucte,
+                            Ketthucthucte = schedule.Ketthucthucte,
+                        }
+                    };
+                }
+            }
+            throw new NotImplementedException();
+        }
+
+        public async Task<ServiceDefault<ScheduleTeacherAttendanceResponse>> TeacherCheckinAsync(string? GiangvienID, string? LichhocID)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                using (var trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Buoc 1: them vao bang diem danh
+                        var attendance = Guid.NewGuid().ToString();
+                        await _attendanceRepository.CreateAsync(conn, trans, attendance, LichhocID, GiangvienID, null, DateTime.UtcNow, DateTime.UtcNow);
+
+                        // Buoc 2: update bang Lichhoc
+                        await _scheduleRepository.UpdateAsync(conn, trans, LichhocID, null, null, GiangvienID, null, null, null, DateTime.UtcNow, DateTime.UtcNow, null);
+                        await trans.CommitAsync();
+
+                        return new ServiceDefault<ScheduleTeacherAttendanceResponse>
+                        {
+                            statusCode = StatusCodes.Status500InternalServerError,
+                            Message = "Check in thanh cong",
+                            Data = null,
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new ServiceDefault<ScheduleTeacherAttendanceResponse>
+                        {
+                            statusCode = StatusCodes.Status500InternalServerError,
+                            Message = "Check in khong thanh cong" + ex.Message,
+                            Data = null,
+                        };
+                    }
+
+                }
+            }
+            throw new NotImplementedException();
+        }
+
         public async Task<ServiceDefault<TeacherUpdateResponse>> TeacherUpdateAsync(TeacherUpdateResquest updateResquest)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -278,6 +404,47 @@ namespace TPS_FullStack.Server.Modules.Admin
                     }
                 }
             }
+        }
+
+        public async Task<ServiceDefault<ScheduleTeacherAttendanceResponse>> TeacherCheckoutAsync(string? GiangvienID, string? LichhocID)
+        {
+
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                using (var trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Buoc 1: them vao bang diem danh
+                        var attendance = Guid.NewGuid().ToString();
+                        await _attendanceRepository.CreateAsync(conn, trans, attendance, LichhocID, GiangvienID, null, DateTime.UtcNow, DateTime.UtcNow);
+
+                        // Buoc 2: update bang Lichhoc
+                        await _scheduleRepository.UpdateAsync(conn, trans, LichhocID, null, null, GiangvienID, null, null, null, null, null, DateTime.UtcNow);
+                        await trans.CommitAsync();
+
+                        return new ServiceDefault<ScheduleTeacherAttendanceResponse>
+                        {
+                            statusCode = StatusCodes.Status500InternalServerError,
+                            Message = "Check out thanh cong",
+                            Data = null,
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new ServiceDefault<ScheduleTeacherAttendanceResponse>
+                        {
+                            statusCode = StatusCodes.Status500InternalServerError,
+                            Message = "Check out khong thanh cong" + ex.Message,
+                            Data = null,
+                        };
+                    }
+
+                }
+            }
+            throw new NotImplementedException();
         }
     }
 }

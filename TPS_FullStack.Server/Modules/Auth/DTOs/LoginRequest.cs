@@ -1,6 +1,6 @@
 ﻿namespace TPS_FullStack.Server.Modules.Auth
 {
-    public class LoginDto
+    public class LoginRequest
     {
         public required string Username { get; set; }
         public required string Password { get; set; }

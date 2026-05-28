@@ -43,6 +43,21 @@ namespace TPS_FullStack.Server.Modules.Auth
             // }
             throw new NotImplementedException();
         }
+
+        public async Task<AppUser?> GetByUserNameAsync(string? Username, string? Password)
+        {
+            var user = await _userManager.FindByNameAsync(Username);
+            if(user == null)
+            {
+                return null;
+            }
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, Password);
+            if(user.Kichhoat == false & isValidPassword)
+            {
+                return null;
+            }
+             throw new NotImplementedException();
+        }
     }
 
 }

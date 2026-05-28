@@ -11,6 +11,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public Task UpdateAsync (SqlConnection conn, SqlTransaction trans, string? LichhocID, string? KhoahocID, string? ChuyendeID, string? GiangvienID,
                                 DateTime? Ngaydukien, DateTime? Batdaudukien, DateTime? Ketthucdukien, DateTime? Ngaythucte, DateTime? Batdauthucte, DateTime? Ketthucthucte);
         public Task DeleteAsync (SqlConnection conn, SqlTransaction trans, string? LichhocID);
+        public Task <List<ScheduleModel>> GetByStudentIDAsync(SqlConnection conn, string? HocvienID);
     }
 
 }
