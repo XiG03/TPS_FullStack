@@ -7,7 +7,7 @@ namespace TPS_FullStack.Server.Modules.JWT
     public class JwtRepository : IJwtRepository
     {
         private readonly IConfiguration _configuration;
-        
+
         public JwtRepository(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -21,21 +21,24 @@ namespace TPS_FullStack.Server.Modules.JWT
             {
                 conn.Open();
 
-                var query = @"INSERT INTO dbo.RefreshToken(Id, UserId, refreshToken, ExpiryTime, IsRevoked, CreatedAt)
-                            VALUES (@MaId, @UserId, @refreshToken, ExpiryTime, IsRevoked, CreatedAt)";   
+                var query = @"INSERT INTO dbo.RefreshTokens (Id, UserId, refreshToken, ExpiryTime, IsRevoked, CreatedAt)
+                            VALUES (@MaId, @UserId, @refreshToken, @ExpiryTime, @IsRevoked, @CreatedAt)";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    //Input parameters
-
-
+                    cmd.Parameters.AddWithValue("@MaId", Guid.NewGuid().ToString());
+                    cmd.Parameters.AddWithValue("@UserId", string.IsNullOrWhiteSpace(UserId) ? DBNull.Value : UserId);
+                    cmd.Parameters.AddWithValue("@refreshToken", (object?)refreshToken ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ExpiryTime", (object?)ExpiryTime ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsRevoked", false);
+                    cmd.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
                     // Check query
                     int rows = cmd.ExecuteNonQuery();
-                    if(rows == 1)
+                    if (rows == 1)
                     {
                         return true;
                     }
-                    if(rows == 0)
+                    if (rows == 0)
                     {
                         return false;
                     }

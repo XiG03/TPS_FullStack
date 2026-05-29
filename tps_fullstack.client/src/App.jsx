@@ -10,8 +10,10 @@ import ScheduleManagementPage from './pages/ScheduleManagementPage';
 import ScheduleDetailPage from './pages/ScheduleDetailPage';
 import StudentManagementPage from './pages/StudentManagementPage';
 import StudentDetailPage from './pages/StudentDetailPage';
+import StudentWorkspacePage from './pages/StudentWorkspacePage';
 import TeacherManagementPage from './pages/TeacherManagementPage';
 import TeacherDetailPage from './pages/TeacherDetailPage';
+import TeacherWorkspacePage from './pages/TeacherWorkspacePage';
 import LoginPage from './pages/LoginPage';
 import ReportManagementPage from './pages/ReportManagementPage';
 import LabCreatePage from './pages/LabCreatePage';
@@ -23,6 +25,8 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/teacher/me" element={<TeacherWorkspacePage />} />
+        <Route path="/student/me" element={<StudentWorkspacePage />} />
 
         {/* Main Admin Layout Route */}
         <Route path="/" element={<AdminLayout />}>

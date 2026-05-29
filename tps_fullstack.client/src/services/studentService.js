@@ -89,6 +89,49 @@ export const getStudentDetail = async (id) => {
     return { data: data ? normalizeStudent(data) : null };
 };
 
+export const getStudentMe = async () => {
+    const response = await fetch(`${API_BASE_URL}/me`, {
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch current student'));
+
+    const data = unwrapServiceResponse(payload);
+    return { data: data ? normalizeStudent(data) : null };
+};
+
+export const getStudentMeSchedules = async () => {
+    const response = await fetch(`${API_BASE_URL}/me/schedules`, {
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch student schedules'));
+
+    const data = unwrapServiceResponse(payload) || [];
+    return { data: Array.isArray(data) ? data : [] };
+};
+
+export const getStudentMeScheduleDetail = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/me/schedule/${id}`, {
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch student schedule detail'));
+
+    return { data: unwrapServiceResponse(payload) };
+};
+
+export const studentCheckinSchedule = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/me/schedule/${id}/checkin`, {
+        method: 'POST',
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to check in schedule'));
+
+    return { data: unwrapServiceResponse(payload), message: payload?.message };
+};
+
 export const createStudent = async (payload) => {
     const response = await fetch(API_BASE_URL, {
         method: 'POST',

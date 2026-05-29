@@ -216,7 +216,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                             TenKhoahoc = schedule.TenKhoahoc,
                             ChuyendeID = schedule.ChuyendeID,
                             TenChuyende = schedule.TenChuyende,
-                            GiangvienID = schedule.TenGiangvien,
+                            GiangvienID = schedule.GiangvienID,
+                            TenGiangvien = schedule.TenGiangvien,
                             Ngaydukien = schedule.Ngaydukien,
                             Batdaudukien = schedule.Batdaudukien,
                             Ketthucdukien = schedule.Ketthucdukien,
@@ -293,7 +294,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                         return new ServiceDefault<ScheduleTeacherAttendanceResponse>
                         {
-                            statusCode = StatusCodes.Status500InternalServerError,
+                            statusCode = StatusCodes.Status200OK,
                             Message = "Check in thanh cong",
                             Data = null,
                         };
@@ -427,7 +428,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                         return new ServiceDefault<ScheduleTeacherAttendanceResponse>
                         {
-                            statusCode = StatusCodes.Status500InternalServerError,
+                            statusCode = StatusCodes.Status200OK,
                             Message = "Check out thanh cong",
                             Data = null,
                         };

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
     const [formData, setFormData] = useState({
-        email: '',
+        username: '',
         password: '',
         rememberMe: false
     });
@@ -23,16 +23,12 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 lg:p-8 bg-surface-container-low relative overflow-hidden">
-            {/* Decorative Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                 <div className="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full opacity-10 blur-3xl bg-gradient-to-br from-primary to-primary-container"></div>
                 <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full opacity-[0.05] blur-3xl bg-primary"></div>
             </div>
 
-            {/* Main Container */}
             <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 z-10 relative">
-                
-                {/* Left Side: Branding & Context */}
                 <div className="hidden lg:flex flex-col w-1/2 pr-12">
                     <div className="mb-8">
                         <span className="font-headline text-3xl font-extrabold tracking-tighter text-primary">The Ledger</span>
@@ -65,20 +61,17 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                     </div>
                 </div>
 
-                {/* Right Side: Login Card */}
                 <div className="w-full lg:w-[480px] flex-shrink-0">
                     <div className="bg-white/85 backdrop-blur-[20px] rounded-xl shadow-[0px_12px_32px_rgba(25,28,30,0.08)] p-8 lg:p-10 relative overflow-hidden">
-                        {/* Subtle top edge highlight */}
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
-                        
-                        {/* Mobile Logo */}
+
                         <div className="lg:hidden mb-8 text-center">
                             <span className="font-headline text-2xl font-extrabold tracking-tighter text-primary">The Ledger</span>
                         </div>
-                        
+
                         <div className="mb-8">
                             <h2 className="font-headline text-2xl font-bold text-on-surface mb-2">Đăng nhập</h2>
-                            <p className="font-body text-sm text-on-surface-variant">Access your certification dashboard</p>
+                            <p className="font-body text-sm text-on-surface-variant">Truy cập bảng điều khiển chứng chỉ của bạn</p>
                         </div>
 
                         {error && (
@@ -88,36 +81,36 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                         )}
 
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Email Field */}
                             <div className="space-y-2">
-                                <label className="font-label text-sm font-medium text-on-surface" htmlFor="email">
-                                    Email đăng nhập
+                                <label className="font-label text-sm font-medium text-on-surface" htmlFor="username">
+                                    Tên đăng nhập
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span className="material-symbols-outlined text-outline-variant text-sm">mail</span>
+                                        <span className="material-symbols-outlined text-outline-variant text-sm">person</span>
                                     </div>
                                     <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        placeholder="name@institution.edu"
+                                        id="username"
+                                        name="username"
+                                        type="text"
+                                        placeholder="Nhập tên đăng nhập"
                                         required
-                                        value={formData.email}
+                                        autoComplete="username"
+                                        disabled={isLoading}
+                                        value={formData.username}
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-4 py-3 bg-surface-container-highest border-none rounded-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 focus:bg-surface-container-lowest transition-all font-body text-sm"
                                     />
                                 </div>
                             </div>
 
-                            {/* Password Field */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                     <label className="font-label text-sm font-medium text-on-surface" htmlFor="password">
                                         Mật khẩu
                                     </label>
                                     <a href="#" className="font-label text-sm font-medium text-primary hover:text-primary-container transition-colors">
-                                        Forgot password?
+                                        Quên mật khẩu?
                                     </a>
                                 </div>
                                 <div className="relative">
@@ -127,9 +120,11 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                                     <input
                                         id="password"
                                         name="password"
-                                        type={showPassword ? "text" : "password"}
+                                        type={showPassword ? 'text' : 'password'}
                                         placeholder="••••••••"
                                         required
+                                        autoComplete="current-password"
+                                        disabled={isLoading}
                                         value={formData.password}
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-10 py-3 bg-surface-container-highest border-none rounded-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 focus:bg-surface-container-lowest transition-all font-body text-sm"
@@ -138,15 +133,15 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline-variant hover:text-on-surface-variant transition-colors"
+                                        aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                                     >
                                         <span className="material-symbols-outlined text-sm">
-                                            {showPassword ? "visibility" : "visibility_off"}
+                                            {showPassword ? 'visibility' : 'visibility_off'}
                                         </span>
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Remember Me */}
                             <div className="flex items-center">
                                 <input
                                     id="remember-me"
@@ -154,24 +149,23 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                                     type="checkbox"
                                     checked={formData.rememberMe}
                                     onChange={handleChange}
+                                    disabled={isLoading}
                                     className="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary/40 bg-surface-container-highest"
                                 />
                                 <label htmlFor="remember-me" className="ml-2 block font-body text-sm text-on-surface-variant">
-                                    Keep me signed in
+                                    Duy trì đăng nhập
                                 </label>
                             </div>
 
-                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={isLoading}
                                 className={`w-full py-3 px-4 text-white rounded-lg font-label font-medium text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all uppercase tracking-wide bg-primary ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:opacity-90'}`}
                             >
-                                {isLoading ? 'Đang xử lý...' : 'Sign In to Dashboard'}
+                                {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
                             </button>
                         </form>
 
-                        {/* Divider */}
                         <div className="mt-8 mb-6 flex items-center justify-center">
                             <div className="w-full h-px bg-surface-dim"></div>
                             <span className="px-4 font-label text-xs text-outline bg-surface-container-lowest">OR</span>
@@ -195,7 +189,6 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                             </button>
                         </div>
 
-                        {/* Sign Up Link */}
                         <p className="mt-6 text-center font-body text-sm text-on-surface-variant">
                             Don't have an account?
                             <a className="ml-1 font-medium text-primary hover:text-primary-container transition-colors" href="#">
@@ -204,7 +197,6 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                         </p>
                     </div>
 
-                    {/* Secure Connection Note */}
                     <div className="mt-6 flex items-center justify-center gap-2 text-outline text-xs font-label">
                         <span className="material-symbols-outlined text-[16px]">lock</span>
                         <span>Secure, encrypted connection</span>

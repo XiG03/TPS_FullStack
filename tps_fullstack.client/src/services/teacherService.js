@@ -42,6 +42,53 @@ export const getTeacherDetail = async (id) => {
     return { data: unwrapServiceResponse(payload) };
 };
 
+export const getTeacherMe = async () => {
+    const response = await fetch(`${API_BASE_URL}/me`, {
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch current teacher'));
+    return { data: unwrapServiceResponse(payload) };
+};
+
+export const getTeacherMeSchedules = async () => {
+    const response = await fetch(`${API_BASE_URL}/me/schedules`, {
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch teacher schedules'));
+    return { data: unwrapServiceResponse(payload) || [] };
+};
+
+export const getTeacherMeScheduleDetail = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/me/schedule/${id}`, {
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch teacher schedule detail'));
+    return { data: unwrapServiceResponse(payload) };
+};
+
+export const teacherCheckinSchedule = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/me/schedule/${id}/checkin`, {
+        method: 'POST',
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to check in schedule'));
+    return { data: unwrapServiceResponse(payload), message: payload?.message };
+};
+
+export const teacherCheckoutSchedule = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/me/schedule/${id}/checkout`, {
+        method: 'POST',
+        headers: getHeaders()
+    });
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to check out schedule'));
+    return { data: unwrapServiceResponse(payload), message: payload?.message };
+};
+
 export const createTeacher = async (teacherData) => {
     const response = await fetch(API_BASE_URL, {
         method: 'POST',
