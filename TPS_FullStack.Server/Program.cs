@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components;
@@ -9,6 +10,8 @@ using TPS_FullStack.Server;
 using TPS_FullStack.Server.AppDbContext;
 using TPS_FullStack.Server.Entities;
 using TPS_FullStack.Server.Modules.Admin;
+using TPS_FullStack.Server.Modules.Auth;
+using TPS_FullStack.Server.Modules.JWT;
 using TPS_FullStack.Server.Modules.Teacher;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,8 +75,10 @@ builder.Services.AddScoped<ICertificateRepository,CertificateRepository>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IScheduleRepository,ScheduleRepository>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
-
-
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IJwtRepository, JwtRepository>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISchedulesService, SchedulesService>();
 builder.Services.AddScoped<ISchedulesRepository, SchedulesRepository>();
 
@@ -130,7 +135,10 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Token"]!)),
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+
+        NameClaimType = ClaimTypes.NameIdentifier,
+        RoleClaimType = ClaimTypes.Role
     };
 });
 

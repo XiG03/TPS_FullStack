@@ -69,7 +69,10 @@ namespace TPS_FullStack.Server.Modules.JWT
             throw new NotImplementedException();
         }
 
-
+        public Task<JWT> GenerateToken(string? UserId, bool? rememberMe)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

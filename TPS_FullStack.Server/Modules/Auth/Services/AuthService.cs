@@ -64,7 +64,7 @@ namespace TPS_FullStack.Server.Modules.Auth
                     Data = new LoginResponse
                     {
                         RefreshToken = await _jwtService.GenerateRefreshTokenAsync(user.Id),
-                        AccessToken = await _jwtService.GenerateAccessTokenAsync(user.Id, null)
+                        AccessToken = await _jwtService.GenerateAccessTokenAsync(user.Id, await _authRepo.GetRoleByIdAsync(user.Id))
                     }
                 };
             } catch(Exception ex)

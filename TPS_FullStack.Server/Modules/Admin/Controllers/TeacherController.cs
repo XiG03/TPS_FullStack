@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace TPS_FullStack.Server.Modules.Admin
@@ -15,10 +17,37 @@ namespace TPS_FullStack.Server.Modules.Admin
             _teacherService = teacherService;
         }
 
+        private string? ResolveTeacherId(string? GiangvienID = null)
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? User.FindFirstValue("sub")
+                ?? GiangvienID;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var result = await _teacherService.TeacherGetAllAsync();
+            return StatusCode(result.statusCode, result);
+        }
+
+
+        [Authorize(Roles = "Giangvien")]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe(string? GiangvienID)
+        {
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(teacherId))
+            {
+                return Unauthorized(new ServiceDefault<TeacherDetailResponse>
+                {
+                    statusCode = StatusCodes.Status401Unauthorized,
+                    Message = "Không xác định được giảng viên hiện tại",
+                    Data = null
+                });
+            }
+
+            var result = await _teacherService.TeacherGetByIDAsync(teacherId);
             return StatusCode(result.statusCode, result);
         }
 
@@ -63,25 +92,26 @@ namespace TPS_FullStack.Server.Modules.Admin
         [HttpGet("me/schedules")]
         public async Task<IActionResult> GetSchedules(string? GiangvienID)
         {
-            var result = await _teacherService.TeacherGetScheduleByIDAsync(GiangvienID);
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _teacherService.TeacherGetScheduleByIDAsync(teacherId);
             return StatusCode(result.statusCode, result);
         }
         [HttpGet("me/schedule/{LichhocID}")]
         public async Task<IActionResult> GetScheduleDetail(string? GiangvienID, string? LichhocID)
         {
-            var result = await _teacherService.TeacherGetScheduleDetailAsync(GiangvienID, LichhocID);
+            var result = await _teacherService.TeacherGetScheduleDetailAsync(ResolveTeacherId(GiangvienID), LichhocID);
             return StatusCode(result.statusCode, result);
         }
         [HttpPost("me/schedule/{LichhocID}/checkin")]
         public async Task<IActionResult> Checkin(string? GiangvienID, string? LichhocID)
         {
-            var result = await _teacherService.TeacherCheckinAsync(GiangvienID, LichhocID);
+            var result = await _teacherService.TeacherCheckinAsync(ResolveTeacherId(GiangvienID), LichhocID);
             return StatusCode(result.statusCode, result);
         }
         [HttpPost("me/schedule/{LichhocID}/checkout")]
         public async Task<IActionResult> Checkout(string? GiangvienID, string? LichhocID)
         {
-            var result = await _teacherService.TeacherCheckoutAsync(GiangvienID, LichhocID);
+            var result = await _teacherService.TeacherCheckoutAsync(ResolveTeacherId(GiangvienID), LichhocID);
             return StatusCode(result.statusCode, result);
         }
     }

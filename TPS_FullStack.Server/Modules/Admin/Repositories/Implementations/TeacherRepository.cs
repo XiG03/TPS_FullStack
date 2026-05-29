@@ -28,7 +28,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                 Kichhoat = false,
             };
 
-            var result = await _userManager.CreateAsync(user);
+            var result = await _userManager.CreateAsync(user, "TPs@123456");
             if (!result.Succeeded)
             {
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));

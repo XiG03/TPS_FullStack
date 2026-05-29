@@ -10,6 +10,8 @@ namespace TPS_FullStack.Server.Modules.JWT
 
         public Task<string> GenerateAccessTokenAsync(string UserId, string role);
 
+        public Task<JWT> GenerateToken(string? UserId, bool? rememberMe);
+
         //Ham check RefreshToken va Gen AccessToken
     }
 }
