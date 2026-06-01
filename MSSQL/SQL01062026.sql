@@ -29,3 +29,40 @@ where Id = '99766ca2-9bdb-4ccd-86be-a1fe7deb5ad1'
 
 
 select * from dbo.Lichhoc_Hocvien_Diemdanh
+
+
+SELECT lh.*, kh.Ten AS TenKhoahoc 
+FROM dbo.Lichhoc lh
+JOIN dbo.Khoahoc kh ON lh.KhoahocID = kh.MaID
+JOIN dbo.Lichhoc_Hocvien_Diemdanh lhd ON lhd.LichhocID = lh.MaID
+JOIN dbo.Khoahoc_Hocvien khhv ON khhv.KhoahocID = kh.MaID
+WHERE khhv.HocvienID = @HocvienID
+
+
+CREATE PROCEDURE [dbo].[GetLichhocByHocvienID]
+    @HocvienID NVARCHAR(50)
+AS
+BEGIN
+    SELECT
+        lh.*,
+        kh.Ten AS TenKhoahoc,
+        CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM dbo.Lichhoc_Hocvien_Diemdanh lhd
+                WHERE lhd.LichhocID = lh.MaID
+                  AND lhd.HocvienID = @HocvienID
+            )
+            THEN CAST(1 AS BIT)
+            ELSE CAST(0 AS BIT)
+        END AS Trangthai
+    FROM dbo.Lichhoc lh
+    JOIN dbo.Khoahoc kh
+        ON lh.KhoahocID = kh.MaID
+    JOIN dbo.Khoahoc_Hocvien khhv
+        ON khhv.KhoahocID = kh.MaID
+    WHERE khhv.HocvienID = @HocvienID
+END
+
+
+EXEC dbo.GetLichhocByHocvienID @HocvienID = 'f1697333-1de0-48a9-b2bd-2e7033e767ec'

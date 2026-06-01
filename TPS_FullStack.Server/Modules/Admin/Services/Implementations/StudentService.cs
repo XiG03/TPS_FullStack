@@ -256,7 +256,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                         Ketthucdukien = schedule.Ketthucdukien,
                         Ngaythucte = schedule.Ngaythucte,
                         Batdauthucte = schedule.Batdauthucte,
-                        Ketthucthucte = schedule.Ketthucthucte
+                        Ketthucthucte = schedule.Ketthucthucte,
+                        Trangthai = schedule.Trangthai
                     });
                 }
             }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 using TPS_FullStack.Server.Entities;
 
 namespace TPS_FullStack.Server.Modules.Admin
@@ -258,8 +259,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                         JOIN dbo.Khoahoc kh ON lh.KhoahocID = kh.MaID
                         JOIN dbo.Khoahoc_Hocvien khhv ON khhv.KhoahocID = kh.MaID
                         WHERE khhv.HocvienID = @HocvienID";
-            using (var cmd = new SqlCommand(query, conn))
+            using (var cmd = new SqlCommand("dbo.GetLichhocByHocvienID", conn))
             {
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@HocvienID", HocvienID ?? (object)DBNull.Value);
                 var Schedules = new List<ScheduleModel>();
                 using (var reader = await cmd.ExecuteReaderAsync())
@@ -301,7 +303,10 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                             Ketthucthucte = reader["Ketthucthucte"] == DBNull.Value
                         ? null
-                        : Convert.ToDateTime(reader["Ketthucthucte"])
+                        : Convert.ToDateTime(reader["Ketthucthucte"]),
+                            Trangthai = reader["Trangthai"] == DBNull.Value
+                        ? null
+                        : Convert.ToBoolean(reader["Trangthai"])
                         });
                     }
                 }
