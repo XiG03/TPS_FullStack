@@ -7,6 +7,7 @@
         public Task<ServiceDefault<TopicCreateResponse>> CreateTopicAsync(TopicCreateRequest createRequest);
         public Task<ServiceDefault<TopicUpdateResponse>> UpdateTopicAsync(TopicUpdateRequest updateRequest);
         public Task<ServiceDefault<string>> DeletedTopicAsync(string MaID);
+        public Task<ServiceDefault<TopicDocumentDownloadResponse>> GetDocumentDownloadAsync(string tailieuID);
     }
 
 }

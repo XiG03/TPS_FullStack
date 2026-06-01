@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/authService';
+import { login, register } from '../services/authService';
 import { setRefreshToken, setToken, removeToken } from '../services/httpClient';
 
 const decodeTokenPayload = (token) => {
@@ -84,6 +84,20 @@ export const useAuth = () => {
         }
     };
 
+    const handleRegister = async (email, password, confirmPassword) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await register(email, password, confirmPassword);
+            return response.data || {};
+        } catch (err) {
+            setError(err.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleLogout = () => {
         removeToken();
         navigate('/login');
@@ -93,6 +107,7 @@ export const useAuth = () => {
         isLoading,
         error,
         handleLogin,
+        handleRegister,
         handleLogout,
     };
 };

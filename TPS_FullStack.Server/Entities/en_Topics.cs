@@ -52,6 +52,10 @@ namespace TPS_FullStack.Server.Entities
 
         [Column(TypeName = "DECIMAL(18,2)")]
         public decimal? Kichthuoc { get; set; }
+        [Column(TypeName = "NVARCHAR(500)")]
+        public string? Duongdan { get; set; }
+        [Column(TypeName = "NVARCHAR(255)")]
+        public string? TentepGoc { get; set; }
         public bool? Khongsudung { get; set; }
     }
 

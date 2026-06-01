@@ -15,6 +15,7 @@ import TeacherManagementPage from './pages/TeacherManagementPage';
 import TeacherDetailPage from './pages/TeacherDetailPage';
 import TeacherWorkspacePage from './pages/TeacherWorkspacePage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import ReportManagementPage from './pages/ReportManagementPage';
 import LabCreatePage from './pages/LabCreatePage';
 import './App.css'; 
@@ -25,11 +26,13 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/teacher/me" element={<TeacherWorkspacePage />} />
         <Route path="/student/me" element={<StudentWorkspacePage />} />
 
         {/* Main Admin Layout Route */}
         <Route path="/" element={<AdminLayout />}>
+          <Route index element={<Navigate to="/login" replace />} />
           {/* Nested routes inside AdminLayout */}
           {/* <Route path="dashboard" element={<AdminDashboard />} /> */}
           <Route path="courses" element={<CourseManagementPage />} />

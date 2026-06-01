@@ -1,26 +1,37 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
+const RegisterUI = ({ onSubmit, isLoading, error, successMessage }) => {
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: '',
-        rememberMe: false
+        confirmPassword: ''
     });
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [clientError, setClientError] = useState('');
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: value
         }));
+        setClientError('');
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        if (formData.password !== formData.confirmPassword) {
+            setClientError('Mật khẩu xác nhận không khớp.');
+            return;
+        }
+
         onSubmit(formData);
     };
+
+    const visibleError = clientError || error;
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 lg:p-8 bg-surface-container-low relative overflow-hidden">
@@ -35,28 +46,28 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                         <span className="font-headline text-3xl font-extrabold tracking-tighter text-primary">The Ledger</span>
                     </div>
                     <h1 className="font-headline text-5xl font-bold leading-tight mb-6 text-on-surface">
-                        The Academic<br />Authority
+                        Join The<br />Academic Hub
                     </h1>
                     <p className="font-body text-lg text-on-surface-variant mb-10 max-w-md">
-                        Enter your credentials to access the premier certification management and learning experience.
+                        Tạo tài khoản để quản lý chứng chỉ, khóa học và lộ trình học tập trong cùng một hệ thống.
                     </p>
                     <div className="space-y-6">
                         <div className="flex items-start gap-4">
                             <div className="w-10 h-10 rounded-full bg-surface-container-lowest shadow-[0px_4px_12px_rgba(25,28,30,0.06)] flex items-center justify-center flex-shrink-0">
-                                <span className="material-symbols-outlined text-primary">verified</span>
+                                <span className="material-symbols-outlined text-primary">person_add</span>
                             </div>
                             <div>
-                                <h3 className="font-headline font-semibold text-on-surface">Verified Achievements</h3>
-                                <p className="font-body text-sm text-on-surface-variant">Immutable records of your academic progress.</p>
+                                <h3 className="font-headline font-semibold text-on-surface">Fast Access</h3>
+                                <p className="font-body text-sm text-on-surface-variant">Đăng ký bằng email và bắt đầu sử dụng hệ thống ngay.</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
                             <div className="w-10 h-10 rounded-full bg-surface-container-lowest shadow-[0px_4px_12px_rgba(25,28,30,0.06)] flex items-center justify-center flex-shrink-0">
-                                <span className="material-symbols-outlined text-primary">menu_book</span>
+                                <span className="material-symbols-outlined text-primary">lock</span>
                             </div>
                             <div>
-                                <h3 className="font-headline font-semibold text-on-surface">Curated Pathways</h3>
-                                <p className="font-body text-sm text-on-surface-variant">Structured learning designed for mastery.</p>
+                                <h3 className="font-headline font-semibold text-on-surface">Secure Identity</h3>
+                                <p className="font-body text-sm text-on-surface-variant">Thông tin đăng nhập được gửi qua API đăng ký của hệ thống.</p>
                             </div>
                         </div>
                     </div>
@@ -71,34 +82,40 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                         </div>
 
                         <div className="mb-8">
-                            <h2 className="font-headline text-2xl font-bold text-on-surface mb-2">Đăng nhập</h2>
-                            <p className="font-body text-sm text-on-surface-variant">Truy cập bảng điều khiển chứng chỉ của bạn</p>
+                            <h2 className="font-headline text-2xl font-bold text-on-surface mb-2">Đăng ký</h2>
+                            <p className="font-body text-sm text-on-surface-variant">Tạo tài khoản mới bằng email của bạn</p>
                         </div>
 
-                        {error && (
+                        {visibleError && (
                             <div className="mb-6 p-3 rounded-lg bg-error-container text-error font-body text-sm">
-                                {error}
+                                {visibleError}
+                            </div>
+                        )}
+
+                        {successMessage && (
+                            <div className="mb-6 p-3 rounded-lg bg-green-50 text-green-700 font-body text-sm">
+                                {successMessage}
                             </div>
                         )}
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <label className="font-label text-sm font-medium text-on-surface" htmlFor="username">
-                                    Tên đăng nhập
+                                <label className="font-label text-sm font-medium text-on-surface" htmlFor="email">
+                                    Email
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span className="material-symbols-outlined text-outline-variant text-sm">person</span>
+                                        <span className="material-symbols-outlined text-outline-variant text-sm">mail</span>
                                     </div>
                                     <input
-                                        id="username"
-                                        name="username"
-                                        type="text"
-                                        placeholder="Nhập tên đăng nhập"
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        placeholder="name@example.com"
                                         required
-                                        autoComplete="username"
+                                        autoComplete="email"
                                         disabled={isLoading}
-                                        value={formData.username}
+                                        value={formData.email}
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-4 py-3 bg-surface-container-highest border-none rounded-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 focus:bg-surface-container-lowest transition-all font-body text-sm"
                                     />
@@ -106,14 +123,9 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                             </div>
 
                             <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <label className="font-label text-sm font-medium text-on-surface" htmlFor="password">
-                                        Mật khẩu
-                                    </label>
-                                    <a href="#" className="font-label text-sm font-medium text-primary hover:text-primary-container transition-colors">
-                                        Quên mật khẩu?
-                                    </a>
-                                </div>
+                                <label className="font-label text-sm font-medium text-on-surface" htmlFor="password">
+                                    Mật khẩu
+                                </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span className="material-symbols-outlined text-outline-variant text-sm">lock</span>
@@ -124,7 +136,7 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="••••••••"
                                         required
-                                        autoComplete="current-password"
+                                        autoComplete="new-password"
                                         disabled={isLoading}
                                         value={formData.password}
                                         onChange={handleChange}
@@ -143,19 +155,37 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center">
-                                <input
-                                    id="remember-me"
-                                    name="rememberMe"
-                                    type="checkbox"
-                                    checked={formData.rememberMe}
-                                    onChange={handleChange}
-                                    disabled={isLoading}
-                                    className="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary/40 bg-surface-container-highest"
-                                />
-                                <label htmlFor="remember-me" className="ml-2 block font-body text-sm text-on-surface-variant">
-                                    Duy trì đăng nhập
+                            <div className="space-y-2">
+                                <label className="font-label text-sm font-medium text-on-surface" htmlFor="confirmPassword">
+                                    Xác nhận mật khẩu
                                 </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span className="material-symbols-outlined text-outline-variant text-sm">verified_user</span>
+                                    </div>
+                                    <input
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        placeholder="••••••••"
+                                        required
+                                        autoComplete="new-password"
+                                        disabled={isLoading}
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        className="w-full pl-10 pr-10 py-3 bg-surface-container-highest border-none rounded-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 focus:bg-surface-container-lowest transition-all font-body text-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline-variant hover:text-on-surface-variant transition-colors"
+                                        aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
+                                    >
+                                        <span className="material-symbols-outlined text-sm">
+                                            {showConfirmPassword ? 'visibility' : 'visibility_off'}
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
 
                             <button
@@ -163,37 +193,14 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
                                 disabled={isLoading}
                                 className={`w-full py-3 px-4 text-white rounded-lg font-label font-medium text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all uppercase tracking-wide bg-primary ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:opacity-90'}`}
                             >
-                                {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
+                                {isLoading ? 'Đang xử lý...' : 'Đăng ký'}
                             </button>
                         </form>
 
-                        <div className="mt-8 mb-6 flex items-center justify-center">
-                            <div className="w-full h-px bg-surface-dim"></div>
-                            <span className="px-4 font-label text-xs text-outline bg-surface-container-lowest">OR</span>
-                            <div className="w-full h-px bg-surface-dim"></div>
-                        </div>
-
-                        <div className="mt-4">
-                            <button
-                                type="button"
-                                onClick={onGoogleSignIn}
-                                className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg font-label font-medium text-sm text-on-surface shadow-sm hover:bg-surface-container-low transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            >
-                                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                                    <path d="M1 1h22v22H1z" fill="none"></path>
-                                </svg>
-                                <span>Sign in with Google</span>
-                            </button>
-                        </div>
-
                         <p className="mt-6 text-center font-body text-sm text-on-surface-variant">
-                            Chưa có tài khoản?
-                            <Link className="ml-1 font-medium text-primary hover:text-primary-container transition-colors" to="/register">
-                                Đăng ký
+                            Đã có tài khoản?
+                            <Link className="ml-1 font-medium text-primary hover:text-primary-container transition-colors" to="/login">
+                                Đăng nhập
                             </Link>
                         </p>
                     </div>
@@ -208,4 +215,4 @@ const LoginUI = ({ onSubmit, isLoading, error, onGoogleSignIn }) => {
     );
 };
 
-export default LoginUI;
+export default RegisterUI;
