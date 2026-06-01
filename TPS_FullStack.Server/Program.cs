@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using TPS_FullStack.Server;
 using TPS_FullStack.Server.AppDbContext;
 using TPS_FullStack.Server.Entities;
+using TPS_FullStack.Server.Helpers;
 using TPS_FullStack.Server.Modules.Admin;
 using TPS_FullStack.Server.Modules.Auth;
 using TPS_FullStack.Server.Modules.JWT;
@@ -111,6 +112,7 @@ builder.Services.AddScoped<ICertificateStudentRepository, CertificateStudentRepo
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IScheduleTeacherAttendanceRepository, ScheduleTeacherAttendanceRepository>();
 builder.Services.AddScoped<IScheduleStudentAttendanceRepository, ScheduleStudentAttendanceRepository>();
+builder.Services.AddHostedService<ExpiredTokenCleanupService>();
 
 
 

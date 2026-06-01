@@ -11,13 +11,13 @@ const AdminLayout = () => {
   };
 
   const navItems = [
-    { path: '/schedules', name: 'Schedules', icon: <CalendarDays size={20} /> },
-    { path: '/labs/new', name: 'Labs', icon: <FlaskConical size={20} /> },
-    { path: '/courses', name: 'Courses', icon: <BookOpen size={20} /> },
-    { path: '/students', name: 'Students', icon: <Users size={20} /> },
-    { path: '/teachers', name: 'Teachers', icon: <UserCog size={20} /> },
-    { path: '/topics', name: 'Topics', icon: <FileText size={20} /> },
-    { path: '/reports', name: 'Reports', icon: <ClipboardCheck size={20} /> },
+    { path: '/schedules', name: 'Lịch học', icon: <CalendarDays size={20} /> },
+    { path: '/labs/new', name: 'Thực hành', icon: <FlaskConical size={20} /> },
+    { path: '/courses', name: 'Khóa học', icon: <BookOpen size={20} /> },
+    { path: '/students', name: 'Học viên', icon: <Users size={20} /> },
+    { path: '/teachers', name: 'Giảng viên', icon: <UserCog size={20} /> },
+    { path: '/topics', name: 'Chuyên đề', icon: <FileText size={20} /> },
+    { path: '/reports', name: 'Báo cáo', icon: <ClipboardCheck size={20} /> },
   ];
 
   return (

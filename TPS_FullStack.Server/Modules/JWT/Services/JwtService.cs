@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
+using TPS_FullStack.Server.Modules.Auth;
 
 namespace TPS_FullStack.Server.Modules.JWT
 {
@@ -13,15 +14,19 @@ namespace TPS_FullStack.Server.Modules.JWT
     {
         private readonly IJwtRepository _jwtRepo;
         private readonly IConfiguration _configuration;
+        private readonly IAuthRepository _authRepo;
 
         public JwtService(IJwtRepository jwtRepo,
-                            IConfiguration configuration)
+                            IConfiguration configuration,
+                            IAuthRepository authRepo)
         {
             _jwtRepo = jwtRepo;
             _configuration = configuration;
+            _authRepo = authRepo;
         }
         public async Task<string> GenerateRefreshTokenAsync(string UserId)
         {
+
             var refreshToken = GenerateRefreshToken();
             var ExpiryTime = DateTime.UtcNow.AddDays(7);
             var result = _jwtRepo.SaveRefreshToken(UserId, refreshToken, ExpiryTime);
@@ -65,12 +70,32 @@ namespace TPS_FullStack.Server.Modules.JWT
             signingCredentials: creds
         );
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-            
+
             throw new NotImplementedException();
         }
 
-        public Task<JWT> GenerateToken(string? UserId, bool? rememberMe)
+        public async Task<ServiceDefault<JWT>> ValidateToken(string? refreshToken)
         {
+            var token = await _jwtRepo.GetByRefreshTokenAsync(refreshToken);
+            if (token == null || token.ExpiryTime < DateTime.UtcNow || token.IsRevoked)
+            {
+                return new ServiceDefault<JWT>
+                {
+                    statusCode = StatusCodes.Status401Unauthorized,
+                    Message = "Invalid refresh token",
+                    Data = null
+                };
+            }
+            return new ServiceDefault<JWT>
+            {
+                statusCode = StatusCodes.Status200OK,
+                Message = "Valid refresh token",
+                Data = new JWT
+                {
+                    refreshToken = token.refreshToken,
+                    accessToken = await GenerateAccessTokenAsync(token.UserId, await _authRepo.GetRoleByIdAsync(token.UserId))
+                }
+            };
             throw new NotImplementedException();
         }
     }
