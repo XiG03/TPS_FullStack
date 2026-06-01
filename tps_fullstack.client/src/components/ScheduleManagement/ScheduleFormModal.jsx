@@ -25,16 +25,28 @@ const getValue = (source, ...keys) => {
 
 const toDateInput = (value) => {
     if (!value) return '';
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
+
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return '';
-    return date.toISOString().slice(0, 10);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
 };
 
 const toTimeInput = (value) => {
     if (!value) return '';
+    if (typeof value === 'string') {
+        const match = value.match(/T(\d{2}:\d{2})/);
+        if (match) return match[1];
+    }
+
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return '';
-    return date.toISOString().slice(11, 16);
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `${hh}:${mm}`;
 };
 
 const mapInitialData = (initialData) => {
@@ -56,7 +68,7 @@ const mapInitialData = (initialData) => {
 
 const combineDateTime = (dateValue, timeValue) => {
     if (!dateValue || !timeValue) return null;
-    return new Date(`${dateValue}T${timeValue}:00`).toISOString();
+    return `${dateValue}T${timeValue}:00`;
 };
 
 const getCourseId = (course) => getValue(course, 'khoahocID', 'KhoahocID', 'maID', 'MaID');
@@ -112,16 +124,21 @@ const ScheduleFormModal = ({ isOpen, onClose, onSubmit, isLoading, initialData }
         const actualStart = combineDateTime(formData.ngaythucte, formData.batdauthucte);
         const actualEnd = combineDateTime(formData.ngaythucte, formData.ketthucthucte);
 
+        const makeDateOnlyISO = (dateStr) => {
+            if (!dateStr) return null;
+            return `${dateStr}T00:00:00`;
+        };
+
         const payload = {
             lichhocID: formData.lichhocID,
             khoahocID: formData.khoahocID,
             chuyendeID: formData.chuyendeID || null,
             giangvienID: formData.giangvienID || null,
-            ngaydukien: formData.ngaydukien ? new Date(`${formData.ngaydukien}T00:00:00`).toISOString() : null,
+            ngaydukien: makeDateOnlyISO(formData.ngaydukien),
             batdaudukien: expectedStart,
             ketthucdukien: expectedEnd,
             kethucdukien: expectedEnd,
-            ngaythucte: formData.ngaythucte ? new Date(`${formData.ngaythucte}T00:00:00`).toISOString() : null,
+            ngaythucte: makeDateOnlyISO(formData.ngaythucte),
             batdauthucte: actualStart,
             ketthucthucte: actualEnd,
             kethucthucte: actualEnd

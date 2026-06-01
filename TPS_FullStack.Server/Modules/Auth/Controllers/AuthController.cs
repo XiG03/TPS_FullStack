@@ -19,6 +19,16 @@ namespace TPS_FullStack.Server.Modules.Auth.Controllers
         public async Task<ActionResult> Login([FromBody] LoginRequest request)
         {
             var result = await _authService.LoginAsync(request);
+            if(result.Data?.RefreshToken != null)
+            {
+                Response.Cookies.Append("refreshToken", result.Data.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(7)
+                });
+            }
             return StatusCode(result.statusCode, result);
         }
     }
