@@ -61,16 +61,39 @@ const normalizeSchedule = (schedule) => ({
     expectedStart: getValue(schedule, 'batdaudukien', 'Batdaudukien'),
     expectedEnd: getValue(schedule, 'ketthucdukien', 'Ketthucdukien', 'kethucdukien', 'Kethucdukien'),
     actualStart: getValue(schedule, 'batdauthucte', 'Batdauthucte'),
-    actualEnd: getValue(schedule, 'ketthucthucte', 'Ketthucthucte', 'kethucthucte', 'Kethucthucte')
+    actualEnd: getValue(schedule, 'ketthucthucte', 'Ketthucthucte', 'kethucthucte', 'Kethucthucte'),
+    attended: normalizeAttendanceStatus(getValue(schedule, 'trangthai', 'Trangthai', 'isCheckedIn', 'IsCheckedIn'))
 });
 
+function normalizeAttendanceStatus(value) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value === 1;
+    if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        return normalized === 'true' || normalized === '1' || normalized === 'diem danh';
+    }
+    return false;
+}
+
 const getScheduleStatus = (schedule) => {
-    if (schedule.actualEnd) return 'completed';
+    if (schedule.attended) return 'attended';
     if (schedule.actualStart) return 'active';
 
     const startDate = toDate(schedule.expectedStart || schedule.expectedDate);
     if (startDate && isAfter(startDate, new Date())) return 'upcoming';
     return 'pending';
+};
+
+const getStatusLabel = (status) => {
+    const labels = {
+        attended: '\u0110\u00e3 \u0111i\u1ec3m danh',
+        completed: '\u0110\u00e3 h\u1ecdc',
+        active: '\u0110ang di\u1ec5n ra',
+        upcoming: 'S\u1eafp h\u1ecdc',
+        pending: 'Ch\u01b0a \u0111i\u1ec3m danh'
+    };
+
+    return labels[status] || labels.pending;
 };
 
 const uniqueCourses = (schedules) => {
@@ -105,8 +128,10 @@ const StudentWorkspaceUI = ({
         const scheduleDate = toDate(schedule.expectedDate || schedule.expectedStart);
         return scheduleDate && isSameDay(scheduleDate, new Date());
     });
-    const completedCount = normalizedSchedules.filter((schedule) => getScheduleStatus(schedule) === 'completed').length;
-    const nextSchedule = normalizedSchedules.find((schedule) => getScheduleStatus(schedule) !== 'completed') || normalizedSchedules[0];
+    const attendedCount = normalizedSchedules.filter((schedule) => schedule.attended).length;
+    const nextSchedule = normalizedSchedules.find((schedule) => !schedule.attended) || normalizedSchedules[0];
+    const nextScheduleStatus = nextSchedule ? getScheduleStatus(nextSchedule) : null;
+    const canCheckinNextSchedule = Boolean(nextSchedule?.id && !nextSchedule.attended && actionId !== nextSchedule.id);
 
     if (isLoading && !student) {
         return (
@@ -184,8 +209,8 @@ const StudentWorkspaceUI = ({
                     </article>
                     <article className="student-stat">
                         <CheckCircle2 size={21} />
-                        <span>{completedCount}</span>
-                        <p>Đã hoàn tất</p>
+                        <span>{attendedCount}</span>
+                        <p>{'\u0110\u00e3 \u0111i\u1ec3m danh'}</p>
                     </article>
                     <article className="student-stat">
                         <Award size={21} />
@@ -205,12 +230,8 @@ const StudentWorkspaceUI = ({
                     {nextSchedule ? (
                         <div className="student-next-session">
                             <div>
-                                <span className={`student-badge ${getScheduleStatus(nextSchedule)}`}>
-                                    {getScheduleStatus(nextSchedule) === 'completed'
-                                        ? 'Đã học'
-                                        : getScheduleStatus(nextSchedule) === 'active'
-                                            ? 'Đang diễn ra'
-                                            : 'Sắp học'}
+                                <span className={`student-badge ${nextScheduleStatus}`}>
+                                    {getStatusLabel(nextScheduleStatus)}
                                 </span>
                                 <h3>{nextSchedule.topicName}</h3>
                                 <p>{nextSchedule.courseName}</p>
@@ -222,12 +243,12 @@ const StudentWorkspaceUI = ({
                             </div>
                             <button
                                 type="button"
-                                className="student-primary-action"
+                                className={`student-primary-action ${nextSchedule.attended ? 'attended' : ''}`}
                                 onClick={() => onCheckin(nextSchedule.id)}
-                                disabled={!nextSchedule.id || actionId === nextSchedule.id}
+                                disabled={!canCheckinNextSchedule}
                             >
-                                <LogIn size={17} />
-                                Check-in buổi học
+                                {nextSchedule.attended ? <CheckCircle2 size={17} /> : <LogIn size={17} />}
+                                {nextSchedule.attended ? '\u0110\u00e3 \u0111i\u1ec3m danh' : 'Check-in bu\u1ed5i h\u1ecdc'}
                             </button>
                         </div>
                     ) : (
@@ -294,14 +315,14 @@ const StudentWorkspaceUI = ({
                         normalizedSchedules.map((schedule) => {
                             const status = getScheduleStatus(schedule);
                             return (
-                                <article key={schedule.id} className="student-schedule-row">
+                                <article key={schedule.id} className={`student-schedule-row ${schedule.attended ? 'attended' : ''}`}>
                                     <div className="student-date-block">
                                         <strong>{formatTime(schedule.expectedStart)}</strong>
                                         <span>{formatTime(schedule.expectedEnd)}</span>
                                     </div>
                                     <div className="student-schedule-main">
                                         <span className={`student-badge ${status}`}>
-                                            {status === 'completed' ? 'Đã học' : status === 'active' ? 'Đang diễn ra' : 'Sắp học'}
+                                            {getStatusLabel(status)}
                                         </span>
                                         <h3>{schedule.topicName}</h3>
                                         <p>{schedule.courseName}</p>
@@ -311,10 +332,10 @@ const StudentWorkspaceUI = ({
                                         <button
                                             type="button"
                                             onClick={() => onCheckin(schedule.id)}
-                                            disabled={!schedule.id || actionId === schedule.id}
-                                            title="Check-in"
+                                            disabled={!schedule.id || schedule.attended || actionId === schedule.id}
+                                            title={schedule.attended ? '\u0110\u00e3 \u0111i\u1ec3m danh' : 'Check-in'}
                                         >
-                                            <LogIn size={17} />
+                                            {schedule.attended ? <CheckCircle2 size={17} /> : <LogIn size={17} />}
                                         </button>
                                     </div>
                                 </article>

@@ -17,6 +17,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public DateTime? Ngaythucte { get; set; }
         public DateTime? Batdauthucte { get; set; }
         public DateTime? Ketthucthucte { get; set; }
+        public bool? Trangthai { get; set; }
     }
 
 }
