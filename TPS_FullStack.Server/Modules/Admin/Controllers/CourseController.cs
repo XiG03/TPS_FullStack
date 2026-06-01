@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -5,6 +6,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/v1/course")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class CourseController : ControllerBase
     {
         private readonly ICourseService _courseService;

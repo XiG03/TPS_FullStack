@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -18,13 +19,10 @@ namespace TPS_FullStack.Server.Modules.Admin
             _studentService = studentService;
         }
 
-        private string? ResolveStudentId(string? HocvienID = null)
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? User.FindFirstValue("sub")
-                ?? HocvienID;
-        }
+        
 
+
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -32,10 +30,11 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Hocvien, Admin")]
         [HttpGet("me")]
         public async Task<IActionResult> GetMe(string? HocvienID)
         {
-            var studentId = ResolveStudentId(HocvienID);
+            var studentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(studentId))
             {
                 return Unauthorized(new ServiceDefault<StudentDetailResponse>
@@ -50,6 +49,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{HocvienID}")]
         public async Task<IActionResult> GetDetail(string HocvienID)
         {
@@ -57,6 +57,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] StudentCreateRequest createRequest)
         {
@@ -69,6 +70,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] StudentUpdateRequest updateRequest)
         {
@@ -81,28 +83,38 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{HocvienID}")]
         public async Task<IActionResult> Delete(string HocvienID)
         {
             var result = await _studentService.StudentDeleteAsync(HocvienID);
             return StatusCode(result.statusCode, result);
         }
+
+        [Authorize(Roles = "Hocvien, Admin")]
         [HttpGet("me/schedules")]
         public async Task<IActionResult> GetSchedules(string? HocvienID)
         {
-            var result = await _studentService.StudentGetScheduleByIDAsync(ResolveStudentId(HocvienID));
+            var studentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _studentService.StudentGetScheduleByIDAsync(studentId);
             return StatusCode(result.statusCode, result);
         }
+
+        [Authorize(Roles = "Hocvien, Admin")]
         [HttpGet("me/schedule/{LichhocID}")]
         public async Task<IActionResult> GetScheduleDetail(string? HocvienID, string? LichhocID)
         {
-            var result = await _studentService.StudentGetScheduleDetailAsync(ResolveStudentId(HocvienID), LichhocID);
+            var studentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _studentService.StudentGetScheduleDetailAsync(studentId, LichhocID);
             return StatusCode(result.statusCode, result);
         }
+
+        [Authorize(Roles = "Hocvien, Admin")]
         [HttpPost("me/schedule/{LichhocID}/checkin")]
         public async Task<IActionResult> Checkin(string? HocvienID, string? LichhocID)
         {
-            var result = await _studentService.StudentCheckinAsync(ResolveStudentId(HocvienID), LichhocID);
+            var studentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _studentService.StudentCheckinAsync(studentId, LichhocID);
             return StatusCode(result.statusCode, result);
         }
     }
