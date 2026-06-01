@@ -31,7 +31,7 @@ namespace TPS_FullStack.Server.Helpers
             using (var connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
-                var command = new SqlCommand("DELETE FROM RefreshTokens WHERE ExpiryDate < @CurrentDate", connection);
+                var command = new SqlCommand("DELETE FROM RefreshTokens WHERE ExpiryTime < @CurrentDate", connection);
                 command.Parameters.AddWithValue("@CurrentDate", DateTime.UtcNow);
                 var affectedRows = await command.ExecuteNonQueryAsync();
                 Console.WriteLine($"Deleted {affectedRows} expired tokens.");
