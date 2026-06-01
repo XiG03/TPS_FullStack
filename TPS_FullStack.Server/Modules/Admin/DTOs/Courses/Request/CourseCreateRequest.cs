@@ -35,8 +35,8 @@
     public class CourseStudentCreateRequest
     {
         public string? MaID { get; set; }
-        public string KhoahocID { get; set; }
-        public string HocvienID { get; set; }
+        public string? KhoahocID { get; set; }
+        public string? HocvienID { get; set; }
         public decimal? Diem { get; set; }
         public decimal? Dieuchinh { get; set; }
     }
