@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -6,6 +7,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/admin/certificate")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class CertificateController : ControllerBase
     {
         private readonly ICertificateService _certificateService;

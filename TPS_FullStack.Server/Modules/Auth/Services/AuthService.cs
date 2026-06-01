@@ -78,6 +78,50 @@ namespace TPS_FullStack.Server.Modules.Auth
             }
             throw new NotImplementedException();
         }
+
+        public async Task<ServiceDefault<RegisterResponse>> RegisterAsync(RegisterRequest request)
+        {
+                try
+                {
+                    var user = new AppUser
+                    {
+                        UserName = request.Email,
+                        Email = request.Email,
+                        Kichhoat = true
+                    };
+                    var result = await _userManager.CreateAsync(user, request.Password);
+                    if (result.Succeeded)
+                    {
+                        return new ServiceDefault<RegisterResponse>
+                        {
+                            statusCode = StatusCodes.Status200OK,
+                            Message = "Register successfully",
+                            Data = new RegisterResponse
+                            {
+                                Id = user.Id
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ServiceDefault<RegisterResponse>
+                        {
+                            statusCode = StatusCodes.Status400BadRequest,
+                            Message = string.Join(", ", result.Errors.Select(e => e.Description)),
+                            Data = null
+                        };
+                    }
+                } catch(Exception ex)
+                {
+                    return new ServiceDefault<RegisterResponse>
+                    {
+                        statusCode = StatusCodes.Status500InternalServerError,
+                        Message = "Server error" + ex.Message,
+                        Data = null
+                    };
+                }
+            throw new NotImplementedException();
+        }
     }
 }
 

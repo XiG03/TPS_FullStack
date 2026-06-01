@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/v1/schedule")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class SchedulesController : ControllerBase
     {
         private readonly ISchedulesService _schedulesService;

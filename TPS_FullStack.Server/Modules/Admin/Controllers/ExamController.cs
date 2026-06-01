@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,6 +6,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/v1/admin/exams")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class ExamController : ControllerBase
     {
         private readonly IFinalExamServices _finalExamServices;

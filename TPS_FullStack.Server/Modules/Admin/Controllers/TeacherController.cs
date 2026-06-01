@@ -17,13 +17,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             _teacherService = teacherService;
         }
 
-        private string? ResolveTeacherId(string? GiangvienID = null)
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? User.FindFirstValue("sub")
-                ?? GiangvienID;
-        }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -32,9 +26,9 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
 
-        [Authorize(Roles = "Giangvien")]
+        [Authorize(Roles = "Giangvien, Admin")]
         [HttpGet("me")]
-        public async Task<IActionResult> GetMe(string? GiangvienID)
+        public async Task<IActionResult> GetMe()
         {
             var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(teacherId))
@@ -51,6 +45,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{MaID}")]
         public async Task<IActionResult> GetDetail(string MaID)
         {
@@ -58,6 +53,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] TeacherCreateResquest createRequest)
         {
@@ -70,6 +66,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] TeacherUpdateResquest updateRequest)
         {
@@ -81,7 +78,8 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _teacherService.TeacherUpdateAsync(updateRequest);
             return StatusCode(result.statusCode, result);
         }
-
+        
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{MaID}")]
         public async Task<IActionResult> Delete(string MaID)
         {
@@ -89,6 +87,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             return StatusCode(result.statusCode, result);
         }
 
+        [Authorize(Roles = "Giangvien, Admin")]
         [HttpGet("me/schedules")]
         public async Task<IActionResult> GetSchedules(string? GiangvienID)
         {
@@ -96,22 +95,28 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _teacherService.TeacherGetScheduleByIDAsync(teacherId);
             return StatusCode(result.statusCode, result);
         }
+        [Authorize(Roles = "Giangvien, Admin")]
         [HttpGet("me/schedule/{LichhocID}")]
         public async Task<IActionResult> GetScheduleDetail(string? GiangvienID, string? LichhocID)
         {
-            var result = await _teacherService.TeacherGetScheduleDetailAsync(ResolveTeacherId(GiangvienID), LichhocID);
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _teacherService.TeacherGetScheduleDetailAsync(teacherId, LichhocID);
             return StatusCode(result.statusCode, result);
         }
+        [Authorize(Roles = "Giangvien, Admin")]
         [HttpPost("me/schedule/{LichhocID}/checkin")]
         public async Task<IActionResult> Checkin(string? GiangvienID, string? LichhocID)
         {
-            var result = await _teacherService.TeacherCheckinAsync(ResolveTeacherId(GiangvienID), LichhocID);
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _teacherService.TeacherCheckinAsync(teacherId, LichhocID);
             return StatusCode(result.statusCode, result);
         }
+        [Authorize(Roles = "Giangvien, Admin")]
         [HttpPost("me/schedule/{LichhocID}/checkout")]
         public async Task<IActionResult> Checkout(string? GiangvienID, string? LichhocID)
         {
-            var result = await _teacherService.TeacherCheckoutAsync(ResolveTeacherId(GiangvienID), LichhocID);
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _teacherService.TeacherCheckoutAsync(teacherId, LichhocID);
             return StatusCode(result.statusCode, result);
         }
     }

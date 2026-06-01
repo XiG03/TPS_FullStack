@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -7,6 +8,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/v1/lab")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class LabController : ControllerBase
     {
         private readonly ILabService _labService;
