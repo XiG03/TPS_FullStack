@@ -26,3 +26,6 @@ SELECT * FROM dbo.AspNetUsers
 update dbo.AspNetUsers
 set Kichhoat = 1
 where Id = '99766ca2-9bdb-4ccd-86be-a1fe7deb5ad1'
+
+
+select * from dbo.Lichhoc_Hocvien_Diemdanh

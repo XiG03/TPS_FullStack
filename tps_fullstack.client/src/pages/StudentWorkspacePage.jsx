@@ -7,6 +7,7 @@ const StudentWorkspacePage = () => {
         schedules,
         isLoading,
         error,
+        successMessage,
         actionId,
         refetch,
         checkin
@@ -18,6 +19,7 @@ const StudentWorkspacePage = () => {
             schedules={schedules}
             isLoading={isLoading}
             error={error}
+            successMessage={successMessage}
             actionId={actionId}
             onRefresh={refetch}
             onCheckin={checkin}

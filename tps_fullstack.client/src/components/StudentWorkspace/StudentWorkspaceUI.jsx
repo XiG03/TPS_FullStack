@@ -88,6 +88,7 @@ const StudentWorkspaceUI = ({
     schedules,
     isLoading,
     error,
+    successMessage,
     actionId,
     onRefresh,
     onCheckin
@@ -133,6 +134,12 @@ const StudentWorkspaceUI = ({
             </section>
 
             {error && <div className="student-alert">{error}</div>}
+            {successMessage && (
+                <div className="student-alert student-alert-success" role="status">
+                    <CheckCircle2 size={18} />
+                    <span>{successMessage}</span>
+                </div>
+            )}
 
             <section className="student-overview">
                 <article className="student-profile">

@@ -10,6 +10,7 @@ export const useStudentWorkspace = () => {
     const [schedules, setSchedules] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
     const [actionId, setActionId] = useState(null);
 
     const fetchWorkspace = useCallback(async () => {
@@ -36,13 +37,25 @@ export const useStudentWorkspace = () => {
         fetchWorkspace();
     }, [fetchWorkspace]);
 
+    useEffect(() => {
+        if (!successMessage) return undefined;
+
+        const timeoutId = window.setTimeout(() => {
+            setSuccessMessage(null);
+        }, 4500);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [successMessage]);
+
     const checkin = async (scheduleId) => {
         setActionId(scheduleId);
         setError(null);
+        setSuccessMessage(null);
 
         try {
             await studentCheckinSchedule(scheduleId);
             await fetchWorkspace();
+            setSuccessMessage('\u0110i\u1ec3m danh th\u00e0nh c\u00f4ng. L\u1ecbch h\u1ecdc \u0111\u00e3 \u0111\u01b0\u1ee3c c\u1eadp nh\u1eadt.');
             return true;
         } catch (err) {
             console.error(err);
@@ -58,6 +71,7 @@ export const useStudentWorkspace = () => {
         schedules,
         isLoading,
         error,
+        successMessage,
         actionId,
         refetch: fetchWorkspace,
         checkin
