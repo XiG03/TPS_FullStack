@@ -129,7 +129,7 @@ export const studentCheckinSchedule = async (id) => {
     const payload = await readJson(response);
     if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to check in schedule'));
 
-    return { data: unwrapServiceResponse(payload), message: payload?.message };
+    return { data: unwrapServiceResponse(payload), message: getApiMessage(payload, '\u0110i\u1ec3m danh th\u00e0nh c\u00f4ng') };
 };
 
 export const createStudent = async (payload) => {

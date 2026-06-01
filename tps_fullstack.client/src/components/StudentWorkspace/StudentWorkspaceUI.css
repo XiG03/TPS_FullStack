@@ -123,6 +123,19 @@
     font-weight: 650;
 }
 
+.student-alert-success {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ecfdf3;
+    color: #027a48;
+    border-color: #abefc6;
+}
+
+.student-alert-success svg {
+    flex: 0 0 auto;
+}
+
 .student-overview {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
