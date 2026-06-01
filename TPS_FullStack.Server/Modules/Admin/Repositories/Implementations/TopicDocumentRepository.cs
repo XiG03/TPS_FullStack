@@ -4,10 +4,29 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     public class TopicDocumentRepository : ITopicDocumentRepository
     {
-        public async Task CreateAsync(SqlConnection conn, SqlTransaction trans, string MaID, string ChuyendeID, string Tieude, DateTime Ngaytao, string Loaitailieu, decimal Kichthuoc)
+        private static async Task EnsureFileColumnsAsync(SqlConnection conn, SqlTransaction? trans = null)
         {
-            var queryCreate = @"INSERT INTO dbo.Chuyende_Tailieu (MaID, ChuyendeID, Tieude, Ngaytao, Loaitailieu, Kichthuoc)
-                                VALUES (@MaID, @ChuyendeID, @Tieude, @Ngaytao, @Loaitailieu, @Kichthuoc)";
+            var query = @"
+IF COL_LENGTH('dbo.Chuyende_Tailieu', 'Duongdan') IS NULL
+BEGIN
+    ALTER TABLE dbo.Chuyende_Tailieu ADD Duongdan NVARCHAR(500) NULL
+END
+
+IF COL_LENGTH('dbo.Chuyende_Tailieu', 'TentepGoc') IS NULL
+BEGIN
+    ALTER TABLE dbo.Chuyende_Tailieu ADD TentepGoc NVARCHAR(255) NULL
+END";
+
+            using var cmd = trans == null ? new SqlCommand(query, conn) : new SqlCommand(query, conn, trans);
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        public async Task CreateAsync(SqlConnection conn, SqlTransaction trans, string MaID, string ChuyendeID, string Tieude, DateTime Ngaytao, string Loaitailieu, decimal Kichthuoc, string? Duongdan, string? TentepGoc)
+        {
+            await EnsureFileColumnsAsync(conn, trans);
+
+            var queryCreate = @"INSERT INTO dbo.Chuyende_Tailieu (MaID, ChuyendeID, Tieude, Ngaytao, Loaitailieu, Kichthuoc, Duongdan, TentepGoc)
+                                VALUES (@MaID, @ChuyendeID, @Tieude, @Ngaytao, @Loaitailieu, @Kichthuoc, @Duongdan, @TentepGoc)";
             using (var cmd = new SqlCommand(queryCreate, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -16,6 +35,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                 cmd.Parameters.AddWithValue("@Ngaytao", (object?)Ngaytao ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@Loaitailieu", (object?)Loaitailieu ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@Kichthuoc", (object?)Kichthuoc ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Duongdan", (object?)Duongdan ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@TentepGoc", (object?)TentepGoc ?? DBNull.Value);
 
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -28,7 +49,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 WHERE
                                     (@MaID IS NOT NULL AND MaID = @MaID)
                                     OR
-                                    (@ChuyendeID IS NOT NULL AND ChuyendeID = @ChuyendeID)";
+                                    (@MaID IS NULL AND @ChuyendeID IS NOT NULL AND ChuyendeID = @ChuyendeID)";
             using (var cmd = new SqlCommand(queryDelete, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -41,7 +62,9 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         public async Task<List<TopicDocumentModel>> GetAllAsync(SqlConnection conn)
         {
-            var queryGetAll = @"SELECT MaID, ChuyendeID, Tieude, Ngaytao, Loaitailieu, Kichthuoc
+            await EnsureFileColumnsAsync(conn);
+
+            var queryGetAll = @"SELECT MaID, ChuyendeID, Tieude, Ngaytao, Loaitailieu, Kichthuoc, Duongdan, TentepGoc
                                 FROM dbo.Chuyende_Tailieu";
             using (var cmd = new SqlCommand(queryGetAll, conn))
             {
@@ -58,7 +81,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                         Tieude = reader["Tieude"].ToString(),
                         Ngaytao = Convert.ToDateTime(reader["Ngaytao"]),
                         Loaitailieu = reader["Loaitailieu"].ToString(),
-                        Kichthuoc = Convert.ToDecimal(reader["Kichthuoc"])
+                        Kichthuoc = Convert.ToDecimal(reader["Kichthuoc"]),
+                        Duongdan = reader["Duongdan"] == DBNull.Value ? null : reader["Duongdan"].ToString(),
+                        TentepGoc = reader["TentepGoc"] == DBNull.Value ? null : reader["TentepGoc"].ToString()
                     });
                 }
                 return result;
@@ -66,10 +91,12 @@ namespace TPS_FullStack.Server.Modules.Admin
             // throw new NotImplementedException();
         }
 
-        public async Task<TopicDocumentModel> GetByIdAsync(SqlConnection conn, string? MaID, string ChuyendeID)
+        public async Task<TopicDocumentModel> GetByIdAsync(SqlConnection conn, string? MaID, string? ChuyendeID)
         {
+            await EnsureFileColumnsAsync(conn);
+
             var queryGetById = @"SELECT Top 1 * FROM dbo.Chuyende_Tailieu
-                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
+                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@MaID IS NULL AND @ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
             using (var cmd = new SqlCommand(queryGetById, conn))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -81,10 +108,12 @@ namespace TPS_FullStack.Server.Modules.Admin
                 {
                     result.MaID = MaID = reader["MaID"].ToString();
                     result.ChuyendeID = reader["ChuyendeID"].ToString();
-                    result.Tieude = reader["Ten"].ToString();
+                    result.Tieude = reader["Tieude"].ToString();
                     result.Ngaytao = Convert.ToDateTime(reader["Ngaytao"]);
                     result.Loaitailieu = reader["Loaitailieu"].ToString();
                     result.Kichthuoc = Convert.ToDecimal(reader["Kichthuoc"]);
+                    result.Duongdan = reader["Duongdan"] == DBNull.Value ? null : reader["Duongdan"].ToString();
+                    result.TentepGoc = reader["TentepGoc"] == DBNull.Value ? null : reader["TentepGoc"].ToString();
                 }
                 else
                 {
@@ -95,15 +124,19 @@ namespace TPS_FullStack.Server.Modules.Admin
             // throw new NotImplementedException();
         }
 
-        public async Task UpdateAsync(SqlConnection conn, SqlTransaction trans, string MaID, string ChuyendeID, string Tieude, DateTime Ngaytao, string Loaitailieu, decimal Kichthuoc)
+        public async Task UpdateAsync(SqlConnection conn, SqlTransaction trans, string MaID, string ChuyendeID, string Tieude, DateTime Ngaytao, string Loaitailieu, decimal Kichthuoc, string? Duongdan, string? TentepGoc)
         {
+            await EnsureFileColumnsAsync(conn, trans);
+
             var queryUpdate = @"UPDATE dbo.Chuyende_Tailieu
                                     SET
                                         Tieude = @Tieude,
                                         Ngaytao = @Ngaytao,
                                         Loaitailieu = @Loaitailieu,
-                                        Kichthuoc = @Kichthuoc
-                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
+                                        Kichthuoc = @Kichthuoc,
+                                        Duongdan = COALESCE(@Duongdan, Duongdan),
+                                        TentepGoc = COALESCE(@TentepGoc, TentepGoc)
+                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@MaID IS NULL AND @ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
             using (var cmd = new SqlCommand(queryUpdate, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -112,6 +145,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                 cmd.Parameters.AddWithValue("@Ngaytao", (object?)Ngaytao ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@Loaitailieu", (object?)Loaitailieu ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@Kichthuoc", (object?)Kichthuoc ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Duongdan", (object?)Duongdan ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@TentepGoc", (object?)TentepGoc ?? DBNull.Value);
 
                 await cmd.ExecuteNonQueryAsync();
             }

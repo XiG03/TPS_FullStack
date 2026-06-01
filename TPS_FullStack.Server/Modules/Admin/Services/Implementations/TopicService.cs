@@ -1,28 +1,97 @@
 ﻿using Microsoft.Data.SqlClient;
 
+using Microsoft.AspNetCore.StaticFiles;
+
 namespace TPS_FullStack.Server.Modules.Admin
 {
     public class TopicService : ITopicService
     {
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
         private readonly ITopicRepository _topicRepository;
         private readonly ITopicDocumentRepository _documentRepository;
         private readonly ITopicQuestionRepository _questionRepository;
         private readonly ITopicAnswerRepository _answerRepository;
-        public TopicService(IConfiguration configuration, ITopicRepository topicRepository,
+        public TopicService(IConfiguration configuration, IWebHostEnvironment environment, ITopicRepository topicRepository,
                             ITopicDocumentRepository documentRepository, ITopicQuestionRepository questionRepository,
         ITopicAnswerRepository answerRepository)
         {
             _configuration = configuration;
+            _environment = environment;
             _topicRepository = topicRepository;
             _documentRepository = documentRepository;
             _questionRepository = questionRepository;
             _answerRepository = answerRepository;
         }
+
+        private async Task<(string? RelativePath, string? OriginalFileName, decimal SizeKb)> SaveDocumentFileAsync(IFormFile? file, string documentId)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return (null, null, 0);
+            }
+
+            var today = DateTime.Now;
+            var relativeFolder = Path.Combine("uploads", "topic-documents", today.ToString("yyyy"), today.ToString("MM"), today.ToString("dd"));
+            var rootPath = string.IsNullOrWhiteSpace(_environment.WebRootPath)
+                ? Path.Combine(_environment.ContentRootPath, "wwwroot")
+                : _environment.WebRootPath;
+            var targetFolder = Path.Combine(rootPath, relativeFolder);
+            Directory.CreateDirectory(targetFolder);
+
+            var originalFileName = Path.GetFileName(file.FileName);
+            var extension = Path.GetExtension(originalFileName);
+            var safeName = string.Join("_", Path.GetFileNameWithoutExtension(originalFileName).Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+            if (string.IsNullOrWhiteSpace(safeName)) safeName = "document";
+
+            var storedFileName = $"{documentId}_{safeName}{extension}";
+            var fullPath = Path.Combine(targetFolder, storedFileName);
+
+            await using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var relativePath = Path.Combine(relativeFolder, storedFileName).Replace("\\", "/");
+            var sizeKb = Math.Ceiling(file.Length / 1024m);
+            return (relativePath, originalFileName, sizeKb);
+        }
+
+        private void DeleteStoredFile(string? relativePath)
+        {
+            if (string.IsNullOrWhiteSpace(relativePath)) return;
+
+            var rootPath = string.IsNullOrWhiteSpace(_environment.WebRootPath)
+                ? Path.Combine(_environment.ContentRootPath, "wwwroot")
+                : _environment.WebRootPath;
+            var normalizedPath = relativePath.Replace("/", Path.DirectorySeparatorChar.ToString());
+            var fullPath = Path.GetFullPath(Path.Combine(rootPath, normalizedPath));
+            var fullRoot = Path.GetFullPath(rootPath);
+
+            if (!fullPath.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath)) return;
+            File.Delete(fullPath);
+        }
+
+        private string GetStoredFileFullPath(string relativePath)
+        {
+            var rootPath = string.IsNullOrWhiteSpace(_environment.WebRootPath)
+                ? Path.Combine(_environment.ContentRootPath, "wwwroot")
+                : _environment.WebRootPath;
+            var normalizedPath = relativePath.Replace("/", Path.DirectorySeparatorChar.ToString());
+            return Path.GetFullPath(Path.Combine(rootPath, normalizedPath));
+        }
+
+        private static string GetContentType(string fileName)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            return provider.TryGetContentType(fileName, out var contentType) ? contentType : "application/octet-stream";
+        }
+
         // Done
         public async Task<ServiceDefault<TopicCreateResponse>> CreateTopicAsync(TopicCreateRequest createRequest)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var savedFiles = new List<string?>();
             using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
@@ -39,8 +108,14 @@ namespace TPS_FullStack.Server.Modules.Admin
                         foreach (var doc in createRequest.Documents)
                         {
                             doc.TailieuID = Guid.NewGuid().ToString();
+                            var savedFile = await SaveDocumentFileAsync(doc.File, doc.TailieuID);
+                            savedFiles.Add(savedFile.RelativePath);
+                            var sizeKb = savedFile.SizeKb > 0 ? savedFile.SizeKb : doc.Kichthuoc;
+                            var title = string.IsNullOrWhiteSpace(doc.Tieude) ? savedFile.OriginalFileName : doc.Tieude;
+
                             await _documentRepository.CreateAsync(conn, trans, doc.TailieuID, createRequest.ChuyendeID,
-                                                                doc.Tieude, doc.Ngaytao, doc.Loaitailieu, doc.Kichthuoc);
+                                                                title, doc.Ngaytao, doc.Loaitailieu, sizeKb,
+                                                                savedFile.RelativePath, savedFile.OriginalFileName);
                         }
 
                         // Buoc 3: Tao cau hoi
@@ -71,6 +146,11 @@ namespace TPS_FullStack.Server.Modules.Admin
                     catch (Exception ex)
                     {
                         await trans.RollbackAsync();
+                        foreach (var path in savedFiles)
+                        {
+                            DeleteStoredFile(path);
+                        }
+
                         return new ServiceDefault<TopicCreateResponse>
                         {
                             statusCode = StatusCodes.Status500InternalServerError,
@@ -156,6 +236,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                         docRes.Ngaytao = doc.Ngaytao;
                         docRes.Loaitailieu = doc.Loaitailieu;
                         docRes.Kichthuoc = doc.Kichthuoc; // Ép kiểu từ decimal sang long tuỳ thiết kế ban đầu
+                        docRes.DownloadUrl = string.IsNullOrWhiteSpace(doc.Duongdan) ? null : $"/api/v1/topic/document/{doc.MaID}/download";
 
                         result.Documents.Add(docRes);
                     }
@@ -263,6 +344,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                 var existingAnswers = new List<TopicAnswerModel>();
                 foreach (var a in allAnswers) if (a.ChuyendeID == updateRequest.ChuyendeID) existingAnswers.Add(a);
 
+                var savedFiles = new List<string?>();
+                var filesToDeleteAfterCommit = new List<string?>();
+
                 using (var trans = conn.BeginTransaction())
                 {
                     try
@@ -286,6 +370,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                             if (!isFound)
                             {
                                 await _documentRepository.DeleteAsync(conn, trans, oldDoc.MaID, updateRequest.ChuyendeID);
+                                filesToDeleteAfterCommit.Add(oldDoc.Duongdan);
                             }
                         }
 
@@ -295,11 +380,35 @@ namespace TPS_FullStack.Server.Modules.Admin
                             if (string.IsNullOrEmpty(doc.TailieuID)) // Them moi
                             {
                                 doc.TailieuID = Guid.NewGuid().ToString();
-                                await _documentRepository.CreateAsync(conn, trans, doc.TailieuID, updateRequest.ChuyendeID, doc.Tieude, doc.Ngaytao, doc.Loaitailieu, doc.Kichthuoc);
+                                var savedFile = await SaveDocumentFileAsync(doc.File, doc.TailieuID);
+                                savedFiles.Add(savedFile.RelativePath);
+                                var sizeKb = savedFile.SizeKb > 0 ? savedFile.SizeKb : doc.Kichthuoc;
+                                var title = string.IsNullOrWhiteSpace(doc.Tieude) ? savedFile.OriginalFileName : doc.Tieude;
+
+                                await _documentRepository.CreateAsync(conn, trans, doc.TailieuID, updateRequest.ChuyendeID, title, doc.Ngaytao, doc.Loaitailieu, sizeKb, savedFile.RelativePath, savedFile.OriginalFileName);
                             }
                             else // Sua
                             {
-                                await _documentRepository.UpdateAsync(conn, trans, doc.TailieuID, updateRequest.ChuyendeID, doc.Tieude, doc.Ngaytao, doc.Loaitailieu, doc.Kichthuoc);
+                                TopicDocumentModel? oldDoc = null;
+                                foreach (var item in existingDocs)
+                                {
+                                    if (item.MaID == doc.TailieuID)
+                                    {
+                                        oldDoc = item;
+                                        break;
+                                    }
+                                }
+
+                                var savedFile = await SaveDocumentFileAsync(doc.File, doc.TailieuID);
+                                savedFiles.Add(savedFile.RelativePath);
+                                if (savedFile.RelativePath != null)
+                                {
+                                    filesToDeleteAfterCommit.Add(oldDoc?.Duongdan);
+                                }
+
+                                var sizeKb = savedFile.SizeKb > 0 ? savedFile.SizeKb : doc.Kichthuoc;
+                                var title = string.IsNullOrWhiteSpace(doc.Tieude) ? savedFile.OriginalFileName : doc.Tieude;
+                                await _documentRepository.UpdateAsync(conn, trans, doc.TailieuID, updateRequest.ChuyendeID, title, doc.Ngaytao, doc.Loaitailieu, sizeKb, savedFile.RelativePath, savedFile.OriginalFileName);
                             }
                         }
 
@@ -387,6 +496,11 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                         await trans.CommitAsync();
 
+                        foreach (var path in filesToDeleteAfterCommit)
+                        {
+                            DeleteStoredFile(path);
+                        }
+
                         return new ServiceDefault<TopicUpdateResponse>
                         {
                             statusCode = StatusCodes.Status200OK,
@@ -397,6 +511,11 @@ namespace TPS_FullStack.Server.Modules.Admin
                     catch (Exception ex)
                     {
                         await trans.RollbackAsync();
+                        foreach (var path in savedFiles)
+                        {
+                            DeleteStoredFile(path);
+                        }
+
                         return new ServiceDefault<TopicUpdateResponse>
                         {
                             statusCode = StatusCodes.Status500InternalServerError,
@@ -405,6 +524,55 @@ namespace TPS_FullStack.Server.Modules.Admin
                         };
                     }
                 }
+            }
+        }
+
+        public async Task<ServiceDefault<TopicDocumentDownloadResponse>> GetDocumentDownloadAsync(string tailieuID)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                var document = await _documentRepository.GetByIdAsync(conn, tailieuID, null);
+                if (document == null || string.IsNullOrWhiteSpace(document.Duongdan))
+                {
+                    return new ServiceDefault<TopicDocumentDownloadResponse>
+                    {
+                        statusCode = StatusCodes.Status404NotFound,
+                        Message = "Khong tim thay file tai lieu",
+                        Data = null
+                    };
+                }
+
+                var fullPath = GetStoredFileFullPath(document.Duongdan);
+                var rootPath = string.IsNullOrWhiteSpace(_environment.WebRootPath)
+                    ? Path.Combine(_environment.ContentRootPath, "wwwroot")
+                    : _environment.WebRootPath;
+                var fullRoot = Path.GetFullPath(rootPath);
+
+                if (!fullPath.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
+                {
+                    return new ServiceDefault<TopicDocumentDownloadResponse>
+                    {
+                        statusCode = StatusCodes.Status404NotFound,
+                        Message = "File tai lieu khong ton tai tren server",
+                        Data = null
+                    };
+                }
+
+                var fileName = string.IsNullOrWhiteSpace(document.TentepGoc) ? document.Tieude : document.TentepGoc;
+                return new ServiceDefault<TopicDocumentDownloadResponse>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Thanh cong",
+                    Data = new TopicDocumentDownloadResponse
+                    {
+                        FilePath = fullPath,
+                        FileName = fileName,
+                        ContentType = GetContentType(fileName)
+                    }
+                };
             }
         }
     }

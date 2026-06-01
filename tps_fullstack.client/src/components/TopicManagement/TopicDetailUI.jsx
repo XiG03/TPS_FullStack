@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { downloadTopicDocument } from '../../services/topicService';
 
 const formatDocumentDate = (value) => {
     if (!value) return 'Chưa có ngày tạo';
@@ -11,6 +12,14 @@ const formatDocumentDate = (value) => {
 
 const TopicDetailUI = ({ detail, isLoading, error }) => {
     const navigate = useNavigate();
+
+    const handleDownloadDocument = async (document) => {
+        try {
+            await downloadTopicDocument(document);
+        } catch (downloadError) {
+            alert(`Không thể tải tài liệu: ${downloadError.message}`);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -100,6 +109,15 @@ const TopicDetailUI = ({ detail, isLoading, error }) => {
                                                 {Number(document.kichthuoc) > 0 && <span>Kích thước: {document.kichthuoc} KB</span>}
                                             </p>
                                         </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDownloadDocument(document)}
+                                            disabled={!document.downloadUrl}
+                                            className="w-9 h-9 rounded-md flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors disabled:opacity-40 disabled:hover:text-on-surface-variant disabled:hover:bg-transparent"
+                                            title="Tải tài liệu"
+                                        >
+                                            <span className="material-symbols-outlined text-[20px]">download</span>
+                                        </button>
                                     </li>
                                 ))}
                             </ul>

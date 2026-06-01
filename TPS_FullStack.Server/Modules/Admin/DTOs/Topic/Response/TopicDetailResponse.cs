@@ -23,6 +23,8 @@
         public string? Loaitailieu { get; set; }
 
         public decimal? Kichthuoc { get; set; }
+
+        public string? DownloadUrl { get; set; }
     }
     public class TopicQuestionDetailResponse
     {
@@ -39,6 +41,15 @@
         public string Ten { get; set; }
 
         public bool Dung { get; set; }
+    }
+
+    public class TopicDocumentDownloadResponse
+    {
+        public string FilePath { get; set; }
+
+        public string FileName { get; set; }
+
+        public string ContentType { get; set; }
     }
 }
 

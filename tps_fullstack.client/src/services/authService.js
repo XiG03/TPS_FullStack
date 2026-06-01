@@ -47,3 +47,20 @@ export const login = async (username, password, stayedSignedin = false) => {
 
     return result;
 };
+
+export const register = async (email, password, confirmPassword) => {
+    const response = await fetch(`${API_BASE_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, confirmPassword })
+    });
+
+    const payload = await readJson(response);
+    const result = unwrapServiceResponse(payload);
+
+    if (!response.ok) {
+        throw new Error(result.message || 'Đăng ký thất bại');
+    }
+
+    return result;
+};

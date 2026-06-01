@@ -35,7 +35,8 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         // Tạo mới chuyên đề
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TopicCreateRequest createRequest)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Create([FromForm] TopicCreateRequest createRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -48,7 +49,8 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         // Cập nhật chuyên đề
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] TopicUpdateRequest updateRequest)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Update([FromForm] TopicUpdateRequest updateRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -60,6 +62,18 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         // Xóa chuyên đề
+        [HttpGet("document/{tailieuID}/download")]
+        public async Task<IActionResult> DownloadDocument(string tailieuID)
+        {
+            var result = await _topicService.GetDocumentDownloadAsync(tailieuID);
+            if (result.Data == null)
+            {
+                return StatusCode(result.statusCode, result);
+            }
+
+            return PhysicalFile(result.Data.FilePath, result.Data.ContentType, result.Data.FileName);
+        }
+
         [HttpDelete("{MaID}")]
         public async Task<IActionResult> Delete(string MaID)
         {

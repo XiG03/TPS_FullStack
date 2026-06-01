@@ -45,7 +45,8 @@ const createEmptyDocument = () => ({
     tieude: '',
     ngaytao: toInputDateTime(),
     loaitailieu: 'PDF',
-    kichthuoc: 0
+    kichthuoc: 0,
+    file: null
 });
 
 const buildFormData = (initialData) => {
@@ -69,7 +70,8 @@ const buildFormData = (initialData) => {
             tieude: document.tieude || '',
             ngaytao: toInputDateTime(document.ngaytao),
             loaitailieu: document.loaitailieu || 'Khác',
-            kichthuoc: document.kichthuoc ?? 0
+            kichthuoc: document.kichthuoc ?? 0,
+            file: null
         })),
         questions: (initialData.questions || []).map((question) => ({
             clientId: question.cauhoiID || generateId(),
@@ -109,7 +111,8 @@ const TopicFormUI = ({ initialData, onSave, isSaving }) => {
                 ...createEmptyDocument(),
                 tieude: file.name,
                 loaitailieu,
-                kichthuoc: Math.round(file.size / 1024)
+                kichthuoc: Math.ceil(file.size / 1024),
+                file
             };
         });
 
@@ -237,7 +240,8 @@ const TopicFormUI = ({ initialData, onSave, isSaving }) => {
                 tieude: document.tieude.trim(),
                 ngaytao: toApiDateTime(document.ngaytao),
                 loaitailieu: document.loaitailieu,
-                kichthuoc: Number(document.kichthuoc) || 0
+                kichthuoc: Number(document.kichthuoc) || 0,
+                file: document.file || null
             })),
             questions: formData.questions.map((question) => ({
                 cauhoiID: question.cauhoiID || '',
@@ -334,7 +338,7 @@ const TopicFormUI = ({ initialData, onSave, isSaving }) => {
                                 className="flex items-center gap-1 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-label text-sm font-bold hover:text-primary transition-colors"
                             >
                                 <span className="material-symbols-outlined text-[18px]">upload_file</span>
-                                Lấy metadata từ file
+                                Tải file lên
                             </button>
                         </div>
                     </div>
