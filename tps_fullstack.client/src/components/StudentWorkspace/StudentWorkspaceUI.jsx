@@ -131,7 +131,7 @@ const StudentWorkspaceUI = ({
     const attendedCount = normalizedSchedules.filter((schedule) => schedule.attended).length;
     const nextSchedule = normalizedSchedules.find((schedule) => !schedule.attended) || normalizedSchedules[0];
     const nextScheduleStatus = nextSchedule ? getScheduleStatus(nextSchedule) : null;
-    const canCheckinNextSchedule = Boolean(nextSchedule?.id && !nextSchedule.attended && actionId !== nextSchedule.id);
+    const canCheckinNextSchedule = Boolean(nextSchedule?.id && !nextSchedule.attended && !nextSchedule.actualEnd && actionId !== nextSchedule.id);
 
     if (isLoading && !student) {
         return (
@@ -241,15 +241,17 @@ const StudentWorkspaceUI = ({
                                 <span>{formatTime(nextSchedule.expectedStart)} - {formatTime(nextSchedule.expectedEnd)}</span>
                                 <small>{nextSchedule.teacherName || 'Chưa phân công giảng viên'}</small>
                             </div>
-                            <button
-                                type="button"
-                                className={`student-primary-action ${nextSchedule.attended ? 'attended' : ''}`}
-                                onClick={() => onCheckin(nextSchedule.id)}
-                                disabled={!canCheckinNextSchedule}
-                            >
-                                {nextSchedule.attended ? <CheckCircle2 size={17} /> : <LogIn size={17} />}
-                                {nextSchedule.attended ? '\u0110\u00e3 \u0111i\u1ec3m danh' : 'Check-in bu\u1ed5i h\u1ecdc'}
-                            </button>
+                            {!nextSchedule.actualEnd && (
+                                <button
+                                    type="button"
+                                    className={`student-primary-action ${nextSchedule.attended ? 'attended' : ''}`}
+                                    onClick={() => onCheckin(nextSchedule.id)}
+                                    disabled={!canCheckinNextSchedule}
+                                >
+                                    {nextSchedule.attended ? <CheckCircle2 size={17} /> : <LogIn size={17} />}
+                                    {nextSchedule.attended ? '\u0110\u00e3 \u0111i\u1ec3m danh' : 'Check-in bu\u1ed5i h\u1ecdc'}
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <p className="student-empty">Chưa có lịch học được phân công.</p>
@@ -328,16 +330,18 @@ const StudentWorkspaceUI = ({
                                         <p>{schedule.courseName}</p>
                                         <small>{formatDate(schedule.expectedDate || schedule.expectedStart)} · {schedule.teacherName || 'Chưa phân công'}</small>
                                     </div>
-                                    <div className="student-row-actions">
-                                        <button
-                                            type="button"
-                                            onClick={() => onCheckin(schedule.id)}
-                                            disabled={!schedule.id || schedule.attended || actionId === schedule.id}
-                                            title={schedule.attended ? '\u0110\u00e3 \u0111i\u1ec3m danh' : 'Check-in'}
-                                        >
-                                            {schedule.attended ? <CheckCircle2 size={17} /> : <LogIn size={17} />}
-                                        </button>
-                                    </div>
+                                    {!schedule.actualEnd && (
+                                        <div className="student-row-actions">
+                                            <button
+                                                type="button"
+                                                onClick={() => onCheckin(schedule.id)}
+                                                disabled={!schedule.id || schedule.attended || actionId === schedule.id}
+                                                title={schedule.attended ? '\u0110\u00e3 \u0111i\u1ec3m danh' : 'Check-in'}
+                                            >
+                                                {schedule.attended ? <CheckCircle2 size={17} /> : <LogIn size={17} />}
+                                            </button>
+                                        </div>
+                                    )}
                                 </article>
                             );
                         })

@@ -32,10 +32,42 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         public async Task<ServiceDefault<ScheduleStudentAttendanceResponse>> StudentCheckinAsync(string? HocvienID, string? LichhocID)
         {
+            if (string.IsNullOrWhiteSpace(HocvienID) || string.IsNullOrWhiteSpace(LichhocID))
+            {
+                return new ServiceDefault<ScheduleStudentAttendanceResponse>
+                {
+                    statusCode = StatusCodes.Status400BadRequest,
+                    Message = "Thieu thong tin hoc vien hoac lich hoc",
+                    Data = null
+                };
+            }
+
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
+
+                var schedule = await _scheduleRepository.GetByIDAsync(conn, LichhocID);
+                if (schedule == null)
+                {
+                    return new ServiceDefault<ScheduleStudentAttendanceResponse>
+                    {
+                        statusCode = StatusCodes.Status404NotFound,
+                        Message = "Khong tim thay lich hoc",
+                        Data = null
+                    };
+                }
+
+                if (schedule.Ketthucthucte != null)
+                {
+                    return new ServiceDefault<ScheduleStudentAttendanceResponse>
+                    {
+                        statusCode = StatusCodes.Status400BadRequest,
+                        Message = "Lich hoc da ket thuc, hoc vien khong the diem danh",
+                        Data = null
+                    };
+                }
+
                 using (var trans = conn.BeginTransaction())
                 {
                     try

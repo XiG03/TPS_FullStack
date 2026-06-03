@@ -238,7 +238,13 @@ namespace TPS_FullStack.Server.Modules.Student
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var queryCheckIn = @"INSERT INTO dbo.Lichhoc_Hocvien_Diemdanh(MaID, LichhocID, HocvienID, KhoahocID)
-                                VALUES (@MaID, @LichhocID, @HocvienID, @KhoahocID)";
+                                SELECT @MaID, @LichhocID, @HocvienID, @KhoahocID
+                                WHERE EXISTS (
+                                    SELECT 1
+                                    FROM dbo.Lichhoc
+                                    WHERE MaID = @LichhocID
+                                      AND Ketthucthucte IS NULL
+                                )";
 
 
             using (var conn = new SqlConnection(connectionString))
