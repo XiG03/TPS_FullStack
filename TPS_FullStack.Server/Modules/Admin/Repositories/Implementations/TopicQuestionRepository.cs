@@ -24,9 +24,8 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             var queryDelete = @"DELETE dbo.Chuyende_Cauhoi
                                 WHERE
-                                    (@MaID IS NOT NULL AND MaID = @MaID)
-                                    OR
-                                    (@ChuyendeID IS NOT NULL AND ChuyendeID = @ChuyendeID)";
+                                    MaID = @MaID
+                                    AND ChuyendeID = @ChuyendeID";
             using (var cmd = new SqlCommand(queryDelete, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -64,7 +63,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<QuestionTopicModel> GetByIdAsync(SqlConnection conn, string? MaID, string ChuyendeID)
         {
             var queryGetById = @"SELECT Top 1 * FROM dbo.Chuyende_Cauhoi
-                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
+                                WHERE MaID = @MaID AND ChuyendeID = @ChuyendeID";
             using (var cmd = new SqlCommand(queryGetById, conn))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -114,7 +113,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             var queryUpdate = @"UPDATE dbo.Chuyende_Cauhoi
                                     SET
                                         Ten = @Ten
-                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
+                                WHERE MaID = @MaID AND ChuyendeID = @ChuyendeID";
             using (var cmd = new SqlCommand(queryUpdate, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
