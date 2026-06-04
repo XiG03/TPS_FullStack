@@ -29,6 +29,17 @@ const appendValue = (formData, key, value) => {
     formData.append(key, value);
 };
 
+const toBoolean = (value) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value !== 0;
+    if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        return normalized === 'true' || normalized === '1';
+    }
+
+    return false;
+};
+
 const toTopicFormData = (payload) => {
     const formData = new FormData();
 
@@ -54,7 +65,7 @@ const toTopicFormData = (payload) => {
         (question.answers || []).forEach((answer, answerIndex) => {
             appendValue(formData, `Questions[${questionIndex}].Answers[${answerIndex}].DapanID`, answer.dapanID || null);
             appendValue(formData, `Questions[${questionIndex}].Answers[${answerIndex}].Ten`, answer.ten || '');
-            appendValue(formData, `Questions[${questionIndex}].Answers[${answerIndex}].Dung`, String(Boolean(answer.dung)));
+            appendValue(formData, `Questions[${questionIndex}].Answers[${answerIndex}].Dung`, String(toBoolean(answer.dung)));
         });
     });
 

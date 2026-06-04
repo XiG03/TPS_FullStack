@@ -18,6 +18,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ReportManagementPage from './pages/ReportManagementPage';
 import LabCreatePage from './pages/LabCreatePage';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 import './App.css'; 
 
 function App() {
@@ -27,12 +28,33 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/teacher/me" element={<TeacherWorkspacePage />} />
-        <Route path="/student/me" element={<StudentWorkspacePage />} />
+        <Route
+          path="/teacher/me"
+          element={(
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherWorkspacePage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/student/me"
+          element={(
+            <ProtectedRoute allowedRoles={['student']}>
+              <StudentWorkspacePage />
+            </ProtectedRoute>
+          )}
+        />
 
         {/* Main Admin Layout Route */}
-        <Route path="/" element={<AdminLayout />}>
-          <Route index element={<Navigate to="/login" replace />} />
+        <Route
+          path="/"
+          element={(
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          )}
+        >
+          <Route index element={<Navigate to="/courses" replace />} />
           {/* Nested routes inside AdminLayout */}
           {/* <Route path="dashboard" element={<AdminDashboard />} /> */}
           <Route path="courses" element={<CourseManagementPage />} />
