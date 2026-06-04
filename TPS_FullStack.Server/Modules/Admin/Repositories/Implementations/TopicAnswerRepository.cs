@@ -24,7 +24,9 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task DeleteAsync(SqlConnection conn, SqlTransaction trans, string? MaID, string ChuyendeID, string Chuyende_CauhoiID)
         {
             var queryDelete = @"DELETE dbo.Chuyende_Dapan
-                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
+                                WHERE MaID = @MaID
+                                    AND ChuyendeID = @ChuyendeID
+                                    AND Chuyende_CauhoiID = @Chuyende_CauhoiID";
             using (var cmd = new SqlCommand(queryDelete, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -65,7 +67,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<TopicAnswerModel> GetByIdAsync(SqlConnection conn, string? MaID, string ChuyendeID)
         {
             var queryGetById = @"SELECT MaID, ChuyendeID, Chuyende_CauhoiID, Ten, Dung FROM dbo.Chuyende_Dapan
-                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
+                                WHERE MaID = @MaID AND ChuyendeID = @ChuyendeID";
             using (var cmd = new SqlCommand(queryGetById, conn))
             {
                 cmd.Parameters.AddWithValue("@MaID", (object?)MaID ?? DBNull.Value);
@@ -110,8 +112,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                         Dung = Convert.ToBoolean(reader["Dung"])
                     });
                 }
+                return result;
             }
-            throw new NotImplementedException();
         }
 
         public async Task UpdateAsync(SqlConnection conn, SqlTransaction trans, string MaID, string ChuyendeID, string Chuyende_CauhoiID, string Ten, bool Dung)
@@ -120,7 +122,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 SET
                                     Ten = @Ten,
                                     Dung = @Dung
-                                WHERE (@MaID IS NOT NULL AND MaID = @MaID) OR (@ChuyendeID IS NOT NULL AND @ChuyendeID = ChuyendeID)";
+                                WHERE MaID = @MaID
+                                    AND ChuyendeID = @ChuyendeID
+                                    AND Chuyende_CauhoiID = @Chuyende_CauhoiID";
 
             using (var cmd = new SqlCommand(queryUpdate, conn, trans))
             {

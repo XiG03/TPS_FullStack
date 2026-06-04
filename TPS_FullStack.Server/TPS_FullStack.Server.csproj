@@ -31,4 +31,9 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Modules\Admin\DTOs\Address\Response\" />
+    <Folder Include="Modules\Admin\DTOs\Address\Request\" />
+  </ItemGroup>
+
 </Project>
