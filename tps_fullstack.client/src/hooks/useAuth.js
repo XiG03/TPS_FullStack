@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, register } from '../services/authService';
 import { setRefreshToken, setToken, removeToken } from '../services/httpClient';
+import {
+    decodeTokenPayload as decodeAuthTokenPayload,
+    getDefaultPathForRole,
+    getRoleFromPayload as getAuthRoleFromPayload
+} from '../utils/auth';
 
 const decodeTokenPayload = (token) => {
     try {
@@ -66,14 +71,8 @@ export const useAuth = () => {
                 setRefreshToken(refreshToken, rememberMe);
             }
 
-            const role = getRoleFromPayload(decodeTokenPayload(token)) || getField(authData, 'role', 'Role');
-            if (isTeacherRole(role)) {
-                navigate('/teacher/me');
-            } else if (isStudentRole(role)) {
-                navigate('/student/me');
-            } else {
-                navigate('/courses');
-            }
+            const role = getAuthRoleFromPayload(decodeAuthTokenPayload(token)) || getField(authData, 'role', 'Role');
+            navigate(getDefaultPathForRole(role), { replace: true });
 
             return authData;
         } catch (err) {

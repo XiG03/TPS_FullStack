@@ -49,6 +49,35 @@ const createEmptyDocument = () => ({
     file: null
 });
 
+const toBoolean = (value) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value !== 0;
+    if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        return normalized === 'true' || normalized === '1';
+    }
+
+    return false;
+};
+
+const normalizeAnswers = (answers = []) => {
+    let hasCorrectAnswer = false;
+
+    return answers.map((answer) => {
+        const isCorrect = toBoolean(answer.dung);
+        const dung = isCorrect && !hasCorrectAnswer;
+
+        if (dung) hasCorrectAnswer = true;
+
+        return {
+            clientId: answer.dapanID || generateId(),
+            dapanID: answer.dapanID || '',
+            ten: answer.ten || '',
+            dung
+        };
+    });
+};
+
 const buildFormData = (initialData) => {
     if (!initialData) {
         return {
@@ -77,12 +106,7 @@ const buildFormData = (initialData) => {
             clientId: question.cauhoiID || generateId(),
             cauhoiID: question.cauhoiID || '',
             ten: question.ten || '',
-            answers: (question.answers || []).map((answer) => ({
-                clientId: answer.dapanID || generateId(),
-                dapanID: answer.dapanID || '',
-                ten: answer.ten || '',
-                dung: Boolean(answer.dung)
-            }))
+            answers: normalizeAnswers(question.answers)
         }))
     };
 };
@@ -249,7 +273,7 @@ const TopicFormUI = ({ initialData, onSave, isSaving }) => {
                 answers: question.answers.map((answer) => ({
                     dapanID: answer.dapanID || '',
                     ten: answer.ten.trim(),
-                    dung: Boolean(answer.dung)
+                    dung: toBoolean(answer.dung)
                 }))
             }))
         };

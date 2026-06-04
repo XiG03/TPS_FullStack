@@ -126,10 +126,14 @@ namespace TPS_FullStack.Server.Modules.Admin
                             await _questionRepository.CreateAsync(conn, trans, ques.CauhoiID, createRequest.ChuyendeID, ques.Ten);
 
                             // 3.2: Tao dap an
+                            var hasCorrectAnswer = false;
                             foreach (var ans in ques.Answers)
                             {
                                 ans.DapanID = Guid.NewGuid().ToString();
-                                await _answerRepository.CreateAsync(conn, trans, ans.DapanID, createRequest.ChuyendeID, ques.CauhoiID, ans.Ten, ans.Dung);
+                                var isCorrect = ans.Dung && !hasCorrectAnswer;
+                                if (isCorrect) hasCorrectAnswer = true;
+
+                                await _answerRepository.CreateAsync(conn, trans, ans.DapanID, createRequest.ChuyendeID, ques.CauhoiID, ans.Ten, isCorrect);
                             }
                         }
                         await trans.CommitAsync();
@@ -480,16 +484,20 @@ namespace TPS_FullStack.Server.Modules.Admin
                             }
 
                             // Them hoac Sua dap an
+                            var hasCorrectAnswer = false;
                             foreach (var a in q.Answers)
                             {
+                                var isCorrect = a.Dung && !hasCorrectAnswer;
+                                if (isCorrect) hasCorrectAnswer = true;
+
                                 if (string.IsNullOrEmpty(a.DapanID))
                                 {
                                     a.DapanID = Guid.NewGuid().ToString();
-                                    await _answerRepository.CreateAsync(conn, trans, a.DapanID, updateRequest.ChuyendeID, q.CauhoiID, a.Ten, a.Dung);
+                                    await _answerRepository.CreateAsync(conn, trans, a.DapanID, updateRequest.ChuyendeID, q.CauhoiID, a.Ten, isCorrect);
                                 }
                                 else
                                 {
-                                    await _answerRepository.UpdateAsync(conn, trans, a.DapanID, updateRequest.ChuyendeID, q.CauhoiID, a.Ten, a.Dung);
+                                    await _answerRepository.UpdateAsync(conn, trans, a.DapanID, updateRequest.ChuyendeID, q.CauhoiID, a.Ten, isCorrect);
                                 }
                             }
                         }
