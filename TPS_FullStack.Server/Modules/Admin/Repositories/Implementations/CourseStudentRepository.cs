@@ -4,6 +4,32 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     public class CourseStudentRepository : ICourseStudentRepository
     {
+        public Task<CourseStudentModel> CheckStudentByCourseIDAsync(SqlConnection conn, string? KhoahocID, string? HocvienID)
+        {
+            var query = @"
+                SELECT TOP 1 MaID, KhoahocID, HocvienID, Diem, Dieuchinh
+                FROM dbo.Khoahoc_Hocvien
+                WHERE KhoahocID = @KhoahocID AND HocvienID = @HocvienID";
+            using(var cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@KhoahocID", KhoahocID ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@HocvienID", HocvienID ?? (object)DBNull.Value);
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return Task.FromResult(new CourseStudentModel
+                    {
+                        MaID = reader["MaID"]?.ToString(),
+                        KhoahocID = reader["KhoahocID"]?.ToString(),
+                        HocvienID = reader["HocvienID"]?.ToString(),
+                        Diem = reader["Diem"] == DBNull.Value ? null : Convert.ToDecimal(reader["Diem"]),
+                        Dieuchinh = reader["Dieuchinh"] == DBNull.Value ? null : Convert.ToDecimal(reader["Dieuchinh"])
+                    });
+                }
+            }
+            return Task.FromResult<CourseStudentModel?>(null);
+        }
+
         public async Task CreateAsync(SqlConnection conn, SqlTransaction trans, string? MaID, string? KhoahocID, string? HocvienID, decimal? Diem, decimal? Dieuchinh)
         {
             var query = @"

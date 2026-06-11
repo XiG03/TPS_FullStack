@@ -8,7 +8,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public string? ChuyendeID { get; set; }
         public string? CauhoiID { get; set; }
         public string? Ten { get; set; }
-        public List<QuestionAnswer> questionAnswers { get; set; }
+        public List<QuestionAnswer>? questionAnswers { get; set; }
     }
     public class QuestionAnswer
     {

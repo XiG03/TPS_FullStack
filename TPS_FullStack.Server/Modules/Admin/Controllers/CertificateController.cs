@@ -5,7 +5,7 @@ using Microsoft.Identity.Client;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
-    [Route("api/admin/certificate")]
+    [Route("api/v1/certificate")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class CertificateController : ControllerBase
@@ -17,6 +17,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> CertificateGetAll()
         {
             var result = await _certificateService.CertificateGetAllAsync();
@@ -25,6 +26,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         [HttpGet("{MaID}")]
+        [AllowAnonymous]
         public async Task<IActionResult> CertificateGetById(string MaID)
         {
             var result = await _certificateService.CertificateFindByIdAsync(MaID);
@@ -72,6 +74,8 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         [HttpPut("revoke/{MaID}")]
+        [HttpDelete("revoke/{MaID}")]
+        [HttpDelete("student/{MaID}")]
         public async Task<IActionResult> CertificateStuRevoke(string MaID)
         {
             var result = await _certificateService.CertificateStuRevokeAsync(MaID);

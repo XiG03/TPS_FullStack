@@ -17,6 +17,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             var result = await _courseService.GetAllCoursesAsync();
@@ -24,6 +25,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         }
 
         [HttpGet("{KhoahocID}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetDetail(string KhoahocID)
         {
             var result = await _courseService.GetCourseDetailAsync(KhoahocID);

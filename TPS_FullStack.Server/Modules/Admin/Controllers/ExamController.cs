@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
-    [Route("api/v1/admin/exams")]
+    [Route("api/v1/exams")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class ExamController : ControllerBase
     {
         private readonly IFinalExamServices _finalExamServices;
-        public ExamController(IFinalExamServices finalExamServices)
+        private readonly IExamService _examService;
+        public ExamController(IExamService examService)
         {
-            _finalExamServices = finalExamServices;
+            _examService = examService;
         }
         [HttpPost("generate")]
         public async Task<IActionResult> GenerateFinalExam(List<string> HocvienIDs, string KhoahocID, decimal Socauhoi)
@@ -44,6 +45,18 @@ namespace TPS_FullStack.Server.Modules.Admin
             var result = await _finalExamServices.UpdateFinalExamScoreAsync(finalExamUpdate);
             return StatusCode(result.statusCode, result);
         }
+        [HttpPost("{KhoahocID}/{HocvienID}")]
+        public async Task<IActionResult> CreateExam(string KhoahocID, string HocvienID)
+        {
+            var createRequest = new ExamCreateRequest();
+            createRequest.KhoahocID = KhoahocID;
+            createRequest.HocvienID = HocvienID;
+
+            var result = await _examService.ExamCreateAsync(createRequest);
+
+            return StatusCode(result.statusCode, result);
+        }
+
 
     }
 }
