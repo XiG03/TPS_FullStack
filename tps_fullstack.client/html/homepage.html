@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Summit Pro - The Curated Ledger</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#6c1f00",
+                        "surface-container": "#eceef0",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#932d00",
+                        "primary": "#00328a",
+                        "on-tertiary-container": "#ffb096",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "on-primary-container": "#afc1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#00174a",
+                        "on-tertiary-fixed": "#390c00",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-error-container": "#93000a",
+                        "outline": "#737685",
+                        "surface-container-low": "#f2f4f6",
+                        "on-secondary-container": "#54647a",
+                        "tertiary-fixed-dim": "#ffb59c",
+                        "primary-container": "#0047bb",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#0b1c30",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-surface": "#191c1e",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#2156ca",
+                        "on-primary-fixed-variant": "#003ea6",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary": "#505f76",
+                        "on-surface-variant": "#434653",
+                        "inverse-primary": "#b3c5ff",
+                        "surface-container-high": "#e6e8ea",
+                        "outline-variant": "#c3c6d6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": [
+                            "Manrope"
+                        ],
+                        "display": [
+                            "Manrope"
+                        ],
+                        "body": [
+                            "Inter"
+                        ],
+                        "label": [
+                            "Inter"
+                        ]
+                    },
+                    "fontSize": {}
+                },
+            },
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, theme('colors.primary'), theme('colors.primary-container'));
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, theme('colors.primary'), theme('colors.primary-container'));
+            color: theme('colors.on-primary');
+            border-radius: theme('borderRadius.lg');
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 50, 138, 0.2);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .ambient-shadow {
+            box-shadow: 0px 12px 32px rgba(25, 28, 30, 0.06);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-surface text-on-surface font-body antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
+    <!-- TopAppBar -->
+    <header
+        class="bg-surface/80 dark:bg-surface/80 backdrop-blur-xl shadow-sm shadow-on-surface/5 flex justify-between items-center w-full px-8 h-20 docked full-width top-0 sticky z-50">
+        <div class="flex items-center gap-8">
+            <div class="text-xl font-headline font-black tracking-tight text-primary dark:text-primary-fixed">The Ledge
+            </div>
+            <nav class="hidden md:flex gap-6">
+                <!-- Assuming this is a landing page, maybe no specific active state, or 'Explore' if it existed. Using inactive for all as it's a general landing -->
+                <a class="text-on-surface-variant hover:text-primary transition-colors font-medium"
+                    href="#">Programs</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors font-medium"
+                    href="#">Certifications</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors font-medium" href="#">Faculty</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button
+                class="p-2 text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-all rounded-full flex items-center justify-center active:scale-95 transition-transform duration-150">
+                <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+            </button>
+            <button
+                class="p-2 text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-all rounded-full flex items-center justify-center active:scale-95 transition-transform duration-150">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+            </button>
+            <img alt="Administrator Profile"
+                class="w-10 h-10 rounded-full border-2 border-surface-container-lowest ambient-shadow cursor-pointer"
+                data-alt="A professional headshot of a business administrator wearing a dark suit against a bright, modern, well-lit white office background. The lighting is soft and flattering, creating a polished, corporate look suitable for a high-end educational platform."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRU82VmRlWGCV2Kcx6MlA09OKTAnSRnAkiTsVHyDrD7wUhmkZaBsl5OZvGeGjOuFERl_pKzkZEBjjGiP34m692_F5YWrdJRHZ83dyIAt4anZvXySwttaOSLIy7wnKxeoqWu4E1Qay5oO0AYsha8dcH2YszmGSTHA7hnnNhDfO0gV2ksRzHbbotDQSgunZvl_tiszeKQWC86QKpi_4TVF4Y95D0UmpYVAtz1iH5pgJYSQA-xJK26uISSehwg377bFXjM1FS-CM8Vdmy">
+        </div>
+    </header>
+    <main>
+        <!-- Hero Section -->
+        <section class="relative pt-32 pb-24 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto overflow-hidden">
+            <div class="absolute inset-0 z-0 pointer-events-none opacity-50"
+                style="background: radial-gradient(circle at top right, theme('colors.primary-fixed'), transparent 50%);">
+            </div>
+            <div class="relative z-10 max-w-3xl">
+                <span
+                    class="inline-block py-1 px-3 rounded-full bg-secondary-fixed text-on-secondary-fixed text-label-md font-semibold tracking-wider uppercase mb-6">The
+                    Curated Ledger</span>
+                <h1
+                    class="font-display font-extrabold text-5xl md:text-6xl lg:text-7xl leading-tight tracking-tight text-on-surface mb-8">
+                    Elevate Your <br> <span class="gradient-text">Academic Authority</span>
+                </h1>
+                <p class="font-body text-xl text-on-surface-variant leading-relaxed mb-10 max-w-2xl">
+                    Join an elite tier of professionals. Our meticulously designed certification pathways provide the
+                    foundational knowledge and prestige required to lead in today's complex environments.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <button class="btn-primary px-8 py-4 font-semibold text-lg flex items-center gap-2">
+                        Explore Programs
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                    <button
+                        class="px-8 py-4 bg-secondary-container text-on-secondary-container rounded-lg font-semibold text-lg hover:bg-secondary-fixed transition-colors">
+                        View Curriculum
+                    </button>
+                </div>
+            </div>
+            <!-- Hero Imagery (Abstract/Academic) -->
+            <div
+                class="mt-20 relative rounded-xl overflow-hidden glass-card ambient-shadow p-4 bg-surface-container-lowest">
+                <img alt="Students collaborating" class="w-full h-[500px] object-cover rounded-lg"
+                    data-alt="A high-end, bright, modern photograph of professional students collaborating in a sleek, minimalist study room. The space features white walls, subtle slate accents, and natural sunlight pouring in, conveying a sense of academic prestige and focused learning."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6LAus9V41amDYKJ3TTRiFq0kRWaTmbgkYcmie21OuafE00xgJJZNjJQyjpL9-k1XJ3JIDdnMFcaPzGWKDqU6ZBH4ViqVdVWBEKMiP-lhf06KRR-1C3d_lhh1eve0Bnh4jNgOr4c2byliIpyLi4FG1v9q6OQKa54_u0B6X5mLT-bfB0G1M8Zpg7pPu2_KBcEwteh9XdNRSm9tpf8Kw4AVBGIU7uYQNA5whCo3s2aT3yOHVnADpv7Ije0fEmZ4V0N_XsSV6_GhwxNiI">
+            </div>
+        </section>
+        <!-- Featured Courses (Bento Grid Style) -->
+        <section class="py-24 px-8 md:px-16 lg:px-24 bg-surface-container-low">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-16">
+                    <h2 class="font-display font-bold text-4xl text-on-surface mb-4">Curated Courses</h2>
+                    <p class="font-body text-lg text-on-surface-variant max-w-2xl">Select pathways designed by industry
+                        leaders, focusing on deep comprehension and practical mastery.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Course Card 1 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow flex flex-col h-full group hover:-translate-y-1 transition-transform duration-300">
+                        <div
+                            class="w-12 h-12 bg-primary-fixed rounded-lg flex items-center justify-center text-on-primary-fixed mb-6">
+                            <span class="material-symbols-outlined text-3xl"
+                                data-icon="account_balance">account_balance</span>
+                        </div>
+                        <h3 class="font-headline font-bold text-2xl text-on-surface mb-3">Corporate Governance</h3>
+                        <p class="font-body text-on-surface-variant mb-8 flex-grow">Master the frameworks of ethical
+                            corporate leadership and compliance.</p>
+                        <div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/20">
+                            <div class="flex flex-col">
+                                <span class="text-label-md text-on-surface-variant font-medium">8 Weeks</span>
+                                <span class="text-body-sm text-on-surface font-semibold">Dr. S. Chen</span>
+                            </div>
+                            <button
+                                class="text-primary font-semibold hover:text-primary-container flex items-center gap-1 transition-colors">
+                                Details <span class="material-symbols-outlined text-sm">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Course Card 2 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow flex flex-col h-full group hover:-translate-y-1 transition-transform duration-300 lg:col-span-2 relative overflow-hidden">
+                        <div
+                            class="absolute top-0 right-0 w-64 h-64 bg-secondary-fixed rounded-full filter blur-3xl opacity-30 -mr-20 -mt-20 pointer-events-none">
+                        </div>
+                        <div class="relative z-10 h-full flex flex-col">
+                            <div class="flex justify-between items-start mb-6">
+                                <div
+                                    class="w-12 h-12 bg-primary-fixed rounded-lg flex items-center justify-center text-on-primary-fixed">
+                                    <span class="material-symbols-outlined text-3xl"
+                                        data-icon="insights">insights</span>
+                                </div>
+                                <span
+                                    class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-label-md font-semibold">Intensive</span>
+                            </div>
+                            <h3 class="font-headline font-bold text-3xl text-on-surface mb-4">Advanced Data Strategy
+                            </h3>
+                            <p class="font-body text-on-surface-variant mb-8 max-w-xl flex-grow">A comprehensive dive
+                                into leveraging predictive analytics for enterprise-level decision making. Designed for
+                                senior analysts.</p>
+                            <div class="flex items-center justify-between mt-auto pt-6">
+                                <div class="flex items-center gap-4">
+                                    <img alt="Instructor Profile" class="w-10 h-10 rounded-full"
+                                        data-alt="A portrait of a confident female instructor with glasses, looking directly at the camera. The background is a soft, blurred modern office environment, maintaining a professional and academic tone suitable for the UI."
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuALcCvk6BETpmUkJQcFlTtC1BVNMUnk615BCL0mjqN9x0_n27hOFCv_GN8YqXqhpi2AhyDwxKHuZc0Oe6frDwuXsiHg6TRaDbxQ2pIe0n_usqbEN8gwjOAmgKWHiaCGjWVPabEcEYtW6ku5yBw-aYH28Pu4QYxuJvME1EIrZEpI-hOm6WpssEvBeaUoQCaGiYZX9JntQ5p9zHkv9pgTw5F3VBulczHGBvd5eE1X2wZKUvTWUJnvXA4FWd9fBDtrYgOm26KbdFkDqdI7">
+                                    <div class="flex flex-col">
+                                        <span class="text-label-md text-on-surface-variant font-medium">12 Weeks • Live
+                                            Sessions</span>
+                                        <span class="text-body-sm text-on-surface font-semibold">Prof. E.
+                                            Martinez</span>
+                                    </div>
+                                </div>
+                                <button class="btn-primary px-6 py-2 font-medium">Enroll</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Course Card 3 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow flex flex-col h-full group hover:-translate-y-1 transition-transform duration-300">
+                        <div
+                            class="w-12 h-12 bg-primary-fixed rounded-lg flex items-center justify-center text-on-primary-fixed mb-6">
+                            <span class="material-symbols-outlined text-3xl" data-icon="gavel">gavel</span>
+                        </div>
+                        <h3 class="font-headline font-bold text-2xl text-on-surface mb-3">Regulatory Policy</h3>
+                        <p class="font-body text-on-surface-variant mb-8 flex-grow">Navigate complex international legal
+                            frameworks and regulatory environments.</p>
+                        <div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/20">
+                            <div class="flex flex-col">
+                                <span class="text-label-md text-on-surface-variant font-medium">6 Weeks</span>
+                                <span class="text-body-sm text-on-surface font-semibold">J. Sterling, Esq.</span>
+                            </div>
+                            <button
+                                class="text-primary font-semibold hover:text-primary-container flex items-center gap-1 transition-colors">
+                                Details <span class="material-symbols-outlined text-sm">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Footer -->
+        <footer class="bg-surface-dim pt-16 pb-8 px-8 md:px-16 lg:px-24">
+            <div
+                class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12 border-b border-outline-variant/30 pb-12 mb-8">
+                <div>
+                    <div class="text-2xl font-headline font-black tracking-tight text-primary mb-4">Summit Pro</div>
+                    <p class="font-body text-on-surface-variant max-w-sm">Elevating professional standards through
+                        rigorous, curated academic certification.</p>
+                </div>
+                <div class="flex gap-16">
+                    <div class="flex flex-col gap-3">
+                        <h4 class="font-headline font-bold text-on-surface mb-2">Platform</h4>
+                        <a class="font-body text-on-surface-variant hover:text-primary transition-colors"
+                            href="#">Programs</a>
+                        <a class="font-body text-on-surface-variant hover:text-primary transition-colors"
+                            href="#">Verify Credential</a>
+                        <a class="font-body text-on-surface-variant hover:text-primary transition-colors"
+                            href="#">Institutions</a>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <h4 class="font-headline font-bold text-on-surface mb-2">Legal</h4>
+                        <a class="font-body text-on-surface-variant hover:text-primary transition-colors"
+                            href="#">Privacy Policy</a>
+                        <a class="font-body text-on-surface-variant hover:text-primary transition-colors" href="#">Terms
+                            of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto flex justify-between items-center text-on-surface-variant text-label-md">
+                <p class="">© 2024 Summit Academy. All rights reserved.</p>
+                <div class="flex gap-4">
+                    <span class="material-symbols-outlined cursor-pointer hover:text-primary">language</span>
+                    <span class="">English (US)</span>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+
+</body>
+
+</html>

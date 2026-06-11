@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const STATUS_OPTIONS = [
     { value: 'all', label: 'Tất cả' },
@@ -10,6 +12,7 @@ const STATUS_OPTIONS = [
 const ReportManagementUI = ({ reports, isLoading, error, onViewReport, onGradeReport }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const navigate = useNavigate();
 
     const filteredReports = useMemo(() => {
         return reports.filter((report) => {
@@ -26,11 +29,18 @@ const ReportManagementUI = ({ reports, isLoading, error, onViewReport, onGradeRe
 
     return (
         <div className="flex-1 overflow-y-auto bg-surface relative z-0 flex flex-col min-h-[calc(100vh-60px)]">
-            <header className="flex justify-between items-end px-12 pt-10 pb-10">
+            <header className="flex flex-col gap-6 px-6 pt-8 pb-8 lg:flex-row lg:items-end lg:justify-between lg:px-12 lg:pt-10">
                 <div className="flex flex-col gap-2">
                     <h1 className="font-headline text-4xl font-extrabold text-on-surface tracking-tight">Quản lý Bài thu hoạch</h1>
                     <p className="font-body text-on-surface-variant text-base">Theo dõi tiến độ nộp bài, chấm điểm và phản hồi cho sinh viên.</p>
                 </div>
+                <button
+                    onClick={() => navigate('/reports/new')}
+                    className="flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-3.5 rounded-lg font-body font-semibold shadow-[0px_12px_32px_rgba(25,28,30,0.06)] hover:shadow-md transition-all hover:-translate-y-0.5"
+                >
+                    <Plus size={20} />
+                    Thêm bài thu hoạch
+                </button>
             </header>
 
             <section className="px-12 pb-8 grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -57,7 +57,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                     + @"SELECT kh.MaID, kh.Ten
                                         FROM dbo.Khoahoc kh
                                         WHERE kh.ChungchiID = @MaID and kh.Khongsudung = 0;"
-                                    + @"SELECT cc_hv.MaID, hv.Hoten, cc_hv.Ngaycap, cc_hv.Ngayhethan
+                                    + @"SELECT cc_hv.MaID, cc_hv.HocvienID, hv.Hoten, cc_hv.Ngaycap, cc_hv.Ngayhethan
                                         FROM dbo.Chungchi_Hocvien cc_hv
                                         JOIN dbo.Hocvien hv ON hv.MaID = cc_hv.HocvienID 
                                         WHERE cc_hv.ChungchiID = @MaID AND cc_hv.Khongsudung = 0";
@@ -82,7 +82,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                                 certificateDetail.certificateInfo.MaID = reader["MaID"].ToString();
                                 certificateDetail.certificateInfo.Ten = reader["Ten"].ToString();
                                 certificateDetail.certificateInfo.Mota = reader["Mota"].ToString();
-                                certificateDetail.certificateInfo.Thoigiansudung = (decimal)reader["MaID"];
+                                certificateDetail.certificateInfo.Thoigiansudung = (decimal)reader["Thoigiansudung"];
                                 certificateDetail.certificateInfo.Donvicap = reader["Donvicap"].ToString();
                             }
 
@@ -105,7 +105,8 @@ namespace TPS_FullStack.Server.Modules.Admin
                                     {
                                         MaID = reader["MaID"].ToString(),
                                         ChungchiID = certificateDetail.certificateInfo.MaID,
-                                        HocvienID = reader["Hoten"].ToString(),
+                                        HocvienID = reader["HocvienID"].ToString(),
+                                        HocvienTen = reader["Hoten"].ToString(),
                                         Ngaycap = (DateTime)reader["Ngaycap"],
                                         Ngayhethan = (DateTime)reader["Ngayhethan"]
                                     }
@@ -279,7 +280,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                         cmd.Parameters.AddWithValue("@Mota", updateDto.certificateInfo.Mota);
                         cmd.Parameters.AddWithValue("@Donvicap", updateDto.certificateInfo.Donvicap);
                         cmd.Parameters.AddWithValue("@Thoigiansudung", updateDto.certificateInfo.Thoigiansudung);
-                        cmd.Parameters.AddWithValue("@User", null);
+                        cmd.Parameters.AddWithValue("@User", DBNull.Value);
 
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
@@ -291,7 +292,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     using (var cmd = new SqlCommand(queryCerCourseRemove, conn, trans))
                     {
                         cmd.Parameters.AddWithValue("@MaID", updateDto.certificateInfo.MaID);
-                        cmd.Parameters.AddWithValue("@User", null);
+                        cmd.Parameters.AddWithValue("@User", DBNull.Value);
 
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
@@ -305,7 +306,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                         using (var cmd = new SqlCommand(queryCerCourseUpdate, conn, trans))
                         {
                             cmd.Parameters.AddWithValue("@MaID", updateDto.certificateInfo.MaID);
-                            cmd.Parameters.AddWithValue("@User", null);
+                            cmd.Parameters.AddWithValue("@User", DBNull.Value);
                             cmd.Parameters.AddWithValue("@KhoahocID", course.KhoahocID);
 
                             if (await cmd.ExecuteNonQueryAsync() < 0)
@@ -322,7 +323,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                         cmd.Parameters.AddWithValue("@Ten", updateDto.certificateInfo.Ten);
                         cmd.Parameters.AddWithValue("@Mota", updateDto.certificateInfo.Mota);
                         cmd.Parameters.AddWithValue("@Donvicap", updateDto.certificateInfo.Donvicap);
-                        cmd.Parameters.AddWithValue("@User", null);
+                        cmd.Parameters.AddWithValue("@User", DBNull.Value);
 
                         if (await cmd.ExecuteNonQueryAsync() < 0)
                         {
@@ -352,6 +353,9 @@ namespace TPS_FullStack.Server.Modules.Admin
             using(var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
+                var ngaycap = DateTime.Now;
+                var ngayhethan = ngaycap.AddMonths(Math.Max(0, (int)Math.Round(createDto.Thoigiansudung)));
+
                 using(var cmd = new SqlCommand(queryInsert, conn))
                 {
                     cmd.Parameters.AddWithValue("@MaID", createDto.MaID = Guid.NewGuid().ToString());
@@ -360,10 +364,10 @@ namespace TPS_FullStack.Server.Modules.Admin
                     cmd.Parameters.AddWithValue("@ChungchiTen", createDto.Ten);
                     cmd.Parameters.AddWithValue("@ChungchiMota", createDto.Mota);
                     cmd.Parameters.AddWithValue("@Donvicap", createDto.Donvicap);
-                    cmd.Parameters.AddWithValue("@Ngaycap", createDto.Ngaycap);
-                    cmd.Parameters.AddWithValue("@Ngayhethan", createDto.Ngayhethan);
+                    cmd.Parameters.AddWithValue("@Ngaycap", ngaycap);
+                    cmd.Parameters.AddWithValue("@Ngayhethan", ngayhethan);
                     cmd.Parameters.AddWithValue("@Khongsudung", createDto.Khongsudung == null ? false: createDto.Khongsudung);
-                    cmd.Parameters.AddWithValue("@CreatedBy", null);
+                    cmd.Parameters.AddWithValue("@CreatedBy", DBNull.Value);
 
                     if(await cmd.ExecuteNonQueryAsync() < 0)
                     {

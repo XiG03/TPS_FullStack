@@ -9,6 +9,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public Task CreateAsync (SqlConnection conn, SqlTransaction trans, string? MaID, string? KhoahocID, string? HocvienID, decimal? Diem, decimal? Dieuchinh);
         public Task UpdateAsync (SqlConnection conn, SqlTransaction trans, string? MaID, string? KhoahocID, string? HocvienID, decimal? Diem, decimal? Dieuchinh);
         public Task DeleteAsync (SqlConnection conn, SqlTransaction trans, string? MaID);
+        public Task<CourseStudentModel> CheckStudentByCourseIDAsync(SqlConnection conn, string? KhoahocID, string? HocvienID);
     }
 
 }

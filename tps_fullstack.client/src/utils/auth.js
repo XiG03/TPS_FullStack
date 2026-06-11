@@ -40,7 +40,7 @@ export const getDefaultPathForRole = (role) => {
     if (normalized === 'teacher') return '/teacher/me';
     if (normalized === 'student') return '/student/me';
 
-    return '/courses';
+    return '/';
 };
 
 export const hasAnyRole = (role, allowedRoles = []) => {

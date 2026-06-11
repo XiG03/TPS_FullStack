@@ -238,7 +238,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     hv.Hoten AS TenHocvien,
 
                     cchv.Chungchi_Mota AS Mota,
-                    cchv.Chungchi_Donvicap AS Dongvicap,
+                    cchv.Chungchi_Donvicap AS Donvicap,
                     cchv.Ngaycap,
                     cchv.Ngayhethan
 

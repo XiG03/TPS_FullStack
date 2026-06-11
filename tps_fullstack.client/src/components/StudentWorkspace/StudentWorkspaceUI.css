@@ -31,6 +31,8 @@
 .student-content-grid,
 .student-course-panel,
 .student-schedule-panel,
+.student-workspace-layout,
+.student-tab-panel,
 .student-alert {
     max-width: 1200px;
     margin-left: auto;
@@ -134,6 +136,65 @@
 
 .student-alert-success svg {
     flex: 0 0 auto;
+}
+
+.student-workspace-layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.student-workspace-main {
+    min-width: 0;
+}
+
+.student-workspace-nav {
+    position: sticky;
+    top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px;
+    border: 1px solid #dfe7d9;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+}
+
+.student-workspace-nav button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    min-height: 42px;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #5f6b7d;
+    cursor: pointer;
+    width: 100%;
+    font: inherit;
+    font-weight: 820;
+    text-align: left;
+    transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.student-workspace-nav button:hover {
+    background: #f1f5ef;
+    color: #0f766e;
+}
+
+.student-workspace-nav button.active {
+    background: #0f766e;
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(15, 118, 110, 0.16);
+}
+
+.student-tab-panel {
+    display: grid;
+    gap: 18px;
 }
 
 .student-overview {
@@ -398,6 +459,205 @@
     font-weight: 680;
 }
 
+.student-course-card small {
+    display: block;
+    margin-top: 8px;
+    color: #0f766e;
+    font-weight: 760;
+}
+
+.student-calendar-panel {
+    padding: 20px;
+}
+
+.student-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.student-calendar-header .student-section-title {
+    margin-bottom: 0;
+}
+
+.student-calendar-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.student-calendar-controls strong {
+    min-width: 150px;
+    color: #111827;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.student-calendar-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid #d8e3d1;
+    border-radius: 8px;
+    background: #fff;
+    color: #263246;
+    cursor: pointer;
+    transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.student-calendar-controls button:hover {
+    background: #f1f5ef;
+    transform: translateY(-1px);
+}
+
+.student-calendar-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 18px;
+    align-items: start;
+}
+
+.student-calendar {
+    min-width: 0;
+}
+
+.student-calendar-weekdays,
+.student-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.student-calendar-weekdays {
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.student-calendar-weekdays span {
+    color: #657188;
+    font-size: 12px;
+    font-weight: 850;
+    text-align: center;
+}
+
+.student-calendar-grid {
+    gap: 8px;
+}
+
+.student-calendar-day {
+    min-width: 0;
+    min-height: 126px;
+    padding: 10px;
+    border: 1px solid #e2e8dd;
+    border-radius: 8px;
+    background: #fbfdf9;
+    color: #172033;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease, background 0.16s ease;
+}
+
+.student-calendar-day:hover {
+    border-color: #8bc5ad;
+    transform: translateY(-1px);
+}
+
+.student-calendar-day.muted {
+    background: #f3f5ef;
+    color: #9aa3af;
+}
+
+.student-calendar-day.today {
+    border-color: #0f766e;
+}
+
+.student-calendar-day.selected {
+    background: #ecfdf3;
+    border-color: #0f766e;
+    box-shadow: 0 10px 24px rgba(15, 118, 110, 0.12);
+}
+
+.student-calendar-day.has-event .student-calendar-number {
+    color: #0f766e;
+}
+
+.student-calendar-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-weight: 850;
+}
+
+.student-calendar-day.today .student-calendar-number {
+    background: #0f766e;
+    color: #fff;
+}
+
+.student-calendar-events {
+    display: grid;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.student-calendar-events span,
+.student-calendar-events em {
+    display: block;
+    overflow: hidden;
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 760;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.student-calendar-events span {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.student-calendar-events span.attended {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.student-calendar-events span.active {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.student-calendar-events span.pending {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.student-calendar-events em {
+    background: #f1f5ef;
+    color: #5f6b7d;
+}
+
+.student-day-agenda {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #e2e8dd;
+    border-radius: 8px;
+    background: #fbfdf9;
+}
+
+.student-day-agenda .student-section-title h2 {
+    font-size: 17px;
+}
+
 .student-schedule-list {
     display: grid;
     gap: 10px;
@@ -521,9 +781,27 @@
 }
 
 @media (max-width: 980px) {
+    .student-workspace-layout,
     .student-overview,
-    .student-content-grid {
+    .student-content-grid,
+    .student-calendar-layout {
         grid-template-columns: 1fr;
+    }
+
+    .student-workspace-nav {
+        position: static;
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .student-workspace-nav button {
+        width: auto;
+        flex: 0 0 auto;
+        justify-content: center;
+    }
+
+    .student-calendar-day {
+        min-height: 112px;
     }
 }
 
@@ -544,6 +822,39 @@
     .student-profile dl,
     .student-stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .student-workspace-nav {
+        padding: 5px;
+    }
+
+    .student-workspace-nav button {
+        min-height: 40px;
+        padding: 9px 12px;
+    }
+
+    .student-calendar-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .student-calendar-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .student-calendar-controls strong {
+        min-width: 0;
+    }
+
+    .student-calendar-weekdays,
+    .student-calendar-grid {
+        min-width: 680px;
+    }
+
+    .student-calendar {
+        overflow-x: auto;
+        padding-bottom: 6px;
     }
 
     .student-schedule-row {

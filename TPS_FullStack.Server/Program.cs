@@ -16,6 +16,7 @@ using TPS_FullStack.Server.Modules.JWT;
 using TPS_FullStack.Server.Modules.Teacher;
 
 var builder = WebApplication.CreateBuilder(args);
+const string SpaCorsPolicy = "SpaCorsPolicy";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -23,6 +24,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(SpaCorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins(
+                "https://localhost:60704",
+                "https://127.0.0.1:60704",
+                "http://localhost:60704",
+                "http://127.0.0.1:60704")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen( options =>
@@ -112,6 +127,11 @@ builder.Services.AddScoped<ICertificateStudentRepository, CertificateStudentRepo
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IScheduleTeacherAttendanceRepository, ScheduleTeacherAttendanceRepository>();
 builder.Services.AddScoped<IScheduleStudentAttendanceRepository, ScheduleStudentAttendanceRepository>();
+builder.Services.AddScoped<IExamRepository, ExamRepository>();
+builder.Services.AddScoped<IExamQuestionRepository, ExamQuestionRepository>();
+builder.Services.AddScoped<IExamAnswersRepository, ExamAnswersRepository>();
+builder.Services.AddScoped<IExamService, ExamService>();
+//builder.Services.AddScoped<IFinalExamServices, FinalExamServices>();
 builder.Services.AddHostedService<ExpiredTokenCleanupService>();
 
 
@@ -170,6 +190,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(SpaCorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();

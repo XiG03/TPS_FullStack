@@ -118,10 +118,71 @@
 
 .teacher-overview,
 .teacher-content-grid,
-.teacher-schedule-panel {
+.teacher-schedule-panel,
+.teacher-workspace-layout,
+.teacher-tab-panel {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.teacher-workspace-layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.teacher-workspace-main {
+    min-width: 0;
+}
+
+.teacher-workspace-nav {
+    position: sticky;
+    top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px;
+    border: 1px solid #dfe7f1;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+}
+
+.teacher-workspace-nav button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #5f6b7d;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 820;
+    text-align: left;
+    transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.teacher-workspace-nav button:hover {
+    background: #eef5ff;
+    color: #0b4aa2;
+}
+
+.teacher-workspace-nav button.active {
+    background: #0b4aa2;
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(11, 74, 162, 0.16);
+}
+
+.teacher-tab-panel {
+    display: grid;
+    gap: 18px;
 }
 
 .teacher-overview {
@@ -344,6 +405,29 @@
     font-weight: 680;
 }
 
+.teacher-course-card-list {
+    margin-top: 0;
+}
+
+.teacher-course-card-list .teacher-course-item {
+    align-items: flex-start;
+    padding: 14px;
+    border: 1px solid #e4ebf4;
+    border-radius: 8px;
+    background: #fbfdff;
+}
+
+.teacher-course-card-list .teacher-course-item div {
+    min-width: 0;
+}
+
+.teacher-course-card-list .teacher-course-item small {
+    display: block;
+    margin-top: 6px;
+    color: #0b4aa2;
+    font-weight: 760;
+}
+
 .teacher-course-item span {
     width: 8px;
     height: 8px;
@@ -472,10 +556,215 @@
     border-radius: 8px;
 }
 
+.teacher-calendar-panel {
+    padding: 20px;
+}
+
+.teacher-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.teacher-calendar-header .teacher-section-title {
+    margin-bottom: 0;
+}
+
+.teacher-calendar-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.teacher-calendar-controls strong {
+    min-width: 150px;
+    color: #111827;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.teacher-calendar-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid #d7dfeb;
+    border-radius: 8px;
+    background: #fff;
+    color: #29364a;
+    cursor: pointer;
+    transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.teacher-calendar-controls button:hover {
+    background: #eef5ff;
+    transform: translateY(-1px);
+}
+
+.teacher-calendar-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 18px;
+    align-items: start;
+}
+
+.teacher-calendar {
+    min-width: 0;
+}
+
+.teacher-calendar-weekdays,
+.teacher-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.teacher-calendar-weekdays {
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.teacher-calendar-weekdays span {
+    color: #657188;
+    font-size: 12px;
+    font-weight: 850;
+    text-align: center;
+}
+
+.teacher-calendar-grid {
+    gap: 8px;
+}
+
+.teacher-calendar-day {
+    min-width: 0;
+    min-height: 126px;
+    padding: 10px;
+    border: 1px solid #e4ebf4;
+    border-radius: 8px;
+    background: #fbfdff;
+    color: #152033;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease, background 0.16s ease;
+}
+
+.teacher-calendar-day:hover {
+    border-color: #82aee9;
+    transform: translateY(-1px);
+}
+
+.teacher-calendar-day.muted {
+    background: #f1f5f9;
+    color: #9aa3af;
+}
+
+.teacher-calendar-day.today {
+    border-color: #0b4aa2;
+}
+
+.teacher-calendar-day.selected {
+    background: #e8f2ff;
+    border-color: #0b4aa2;
+    box-shadow: 0 10px 24px rgba(11, 74, 162, 0.12);
+}
+
+.teacher-calendar-day.has-event .teacher-calendar-number {
+    color: #0b4aa2;
+}
+
+.teacher-calendar-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-weight: 850;
+}
+
+.teacher-calendar-day.today .teacher-calendar-number {
+    background: #0b4aa2;
+    color: #fff;
+}
+
+.teacher-calendar-events {
+    display: grid;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.teacher-calendar-events span,
+.teacher-calendar-events em {
+    display: block;
+    overflow: hidden;
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 760;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.teacher-calendar-events span {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.teacher-calendar-events span.teaching {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.teacher-calendar-events span.completed {
+    background: #e0ecff;
+    color: #1d4ed8;
+}
+
+.teacher-calendar-events em {
+    background: #eef5ff;
+    color: #5f6b7d;
+}
+
+.teacher-day-agenda {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #e4ebf4;
+    border-radius: 8px;
+    background: #fbfdff;
+}
+
+.teacher-day-agenda .teacher-section-title h2 {
+    font-size: 17px;
+}
+
 @media (max-width: 980px) {
+    .teacher-workspace-layout,
     .teacher-overview,
-    .teacher-content-grid {
+    .teacher-content-grid,
+    .teacher-calendar-layout {
         grid-template-columns: 1fr;
+    }
+
+    .teacher-workspace-nav {
+        position: static;
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .teacher-workspace-nav button {
+        width: auto;
+        flex: 0 0 auto;
+        justify-content: center;
+    }
+
+    .teacher-calendar-day {
+        min-height: 112px;
     }
 }
 
@@ -496,6 +785,39 @@
     .teacher-profile dl,
     .teacher-stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .teacher-workspace-nav {
+        padding: 5px;
+    }
+
+    .teacher-workspace-nav button {
+        min-height: 40px;
+        padding: 9px 12px;
+    }
+
+    .teacher-calendar-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .teacher-calendar-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .teacher-calendar-controls strong {
+        min-width: 0;
+    }
+
+    .teacher-calendar-weekdays,
+    .teacher-calendar-grid {
+        min-width: 680px;
+    }
+
+    .teacher-calendar {
+        overflow-x: auto;
+        padding-bottom: 6px;
     }
 
     .teacher-schedule-row {

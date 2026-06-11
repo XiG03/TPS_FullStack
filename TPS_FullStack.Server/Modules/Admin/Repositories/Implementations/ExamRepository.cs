@@ -20,7 +20,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             string? DeletedBy)
         {
             var query = @"
-                INSERT INTO dbo.Exam
+                INSERT INTO dbo.Baithuhoach
                 (
                     MaID,
                     KhoahocID,
@@ -32,8 +32,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     UpdatedAt,
                     UpdatedBy,
                     DeletedAt,
-                    DeletedBy,
-                    Khongsudung
+                    DeletedBy
                 )
                 VALUES
                 (
@@ -47,8 +46,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     @UpdatedAt,
                     @UpdatedBy,
                     @DeletedAt,
-                    @DeletedBy,
-                    0
+                    @DeletedBy
                 )";
 
             using var cmd = new SqlCommand(query, conn, trans);
@@ -71,7 +69,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task DeleteAsync(SqlConnection conn, SqlTransaction trans, string? MaID)
         {
             var query = @"
-                UPDATE dbo.Exam
+                UPDATE dbo.Baithuhoach
                 SET Khongsudung = 1
                 WHERE MaID = @MaID";
 
@@ -195,7 +193,7 @@ namespace TPS_FullStack.Server.Modules.Admin
             string? DeletedBy)
         {
             var query = @"
-                UPDATE dbo.Exam
+                UPDATE dbo.Baithuhoach
                 SET
                     KhoahocID = @KhoahocID,
                     HocvienID = @HocvienID,

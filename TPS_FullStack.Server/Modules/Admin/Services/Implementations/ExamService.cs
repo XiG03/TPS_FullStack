@@ -9,13 +9,22 @@ namespace TPS_FullStack.Server.Modules.Admin
         private readonly ICourseTopicRepository _courseTopicRepository;
         private readonly ITopicQuestionRepository _topicQuestionRepository;
         private readonly ITopicAnswerRepository _topicAnswerRepository;
+        private readonly ICourseStudentRepository _courseStudentRepository;
+        private readonly IExamQuestionRepository _examQuestionRepository;
+        private readonly IExamRepository _examRepository;
+        private readonly IExamAnswersRepository _examAnswersRepository;
         public ExamService(IConfiguration configuration, ICourseTopicRepository courseTopicRepository,
-                        ITopicQuestionRepository topicQuestionRepository, ITopicAnswerRepository topicAnswerRepository)
+                        ITopicQuestionRepository topicQuestionRepository, ITopicAnswerRepository topicAnswerRepository,
+                        ICourseStudentRepository courseStudentRepository, IExamQuestionRepository examQuestionRepository, IExamRepository examRepository, IExamAnswersRepository examAnswersRepository)
         {
             _configuration = configuration;
             _courseTopicRepository = courseTopicRepository;
             _topicQuestionRepository = topicQuestionRepository;
             _topicAnswerRepository = topicAnswerRepository;
+            _courseStudentRepository = courseStudentRepository;
+            _examQuestionRepository = examQuestionRepository;
+            _examRepository = examRepository;
+            _examAnswersRepository = examAnswersRepository;
         }
         public async Task<ServiceDefault<ExamCreateResponse>> ExamCreateAsync(ExamCreateRequest createRequest)
         {
@@ -23,50 +32,58 @@ namespace TPS_FullStack.Server.Modules.Admin
             using(var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
-                // Lay danh sach topic
-                var topics = await _courseTopicRepository.GetByCourseIDAsync(conn,createRequest.KhoahocID);
-                if(topics.Count() == 0)
+                if(await _courseStudentRepository.CheckStudentByCourseIDAsync(conn,createRequest.KhoahocID,createRequest.HocvienID) == null)
                 {
                     return new ServiceDefault<ExamCreateResponse>
                     {
                         statusCode = StatusCodes.Status400BadRequest,
-                        Message = "Khong co danh sach chuyen de",
+                        Message = "Hoc vien khong co trong khoa hoc",
                         Data = null
                     };
                 }
-                // Lay danh sach cau hoi va cau tra loi
-                var list = new List<Question>();
-                foreach(var topic in topics)
+                var questions = await _examQuestionRepository.GetByCourseIDAsync(conn, createRequest.KhoahocID);
+
+                using (var transaction = conn.BeginTransaction())
                 {
-                    var questions = await _topicQuestionRepository.GetByTopicIdAsync(conn, topic.ChuyendeID);
-                    foreach(var ques in questions)
+                    try
                     {
-                        list.Add(new Question
+                        var examID = Guid.NewGuid().ToString();
+                        await _examRepository.CreateAsync(conn, transaction, examID, createRequest.KhoahocID, createRequest.HocvienID, null, null, DateTime.UtcNow, "Admin", null, null, null, null);
+                        foreach(var question in questions)
                         {
-                            ChuyendeID = ques.ChuyendeID,
-                            CauhoiID = ques.MaID,
-                            Ten = ques.Ten,
-                            questionAnswers = new List<QuestionAnswer>()
-                        });
-                    }
-                    var answers = await _topicAnswerRepository.GetByTopicIdAsync(conn,topic.ChuyendeID);
-                    foreach(var ques in list)
-                    {
-                        foreach(var ans in answers)
-                        {
-                            if(ans.Chuyende_CauhoiID == ques.CauhoiID)
+                            var quesID = Guid.NewGuid().ToString();
+                            await _examQuestionRepository.CreateAsync(conn, transaction, quesID, examID, createRequest.KhoahocID, question.ChuyendeID, question.CauhoiID, question.Ten);
+                            foreach(var ans in question.questionAnswers)
                             {
-                                ques.questionAnswers.Add(new QuestionAnswer
-                                {
-                                    CauhoiID = ans.Chuyende_CauhoiID,
-                                    Ten = ans.Ten,
-                                    Dung = ans.Dung
-                                });
+                                var answerID = Guid.NewGuid().ToString();
+                                await _examAnswersRepository.CreateAsync(conn, transaction, answerID, examID, quesID, ans.Ten, ans.Dung, null);
                             }
                         }
-                    }   
+                        transaction.Commit();
+                        return new ServiceDefault<ExamCreateResponse>
+                        {
+                            statusCode = StatusCodes.Status200OK,
+                            Message = "Tao de thi thanh cong",
+                            Data = new ExamCreateResponse
+                            {
+                            }
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        return new ServiceDefault<ExamCreateResponse>
+                        {
+                            statusCode = StatusCodes.Status500InternalServerError,
+                            Message = "Loi server: " + ex.Message,
+                            Data = null
+                        };
+                    }
                 }
-                Random rnd = new Random();
+
+
+
+
             }
             throw new NotImplementedException();
         }

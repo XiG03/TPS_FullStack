@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { BookOpen, Users, UserCog, FileText, Menu, X, CalendarDays, ClipboardCheck, FlaskConical } from 'lucide-react';
+import { Award, BookOpen, Users, UserCog, FileText, Menu, X, CalendarDays, ClipboardCheck, FlaskConical } from 'lucide-react';
 import './AdminLayout.css';
 
 const AdminLayout = () => {
@@ -18,6 +18,7 @@ const AdminLayout = () => {
     { path: '/teachers', name: 'Giảng viên', icon: <UserCog size={20} /> },
     { path: '/topics', name: 'Chuyên đề', icon: <FileText size={20} /> },
     { path: '/reports', name: 'Báo cáo', icon: <ClipboardCheck size={20} /> },
+    { path: '/certificates', name: 'Chứng chỉ', icon: <Award size={20} /> },
   ];
 
   return (

@@ -17,7 +17,12 @@ import TeacherWorkspacePage from './pages/TeacherWorkspacePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ReportManagementPage from './pages/ReportManagementPage';
+import ExamCreatePage from './pages/ExamCreatePage';
 import LabCreatePage from './pages/LabCreatePage';
+import CertificateManagementPage from './pages/CertificateManagementPage';
+import CertificateFormPage from './pages/CertificateFormPage';
+import CertificateDetailPage from './pages/CertificateDetailPage';
+import HomePage from './pages/HomePage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import './App.css'; 
 
@@ -44,17 +49,16 @@ function App() {
             </ProtectedRoute>
           )}
         />
+        <Route path="/" element={<HomePage />} />
 
         {/* Main Admin Layout Route */}
         <Route
-          path="/"
           element={(
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminLayout />
             </ProtectedRoute>
           )}
         >
-          <Route index element={<Navigate to="/courses" replace />} />
           {/* Nested routes inside AdminLayout */}
           {/* <Route path="dashboard" element={<AdminDashboard />} /> */}
           <Route path="courses" element={<CourseManagementPage />} />
@@ -73,7 +77,12 @@ function App() {
           <Route path="topics/new" element={<TopicFormPage />} />
           <Route path="topics/:id/edit" element={<TopicFormPage />} />
           <Route path="topics/:id" element={<TopicDetailPage />} />
+          <Route path="certificates" element={<CertificateManagementPage />} />
+          <Route path="certificates/new" element={<CertificateFormPage />} />
+          <Route path="certificates/:id/edit" element={<CertificateFormPage />} />
+          <Route path="certificates/:id" element={<CertificateDetailPage />} />
           <Route path="reports" element={<ReportManagementPage />} />
+          <Route path="reports/new" element={<ExamCreatePage />} />
           
           {/* Catch-all route to redirect back to courses */}
           <Route path="*" element={<Navigate to="/courses" replace />} />
