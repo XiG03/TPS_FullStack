@@ -15,48 +15,37 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             _examService = examService;
         }
-        [HttpPost("generate")]
-        public async Task<IActionResult> GenerateFinalExam(List<string> HocvienIDs, string KhoahocID, decimal Socauhoi)
+        
+        [HttpGet]
+        public async Task<IActionResult> GetAllExams()
         {
-            var result = await _finalExamServices.GenerateFinalExamAsync(HocvienIDs, KhoahocID, Socauhoi);
+            var result = await _examService.ExamGetAllAsync();
             return StatusCode(result.statusCode, result);
         }
-        [HttpGet("lists")]
-        public async Task<IActionResult> GetFinalExamLists()
+
+        [HttpGet("{MaID}")]
+        public async Task<IActionResult> GetExamDetail(string MaID)
         {
-            var result = await _finalExamServices.GetFinalExamListsAsync();
+            var result = await _examService.ExamGetDetailAsync(MaID);
             return StatusCode(result.statusCode, result);
         }
-        [HttpGet("lists/{KhoahocID}")]
-        public async Task<IActionResult> GetFinalExamLists(string KhoahocID)
-        {
-            var result = await _finalExamServices.GetFinalExamListsAsync(KhoahocID);
-            return StatusCode(result.statusCode, result);
-        }
-        [HttpGet("detail/{MaID}")]
-        public async Task<IActionResult> GetFinalExamDetail(string MaID)
-        {
-            var result = await _finalExamServices.GetFinalExamDetailAsync(MaID);
-            return StatusCode(result.statusCode, result);
-        }
-        [HttpPut("update-score")]
-        public async Task<IActionResult> UpdateFinalExamScore(finalExamUpdate finalExamUpdate)
-        {
-            var result = await _finalExamServices.UpdateFinalExamScoreAsync(finalExamUpdate);
-            return StatusCode(result.statusCode, result);
-        }
+
+        // [HttpPut("{MaID}")]
+        // public async Task<IActionResult> UpdateExam(string MaID, ExamUpdateRequest updateRequest)
+        // {
+        //     updateRequest.MaID = MaID;
+        //     var result = await _examService.ExamUpdateAsync(updateRequest);
+        //     return StatusCode(result.statusCode, result);
+        // }
+
         [HttpPost("{KhoahocID}/{HocvienID}")]
         public async Task<IActionResult> CreateExam(string KhoahocID, string HocvienID)
         {
             var createRequest = new ExamCreateRequest();
             createRequest.KhoahocID = KhoahocID;
             createRequest.HocvienID = HocvienID;
-
             var result = await _examService.ExamCreateAsync(createRequest);
-
             return StatusCode(result.statusCode, result);
         }
-
-
     }
 }

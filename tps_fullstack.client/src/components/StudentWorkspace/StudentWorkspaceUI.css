@@ -2,7 +2,7 @@
     min-height: 100vh;
     background: #f7f8f4;
     color: #172033;
-    padding: 28px;
+    padding: 28px 18px;
     overflow-y: auto;
     box-sizing: border-box;
 }
@@ -34,7 +34,8 @@
 .student-workspace-layout,
 .student-tab-panel,
 .student-alert {
-    max-width: 1200px;
+    width: min(1760px, calc(100vw - 36px));
+    max-width: none;
     margin-left: auto;
     margin-right: auto;
 }
@@ -140,8 +141,8 @@
 
 .student-workspace-layout {
     display: grid;
-    grid-template-columns: 250px minmax(0, 1fr);
-    gap: 18px;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 16px;
     align-items: start;
 }
 
@@ -517,8 +518,8 @@
 
 .student-calendar-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 18px;
+    grid-template-columns: minmax(820px, 1fr) 460px;
+    gap: 16px;
     align-items: start;
 }
 

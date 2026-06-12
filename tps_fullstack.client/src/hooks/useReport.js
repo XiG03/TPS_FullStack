@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getReports, gradeReport } from '../services/reportService';
+import { getExamDetail, getExams } from '../services/examService';
 
 export const useReport = () => {
     const [reports, setReports] = useState([]);
+    const [selectedReport, setSelectedReport] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingDetail, setIsLoadingDetail] = useState(false);
     const [error, setError] = useState(null);
+    const [detailError, setDetailError] = useState(null);
 
-    const fetchReports = useCallback(async (filters = {}) => {
+    const fetchReports = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
-            const res = await getReports(filters);
-            setReports(res.data);
+            const res = await getExams();
+            setReports(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             setError('Lỗi khi tải danh sách bài thu hoạch.');
             console.error(err);
@@ -24,28 +27,38 @@ export const useReport = () => {
         fetchReports();
     }, [fetchReports]);
 
-    const handleGradeReport = async ({ id, score, feedback }) => {
+    const handleViewReport = async (report) => {
+        if (!report?.maID) return;
+
+        setIsLoadingDetail(true);
+        setDetailError(null);
+        setSelectedReport(null);
+
         try {
-            await gradeReport({ id, score, feedback });
-            setReports((prev) =>
-                prev.map((report) =>
-                    report.id === id
-                        ? { ...report, score, feedback, status: 'graded' }
-                        : report
-                )
-            );
-            return true;
+            const res = await getExamDetail(report.maID);
+            setSelectedReport(res.data ? { ...report, ...res.data, score: res.data.score ?? report.score } : report);
         } catch (err) {
+            setDetailError('Không tải được chi tiết bài thu hoạch.');
             console.error(err);
-            return false;
+        } finally {
+            setIsLoadingDetail(false);
         }
+    };
+
+    const closeReportDetail = () => {
+        setSelectedReport(null);
+        setDetailError(null);
     };
 
     return {
         reports,
+        selectedReport,
         isLoading,
+        isLoadingDetail,
         error,
+        detailError,
         fetchReports,
-        handleGradeReport,
+        handleViewReport,
+        closeReportDetail
     };
 };

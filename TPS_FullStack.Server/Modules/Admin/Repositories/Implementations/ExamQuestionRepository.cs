@@ -154,6 +154,68 @@ namespace TPS_FullStack.Server.Modules.Admin
             }
         }
 
+        public async Task<List<ExamQuestion>> GetByExamIDAsync(
+    SqlConnection conn,
+    string? BaithuhoachID)
+        {
+            var questions = new List<ExamQuestion>();
+            var questionMap = new Dictionary<string, ExamQuestion>();
+
+            if (string.IsNullOrWhiteSpace(BaithuhoachID))
+                return questions;
+
+            using var cmd = new SqlCommand("sp_Baithuhoach_Cauhoi_Traloi", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@MaBaithuhoach", SqlDbType.NVarChar, 50).Value = BaithuhoachID;
+
+            if (conn.State != ConnectionState.Open)
+                await conn.OpenAsync();
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var question = new ExamQuestion
+                {
+                    MaID = reader["MaID"] as string,
+                    BaithuhoachID = reader["BaithuhoachID"] as string,
+                    CauhoiID = reader["CauhoiID"] as string,
+                    Tencauhoi = reader["Tencauhoi"] as string,
+                    ChuyendeID = reader["ChuyendeID"] as string,
+                    KhoahocID = reader["KhoahocID"] as string,
+                    examAnswers = new List<ExamAnswers>()
+                };
+
+                questions.Add(question);
+
+                if (!string.IsNullOrEmpty(question.MaID))
+                    questionMap[question.MaID] = question;
+            }
+
+            await reader.NextResultAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var answer = new ExamAnswers
+                {
+                    MaID = reader["MaID"] as string,
+                    BaithuhoachID = reader["BaithuhoachID"] as string,
+                    Baithuhoach_CauhoiID = reader["Baithuhoach_CauhoiID"] as string,
+                    NdTraloi = reader["NdTraloi"] as string,
+                    Dung = reader["Dung"] == DBNull.Value ? null : Convert.ToBoolean(reader["Dung"]),
+                    Chon = reader["Chon"] == DBNull.Value ? null : Convert.ToBoolean(reader["Chon"])
+                };
+
+                if (!string.IsNullOrEmpty(answer.Baithuhoach_CauhoiID)
+                    && questionMap.TryGetValue(answer.Baithuhoach_CauhoiID, out var question))
+                {
+                    question.examAnswers!.Add(answer);
+                }
+            }
+
+            return questions;
+        }
+
         public async Task<ExamQuestionModel> GetByIDAsync(SqlConnection conn, string? MaID)
         {
             const string sql = @"
