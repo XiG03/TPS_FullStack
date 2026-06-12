@@ -82,22 +82,23 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<List<ExamModel>> GetAllAsync(SqlConnection conn)
         {
             var query = @"
-                SELECT
-                    e.MaID,
+                        SELECT
+                            e.MaID,
 
-                    e.KhoahocID,
-                    kh.Ten AS TenKhoahoc,
+                            e.KhoahocID,
+                            kh.Ten AS TenKhoahoc,
 
-                    e.HocvienID,
-                    hv.Hoten AS TenHocvien,
+                            e.HocvienID,
+                            hv.Hoten AS TenHocvien,
 
-                    e.Batdauthi,
-                    e.Ketthucthi
+                            e.Batdauthi,
+                            e.Ketthucthi,
 
-                FROM dbo.Baithuhoach e
+                            dbo.fnc_Baithuhoach_Tinhdiem(e.MaID) AS Diem
 
-                JOIN dbo.Khoahoc kh ON kh.MaID = e.KhoahocID
-                JOIN dbo.Hocvien hv ON hv.MaID = e.HocvienID";
+                        FROM dbo.Baithuhoach e
+                        JOIN dbo.Khoahoc kh ON kh.MaID = e.KhoahocID
+                        JOIN dbo.Hocvien hv ON hv.MaID = e.HocvienID";
 
             var list = new List<ExamModel>();
 
@@ -120,7 +121,10 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                     Ketthucthi = reader["Ketthucthi"] == DBNull.Value
                         ? null
-                        : Convert.ToDateTime(reader["Ketthucthi"])
+                        : Convert.ToDateTime(reader["Ketthucthi"]),
+                    Diem = reader["Diem"] == DBNull.Value
+                        ? null
+                        : Convert.ToDecimal(reader["Diem"]),
                 });
             }
 
@@ -140,7 +144,9 @@ namespace TPS_FullStack.Server.Modules.Admin
                     hv.Hoten AS TenHocvien,
 
                     e.Batdauthi,
-                    e.Ketthucthi
+                    e.Ketthucthi,
+                    
+                    dbo.fnc_Baithuhoach_Tinhdiem(e.MaID) AS Diem
 
                 FROM dbo.Baithuhoach e
 
@@ -170,7 +176,10 @@ namespace TPS_FullStack.Server.Modules.Admin
 
                     Ketthucthi = reader["Ketthucthi"] == DBNull.Value
                         ? null
-                        : Convert.ToDateTime(reader["Ketthucthi"])
+                        : Convert.ToDateTime(reader["Ketthucthi"]),
+                    Diem = reader["Diem"] == DBNull.Value
+                        ? null
+                        : Convert.ToDecimal(reader["Diem"])
                 };
             }
 

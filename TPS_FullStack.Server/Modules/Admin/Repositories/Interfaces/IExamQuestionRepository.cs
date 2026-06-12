@@ -13,6 +13,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public Task DeleteAsync(SqlConnection conn, SqlTransaction trans, string? MaID);
 
         public Task<List<Question>> GetByCourseIDAsync(SqlConnection conn, string? KhoahocID);
+        public Task<List<ExamQuestion>> GetByExamIDAsync(SqlConnection conn, string? BaithuhoachID);
     }
 
 }
