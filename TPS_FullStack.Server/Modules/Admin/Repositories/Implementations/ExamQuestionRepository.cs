@@ -242,6 +242,12 @@ namespace TPS_FullStack.Server.Modules.Admin
             throw new NotImplementedException();
         }
 
+        public Task<List<ExamQuestion>> GetByStudentIDAsync(SqlConnection conn, string? HocvienID, string? BaithuhoachID)
+        {
+            var query = @"";
+            throw new NotImplementedException();
+        }
+
         public async Task UpdateAsync(SqlConnection conn, SqlTransaction trans, string? MaID, string? BaithuhoachID, string? KhoahocID, string? ChuyendeID, string? CauhoiID, string? Tencauhoi, string? TraloiID, string? NdTraloi, string? DapanID, string? Nddapan, bool? Dung)
         {
             const string sql = @"

@@ -4,6 +4,7 @@
     color: #172033;
     padding: 28px 18px;
     overflow-y: auto;
+    overflow-x: hidden;
     box-sizing: border-box;
 }
 
@@ -27,17 +28,23 @@
 }
 
 .student-topbar,
+.student-workspace-layout,
+.student-alert {
+    width: min(1760px, 100%);
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .student-overview,
 .student-content-grid,
 .student-course-panel,
 .student-schedule-panel,
-.student-workspace-layout,
-.student-tab-panel,
-.student-alert {
-    width: min(1760px, calc(100vw - 36px));
-    max-width: none;
-    margin-left: auto;
-    margin-right: auto;
+.student-tab-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .student-topbar {
@@ -476,7 +483,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .student-calendar-header .student-section-title {
@@ -516,9 +523,39 @@
     transform: translateY(-1px);
 }
 
+.student-calendar-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.student-calendar-summary div {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+    padding: 12px 14px;
+    border: 1px solid #e2e8dd;
+    border-radius: 8px;
+    background: #fbfdf9;
+}
+
+.student-calendar-summary span {
+    color: #657188;
+    font-size: 12px;
+    font-weight: 760;
+}
+
+.student-calendar-summary strong {
+    color: #0f766e;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 850;
+}
+
 .student-calendar-layout {
     display: grid;
-    grid-template-columns: minmax(820px, 1fr) 460px;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
     gap: 16px;
     align-items: start;
 }
@@ -551,7 +588,7 @@
 
 .student-calendar-day {
     min-width: 0;
-    min-height: 126px;
+    min-height: 112px;
     padding: 10px;
     border: 1px solid #e2e8dd;
     border-radius: 8px;
@@ -649,19 +686,56 @@
 
 .student-day-agenda {
     min-width: 0;
+    position: sticky;
+    top: 18px;
+    display: grid;
+    gap: 14px;
     padding: 16px;
     border: 1px solid #e2e8dd;
     border-radius: 8px;
-    background: #fbfdf9;
+    background: #fff;
+}
+
+.student-agenda-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.student-agenda-heading .student-section-title {
+    margin-bottom: 0;
+}
+
+.student-agenda-heading > span {
+    flex: 0 0 auto;
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: #f1f5ef;
+    color: #5f6b7d;
+    padding: 4px 9px;
+    font-size: 12px;
+    font-weight: 820;
 }
 
 .student-day-agenda .student-section-title h2 {
     font-size: 17px;
 }
 
+.student-agenda-divider {
+    height: 1px;
+    background: #e2e8dd;
+}
+
 .student-schedule-list {
     display: grid;
     gap: 10px;
+}
+
+.student-schedule-list.compact {
+    gap: 8px;
 }
 
 .student-schedule-row {
@@ -673,6 +747,15 @@
     border-radius: 8px;
     padding: 14px;
     background: #fbfdf9;
+}
+
+.student-schedule-list.compact .student-schedule-row {
+    grid-template-columns: 92px minmax(0, 1fr);
+    padding: 12px;
+}
+
+.student-schedule-list.compact .student-date-block strong {
+    font-size: 14px;
 }
 
 .student-schedule-row.attended {
@@ -781,6 +864,261 @@
     border-radius: 8px;
 }
 
+.student-exam-list-panel,
+.student-exam-detail-panel {
+    display: grid;
+    gap: 16px;
+}
+
+.student-exam-list {
+    display: grid;
+    gap: 12px;
+}
+
+.student-exam-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px;
+    gap: 16px;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #e2e8dd;
+    border-radius: 8px;
+    background: #fbfdf9;
+}
+
+.student-exam-card-main,
+.student-exam-card-side {
+    min-width: 0;
+}
+
+.student-exam-card h3,
+.student-exam-detail-header h2,
+.student-question-title h3 {
+    margin: 8px 0 6px;
+    color: #111827;
+    line-height: 1.25;
+    font-weight: 820;
+    letter-spacing: 0;
+}
+
+.student-exam-card h3 {
+    font-size: 18px;
+}
+
+.student-exam-card p,
+.student-exam-detail-header p,
+.student-exam-meta,
+.student-exam-card-side span,
+.student-exam-score span {
+    color: #5f6b7d;
+    font-weight: 650;
+}
+
+.student-exam-card-side {
+    display: grid;
+    justify-items: end;
+    gap: 8px;
+}
+
+.student-exam-card-side strong,
+.student-exam-score strong {
+    color: #111827;
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 850;
+}
+
+.student-exam-detail-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8dd;
+}
+
+.student-secondary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 10px 14px;
+    border: 1px solid #d8e3d1;
+    border-radius: 8px;
+    background: #fff;
+    color: #263246;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 800;
+    transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.student-secondary-action:hover {
+    background: #f1f5ef;
+    transform: translateY(-1px);
+}
+
+.student-exam-score {
+    display: grid;
+    justify-items: end;
+    gap: 6px;
+}
+
+.student-exam-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.student-exam-meta span {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    border-radius: 8px;
+    background: #f1f5ef;
+    padding: 6px 10px;
+}
+
+.student-exam-loading,
+.student-submitted-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #0f766e;
+    font-weight: 800;
+}
+
+.student-question-list {
+    display: grid;
+    gap: 14px;
+}
+
+.student-question-block {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid #e2e8dd;
+    border-radius: 8px;
+    background: #fbfdf9;
+}
+
+.student-question-title span {
+    color: #0f766e;
+    font-size: 12px;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.student-question-result {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    margin-left: 8px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 850;
+}
+
+.student-question-result.correct {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.student-question-result.wrong,
+.student-question-result.missing {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.student-question-title h3 {
+    font-size: 17px;
+}
+
+.student-answer-list {
+    display: grid;
+    gap: 8px;
+}
+
+.student-answer-option {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 12px;
+    border: 1px solid #e2e8dd;
+    border-radius: 8px;
+    background: #fff;
+    color: #263246;
+    cursor: pointer;
+    font-weight: 680;
+    transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.student-answer-option:hover {
+    border-color: #8bc5ad;
+}
+
+.student-answer-option.selected {
+    border-color: #0f766e;
+    background: #ecfdf3;
+    box-shadow: 0 8px 20px rgba(15, 118, 110, 0.08);
+}
+
+.student-answer-option.correct {
+    border-color: #86efac;
+    background: #f0fdf4;
+}
+
+.student-answer-option.wrong {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.student-answer-option input {
+    margin-top: 2px;
+    accent-color: #0f766e;
+}
+
+.student-answer-option span {
+    min-width: 0;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.student-answer-option strong {
+    grid-column: 2;
+    color: #0f766e;
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.student-answer-option.wrong strong {
+    color: #b42318;
+}
+
+.student-exam-warning {
+    margin: 0;
+}
+
+.student-exam-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+}
+
+.student-badge.submitted {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.student-badge.in_progress {
+    background: #fef3c7;
+    color: #92400e;
+}
+
 @media (max-width: 980px) {
     .student-workspace-layout,
     .student-overview,
@@ -803,6 +1141,10 @@
 
     .student-calendar-day {
         min-height: 112px;
+    }
+
+    .student-day-agenda {
+        position: static;
     }
 }
 
@@ -848,6 +1190,10 @@
         min-width: 0;
     }
 
+    .student-calendar-summary {
+        grid-template-columns: 1fr;
+    }
+
     .student-calendar-weekdays,
     .student-calendar-grid {
         min-width: 680px;
@@ -860,6 +1206,20 @@
 
     .student-schedule-row {
         grid-template-columns: 1fr;
+    }
+
+    .student-schedule-list.compact .student-schedule-row {
+        grid-template-columns: 1fr;
+    }
+
+    .student-exam-card,
+    .student-exam-detail-header {
+        grid-template-columns: 1fr;
+    }
+
+    .student-exam-card-side,
+    .student-exam-score {
+        justify-items: start;
     }
 
     .student-date-block {

@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { getCertificateDetail, getCertificates } from '../services/certificateService';
 import { getCourseDetail, getCourses } from '../services/courseService';
-import { getToken } from '../services/httpClient';
 import heroImage from '../assets/hero.png';
 import './HomePage.css';
 
@@ -49,7 +48,6 @@ const HomePage = () => {
     const [isDetailLoading, setIsDetailLoading] = useState(false);
     const [detailError, setDetailError] = useState('');
 
-    const isAuthenticated = Boolean(getToken());
     const overviewRef = useRef(null);
     const programsRef = useRef(null);
     const certificatesRef = useRef(null);
@@ -245,13 +243,13 @@ const HomePage = () => {
                 <div className="homepage-actions">
                     <Link
                         className="homepage-icon-link"
-                        to={isAuthenticated ? '/courses' : '/login'}
-                        aria-label={isAuthenticated ? 'Vào quản trị' : 'Đăng nhập'}
+                        to="/login"
+                        aria-label="Đăng nhập"
                     >
                         <LogIn size={20} />
                     </Link>
-                    <Link className="homepage-primary-link" to={isAuthenticated ? '/courses' : '/login'}>
-                        {isAuthenticated ? 'Quản trị' : 'Đăng nhập'}
+                    <Link className="homepage-primary-link" to="/login">
+                        Đăng nhập
                         <ArrowRight size={18} />
                     </Link>
                 </div>
@@ -263,8 +261,8 @@ const HomePage = () => {
                         <span className="homepage-kicker">TPS Learning Platform</span>
                         <h1>Nền tảng khóa học và chứng chỉ chuyên nghiệp</h1>
                         <p>
-                            Theo dõi chương trình đào tạo, cấu hình chứng chỉ và mở nhanh các
-                            nghiệp vụ quản trị từ một màn hình tổng quan gọn gàng.
+                            Khám phá chương trình đào tạo, chứng chỉ và các thông tin học tập nổi bật
+                            trong một màn hình tổng quan gọn gàng.
                         </p>
 
                         <div className="homepage-hero-actions">
@@ -313,18 +311,18 @@ const HomePage = () => {
                     <div className="homepage-overview">
                         <article>
                             <ShieldCheck size={24} />
-                            <h2>Dữ liệu từ API quản trị</h2>
-                            <p>Homepage đọc trực tiếp từ `api/v1/course` và `api/v1/certificate` qua service hiện có.</p>
+                            <h2>Thông tin được cập nhật</h2>
+                            <p>Danh sách khóa học và chứng chỉ được lấy từ dữ liệu mới nhất của hệ thống.</p>
                         </article>
                         <article>
                             <GraduationCap size={24} />
-                            <h2>Điều hướng nhanh</h2>
-                            <p>Chuyển ngay sang màn quản lý khóa học, chứng chỉ hoặc các nghiệp vụ liên quan.</p>
+                            <h2>Trải nghiệm dễ theo dõi</h2>
+                            <p>Các nhóm thông tin chính được sắp xếp rõ ràng để người học dễ tra cứu.</p>
                         </article>
                         <article>
                             <Users size={24} />
-                            <h2>Sẵn sàng mở rộng</h2>
-                            <p>Cấu trúc card có thể bổ sung giáo viên, học viên và thống kê chi tiết khi API mở thêm dữ liệu.</p>
+                            <h2>Kết nối học tập</h2>
+                            <p>Khóa học, chứng chỉ và đơn vị cấp được trình bày trong cùng một không gian thống nhất.</p>
                         </article>
                     </div>
                 </section>
@@ -436,13 +434,17 @@ const HomePage = () => {
                 <section className="homepage-cta">
                     <div>
                         <CheckCircle2 size={26} />
-                        <h2>Sẵn sàng quản lý chương trình đào tạo?</h2>
-                        <p>Mở dashboard để thêm khóa học mới, gắn chứng chỉ và theo dõi dữ liệu học tập.</p>
+                        <h2>Sẵn sàng tìm chương trình phù hợp?</h2>
+                        <p>Xem các khóa học và chứng chỉ đang được giới thiệu trên nền tảng TPS.</p>
                     </div>
-                    <Link className="homepage-button primary" to={isAuthenticated ? '/courses/new' : '/login'}>
-                        {isAuthenticated ? 'Tạo khóa học' : 'Đăng nhập quản trị'}
+                    <a
+                        className="homepage-button primary"
+                        href="#programs"
+                        onClick={(event) => scrollToSection(event, 'programs')}
+                    >
+                        Xem khóa học
                         <ArrowRight size={19} />
-                    </Link>
+                    </a>
                 </section>
 
                 {activeDetail && (
@@ -482,13 +484,17 @@ const HomePage = () => {
                                 )}
                             </div>
 
-                            <Link
+                            <a
                                 className="homepage-button secondary"
-                                to={isAuthenticated ? (activeDetail.type === 'course' ? '/courses' : '/certificates') : '/login'}
+                                href={activeDetail.type === 'course' ? '#programs' : '#certificates'}
+                                onClick={(event) => {
+                                    closeDetail();
+                                    scrollToSection(event, activeDetail.type === 'course' ? 'programs' : 'certificates');
+                                }}
                             >
-                                {isAuthenticated ? 'Mở dashboard' : 'Đăng nhập để quản trị'}
+                                {activeDetail.type === 'course' ? 'Xem danh sách khóa học' : 'Xem danh sách chứng chỉ'}
                                 <ArrowRight size={18} />
-                            </Link>
+                            </a>
                         </section>
                     </div>
                 )}

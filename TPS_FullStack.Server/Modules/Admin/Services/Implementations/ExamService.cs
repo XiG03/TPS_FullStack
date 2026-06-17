@@ -1,5 +1,7 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using Microsoft.Data.SqlClient;
+using TPS_FullStack.Server.Entities;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
@@ -120,6 +122,48 @@ namespace TPS_FullStack.Server.Modules.Admin
             throw new NotImplementedException();
         }
 
+        public async Task<ServiceDefault<List<ExamResponse>>> ExamGetAllByStudentIDAsync(string? HocvienID)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                var examlist = await _examRepository.GetByStudentIDAsync(conn, HocvienID);
+                if (examlist == null)
+                {
+                    return new ServiceDefault<List<ExamResponse>>
+                    {
+                        statusCode = StatusCodes.Status400BadRequest,
+                        Message = "Khong tim thay danh sach bai thu hoach",
+                        Data = null
+                    };
+                }
+                var response = new List<ExamResponse>();
+                foreach (var e in examlist)
+                {
+                    response.Add(new ExamResponse
+                    {
+                        MaID = e.MaID,
+                        KhoahocID = e.KhoahocID,
+                        TenKhoahoc = e.TenKhoahoc,
+                        HocvienID = e.HocvienID,
+                        TenHocvien = e.TenHocvien,
+                        Batdauthi = e.Batdauthi,
+                        Ketthucthi = e.Ketthucthi,
+                        Diem = e.Diem
+                    });
+                }
+                return new ServiceDefault<List<ExamResponse>>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Tim thay danh sach bai thu hoach",
+                    Data = response
+                };
+            }
+            throw new NotImplementedException();
+        }
+
         public async Task<ServiceDefault<ExamDetailResponse>> ExamGetDetailAsync(string? MaID)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -192,6 +236,224 @@ namespace TPS_FullStack.Server.Modules.Admin
                     Message = "Lấy chi tiết bài thi thành công",
                     Data = response
                 };
+            }
+        }
+
+        public async Task<ServiceDefault<ExamDetailResponse>> ExamGetDetailByStudentIDAsync(string? HocvienID, string? BaithuhoachID)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                var examDetail = await _examRepository.GetByIDAsync(conn, BaithuhoachID);
+
+                if (examDetail == null)
+                {
+                    return new ServiceDefault<ExamDetailResponse>
+                    {
+                        statusCode = StatusCodes.Status400BadRequest,
+                        Message = "Không có bài thi với ID " + BaithuhoachID,
+                        Data = null
+                    };
+                }
+
+                var questions = await _examQuestionRepository.GetByExamIDAsync(conn, BaithuhoachID);
+
+                var response = new ExamDetailResponse
+                {
+                    MaID = examDetail.MaID,
+                    KhoahocID = examDetail.KhoahocID,
+                    TenKhoahoc = examDetail.TenKhoahoc,
+                    HocvienID = examDetail.HocvienID,
+                    TenHocvien = examDetail.TenHocvien,
+                    Batdauthi = examDetail.Batdauthi ?? DateTime.UtcNow,
+                    Ketthucthi = examDetail.Ketthucthi,
+                    Diem = examDetail.Diem,
+                    examQuestionDetails = new List<ExamQuestionDetail>()
+                };
+
+                foreach (var q in questions)
+                {
+                    var questionDetail = new ExamQuestionDetail
+                    {
+                        MaID = q.MaID,
+                        BaithuhoachID = q.BaithuhoachID,
+                        CauhoiID = q.CauhoiID,
+                        Tencauhoi = q.Tencauhoi,
+                        Dung = null,
+                        examAnswerDetails = new List<ExamAnswerDetail>()
+                    };
+
+                    if (q.examAnswers != null)
+                    {
+                        foreach (var a in q.examAnswers)
+                        {
+                            questionDetail.examAnswerDetails.Add(new ExamAnswerDetail
+                            {
+                                MaID = a.MaID,
+                                BaithuhoachID = a.BaithuhoachID,
+                                Baithuhoach_CauhoiID = a.Baithuhoach_CauhoiID,
+                                NdTraloi = a.NdTraloi,
+                                Chon = a.Chon
+                            });
+                        }
+                    }
+
+                    response.examQuestionDetails.Add(questionDetail);
+                }
+
+                return new ServiceDefault<ExamDetailResponse>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Lấy chi tiết bài thi thành công",
+                    Data = response
+                };
+            }
+            throw new NotImplementedException();
+        }
+
+        public async Task<ServiceDefault<ExamDetailResponse>> ExamGetSubmitAsync(string? HocvienID, string? BaithuhoachID)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                var examDetail = await _examRepository.GetByIDAsync(conn, BaithuhoachID);
+
+                if (examDetail == null)
+                {
+                    return new ServiceDefault<ExamDetailResponse>
+                    {
+                        statusCode = StatusCodes.Status400BadRequest,
+                        Message = "Không có bài thi với ID " + BaithuhoachID,
+                        Data = null
+                    };
+                }
+
+                var questions = await _examQuestionRepository.GetByExamIDAsync(conn, BaithuhoachID);
+
+                var response = new ExamDetailResponse
+                {
+                    MaID = examDetail.MaID,
+                    KhoahocID = examDetail.KhoahocID,
+                    TenKhoahoc = examDetail.TenKhoahoc,
+                    HocvienID = examDetail.HocvienID,
+                    TenHocvien = examDetail.TenHocvien,
+                    Batdauthi = examDetail.Batdauthi ?? DateTime.UtcNow,
+                    Ketthucthi = examDetail.Ketthucthi,
+                    Diem = examDetail.Diem,
+                    examQuestionDetails = new List<ExamQuestionDetail>()
+                };
+
+                foreach (var q in questions)
+                {
+                    var questionDetail = new ExamQuestionDetail
+                    {
+                        MaID = q.MaID,
+                        BaithuhoachID = q.BaithuhoachID,
+                        CauhoiID = q.CauhoiID,
+                        Tencauhoi = q.Tencauhoi,
+                        Dung = null,
+                        examAnswerDetails = new List<ExamAnswerDetail>()
+                    };
+
+                    if (q.examAnswers != null)
+                    {
+                        foreach (var a in q.examAnswers)
+                        {
+                            questionDetail.examAnswerDetails.Add(new ExamAnswerDetail
+                            {
+                                MaID = a.MaID,
+                                BaithuhoachID = a.BaithuhoachID,
+                                Baithuhoach_CauhoiID = a.Baithuhoach_CauhoiID,
+                                NdTraloi = a.NdTraloi,
+                                Dung = a.Dung,
+                                Chon = a.Chon
+                            });
+                        }
+                    }
+
+                    response.examQuestionDetails.Add(questionDetail);
+                }
+
+                return new ServiceDefault<ExamDetailResponse>
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    Message = "Lấy chi tiết bài thi thành công",
+                    Data = response
+                };
+            }
+            throw new NotImplementedException();
+        }
+
+        public async Task<ServiceDefault<bool>> ExamSubmitAsync(ExamSubmitResquest submitResquest)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                using (var trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        await _examRepository.UpdateAsync(
+                            conn,
+                            trans,
+                            submitResquest.MaID,
+                            submitResquest.KhoahocID,
+                            submitResquest.HocvienID,
+                            submitResquest.Batdauthi,
+                            submitResquest.Ketthucthi ?? DateTime.UtcNow,
+                            null,
+                            null,
+                            DateTime.UtcNow,
+                            submitResquest.HocvienID,
+                            null,
+                            null);
+
+                        if (submitResquest.answerSubmits != null)
+                        {
+                            foreach (var ans in submitResquest.answerSubmits)
+                            {
+                                await _examAnswersRepository.UpdateAsync(
+                                    conn,
+                                    trans,
+                                    ans.MaID,
+                                    ans.BaithuhoachID,
+                                    ans.Baithuhoach_CauhoiID,
+                                    ans.NdTraloi,
+                                    ans.Dung,
+                                    ans.Chon);
+                            }
+                        }
+
+                        await trans.CommitAsync();
+
+                        return new ServiceDefault<bool>
+                        {
+                            statusCode = StatusCodes.Status200OK,
+                            Data = true,
+                            Message = "Nộp bài thành công"
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await trans.RollbackAsync();
+
+                        return new ServiceDefault<bool>
+                        {
+                            statusCode = StatusCodes.Status400BadRequest,
+                            Data = false,
+                            Message = ex.Message
+                        };
+                    }
+                }
             }
         }
 
