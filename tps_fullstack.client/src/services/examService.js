@@ -51,6 +51,8 @@ const getExamStatus = (exam) => {
 
 const normalizeAnswer = (answer) => ({
     maID: getValue(answer, 'maID', 'MaID'),
+    examId: getValue(answer, 'baithuhoachID', 'BaithuhoachID'),
+    questionId: getValue(answer, 'baithuhoach_CauhoiID', 'Baithuhoach_CauhoiID'),
     answerText: getValue(answer, 'ndTraloi', 'NdTraloi'),
     isCorrect: getValue(answer, 'dung', 'Dung'),
     isSelected: getValue(answer, 'chon', 'Chon')
@@ -58,6 +60,8 @@ const normalizeAnswer = (answer) => ({
 
 const normalizeQuestion = (question) => ({
     maID: getValue(question, 'maID', 'MaID'),
+    examId: getValue(question, 'baithuhoachID', 'BaithuhoachID'),
+    sourceQuestionId: getValue(question, 'cauhoiID', 'CauhoiID'),
     questionText: getValue(question, 'tencauhoi', 'Tencauhoi'),
     isCorrect: getValue(question, 'dung', 'Dung'),
     answers: (getValue(question, 'examAnswerDetails', 'ExamAnswerDetails') || []).map(normalizeAnswer)
@@ -65,7 +69,9 @@ const normalizeQuestion = (question) => ({
 
 export const normalizeExam = (exam) => ({
     maID: getValue(exam, 'maID', 'MaID'),
+    courseId: getValue(exam, 'khoahocID', 'KhoahocID'),
     courseName: getValue(exam, 'tenKhoahoc', 'TenKhoahoc') || 'Khóa học chưa có tên',
+    hocvienID: getValue(exam, 'hocvienID', 'HocvienID'),
     studentName: getValue(exam, 'tenHocvien', 'TenHocvien') || 'Học viên chưa có tên',
     startedAt: getValue(exam, 'batdauthi', 'Batdauthi'),
     endedAt: getValue(exam, 'ketthucthi', 'Ketthucthi'),
@@ -100,6 +106,61 @@ export const getExamDetail = async (id) => {
 
     const data = unwrapServiceResponse(payload);
     return { data: data ? normalizeExamDetail(data) : null };
+};
+
+export const getStudentExams = async (studentId) => {
+    const response = await fetch(`${API_BASE_URL}/student/${encodeURIComponent(studentId)}`, {
+        headers: getHeaders()
+    });
+
+    const payload = await readJson(response);
+    if (!response.ok) {
+        if (response.status === 400) return { data: [] };
+        throw new Error(getApiMessage(payload, 'Failed to fetch student exams'));
+    }
+
+    const data = unwrapServiceResponse(payload) || [];
+    return { data: Array.isArray(data) ? data.map(normalizeExam) : [] };
+};
+
+export const getStudentExamDetail = async ({ studentId, examId }) => {
+    const response = await fetch(`${API_BASE_URL}/${encodeURIComponent(studentId)}/${encodeURIComponent(examId)}`, {
+        headers: getHeaders()
+    });
+
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch student exam detail'));
+
+    const data = unwrapServiceResponse(payload);
+    return { data: data ? normalizeExamDetail(data) : null };
+};
+
+export const getStudentExamResult = async ({ studentId, examId }) => {
+    const response = await fetch(`${API_BASE_URL}/${encodeURIComponent(studentId)}/${encodeURIComponent(examId)}/get`, {
+        headers: getHeaders()
+    });
+
+    const payload = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(payload, 'Failed to fetch submitted exam result'));
+
+    const data = unwrapServiceResponse(payload);
+    return { data: data ? normalizeExamDetail(data) : null };
+};
+
+export const submitStudentExam = async ({ studentId, examId, payload }) => {
+    const response = await fetch(`${API_BASE_URL}/${encodeURIComponent(studentId)}/${encodeURIComponent(examId)}/submit`, {
+        method: 'PUT',
+        headers: getHeaders(true),
+        body: JSON.stringify(payload)
+    });
+
+    const data = await readJson(response);
+    if (!response.ok) throw new Error(getApiMessage(data, 'Failed to submit exam'));
+
+    return {
+        data: unwrapServiceResponse(data),
+        message: getApiMessage(data, 'Nộp bài thành công.')
+    };
 };
 
 export const createExam = async ({ khoahocID, hocvienID }) => {

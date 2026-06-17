@@ -65,6 +65,7 @@ function App() {
           <Route path="courses/new" element={<CourseFormPage />} />
           <Route path="courses/:id/edit" element={<CourseFormPage />} />
           <Route path="courses/:id" element={<CourseDetailPage />} />
+          <Route path="schedule" element={<ScheduleManagementPage />} />
           <Route path="schedules" element={<ScheduleManagementPage />} />
           <Route path="schedules/:id" element={<ScheduleDetailPage />} />
           <Route path="labs" element={<Navigate to="/labs/new" replace />} />
@@ -85,7 +86,7 @@ function App() {
           <Route path="reports/new" element={<ExamCreatePage />} />
           
           {/* Catch-all route to redirect back to courses */}
-          <Route path="*" element={<Navigate to="/courses" replace />} />
+          <Route path="*" element={<Navigate to="/schedule" replace />} />
         </Route>
       </Routes>
     </Router>

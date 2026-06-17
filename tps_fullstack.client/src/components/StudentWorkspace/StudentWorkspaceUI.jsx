@@ -16,18 +16,23 @@ import {
 import { vi } from 'date-fns/locale';
 import {
     Award,
+    ArrowLeft,
     BookOpen,
     CalendarDays,
     CheckCircle2,
     ChevronLeft,
     ChevronRight,
+    ClipboardList,
     Clock,
+    FileCheck2,
     GraduationCap,
+    Loader2,
     LogIn,
     Mail,
     MapPin,
     Phone,
     RotateCcw,
+    Send,
     UserRound
 } from 'lucide-react';
 import './StudentWorkspaceUI.css';
@@ -45,6 +50,53 @@ const toDate = (value) => {
     return Number.isNaN(date.getTime()) ? null : date;
 };
 
+const getTimeParts = (value) => {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+        return {
+            hours: value.getHours(),
+            minutes: value.getMinutes()
+        };
+    }
+
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        const timeMatch = trimmed.match(/(?:T|\s|^)(\d{1,2}):(\d{2})(?::\d{2})?/);
+
+        if (timeMatch) {
+            return {
+                hours: Number(timeMatch[1]),
+                minutes: Number(timeMatch[2])
+            };
+        }
+    }
+
+    const date = toDate(value);
+    return date
+        ? {
+            hours: date.getHours(),
+            minutes: date.getMinutes()
+        }
+        : null;
+};
+
+const combineDateAndTime = (dateValue, timeValue) => {
+    const date = toDate(dateValue);
+    if (!date) return null;
+
+    const timeParts = getTimeParts(timeValue);
+    const combinedDate = new Date(date);
+
+    if (timeParts) {
+        combinedDate.setHours(timeParts.hours, timeParts.minutes, 0, 0);
+    } else {
+        combinedDate.setHours(0, 0, 0, 0);
+    }
+
+    return combinedDate;
+};
+
 const formatDate = (value) => {
     const date = toDate(value);
     return date ? format(date, 'EEEE, dd/MM/yyyy', { locale: vi }) : 'Chưa có ngày';
@@ -56,8 +108,10 @@ const formatShortDate = (value) => {
 };
 
 const formatTime = (value) => {
-    const date = toDate(value);
-    return date ? format(date, 'HH:mm') : '--:--';
+    const timeParts = getTimeParts(value);
+    if (!timeParts) return '--:--';
+
+    return `${String(timeParts.hours).padStart(2, '0')}:${String(timeParts.minutes).padStart(2, '0')}`;
 };
 
 const getInitials = (name) => {
@@ -95,7 +149,7 @@ const getScheduleStatus = (schedule) => {
     if (schedule.attended) return 'attended';
     if (schedule.actualStart) return 'active';
 
-    const startDate = toDate(schedule.expectedStart || schedule.expectedDate);
+    const startDate = combineDateAndTime(schedule.expectedDate, schedule.expectedStart);
     if (startDate && isAfter(startDate, new Date())) return 'upcoming';
     return 'pending';
 };
@@ -112,6 +166,236 @@ const getStatusLabel = (status) => {
     return labels[status] || labels.pending;
 };
 
+const getExamStatusLabel = (status) => {
+    const labels = {
+        submitted: 'Đã nộp',
+        in_progress: 'Đang làm',
+        pending: 'Cần thực hiện'
+    };
+
+    return labels[status] || labels.pending;
+};
+
+const formatScore = (score) => {
+    if (score === undefined || score === null || score === '') return '--';
+    const numericScore = Number(score);
+    return Number.isNaN(numericScore) ? score : numericScore.toFixed(2).replace(/\.00$/, '');
+};
+
+const getInitialSelectedAnswers = (exam) => {
+    const initialAnswers = {};
+    (exam?.questions || []).forEach((question) => {
+        const selectedAnswer = (question.answers || []).find((answer) => answer.isSelected);
+        if (selectedAnswer?.maID) initialAnswers[question.maID] = selectedAnswer.maID;
+    });
+    return initialAnswers;
+};
+
+const StudentExamDetail = ({
+    selectedExam,
+    isExamLoading,
+    examActionId,
+    onCloseExam,
+    onSubmitExam
+}) => {
+    const [selectedAnswers, setSelectedAnswers] = useState(() => getInitialSelectedAnswers(selectedExam));
+    const [submitWarning, setSubmitWarning] = useState(null);
+    const isSubmitted = Boolean(selectedExam?.endedAt);
+
+    const handleSelectAnswer = (questionId, answerId) => {
+        if (isSubmitted) return;
+        setSelectedAnswers((current) => ({
+            ...current,
+            [questionId]: answerId
+        }));
+        setSubmitWarning(null);
+    };
+
+    const handleSubmit = async () => {
+        if (!selectedExam || isSubmitted) return;
+
+        const unansweredQuestions = (selectedExam.questions || []).filter((question) => !selectedAnswers[question.maID]);
+        if (unansweredQuestions.length > 0) {
+            setSubmitWarning(`Bạn còn ${unansweredQuestions.length} câu chưa chọn đáp án.`);
+            return;
+        }
+
+        const submitted = await onSubmitExam(selectedExam, selectedAnswers);
+        if (submitted) setSubmitWarning(null);
+    };
+
+    const getQuestionResult = (question) => {
+        if (!isSubmitted) return null;
+        const selectedAnswer = (question.answers || []).find((answer) => selectedAnswers[question.maID] === answer.maID);
+        if (!selectedAnswer) return 'missing';
+        return selectedAnswer.isCorrect ? 'correct' : 'wrong';
+    };
+
+    return (
+        <article className="student-panel student-exam-detail-panel">
+            <div className="student-exam-detail-header">
+                <button className="student-secondary-action" type="button" onClick={onCloseExam}>
+                    <ArrowLeft size={17} />
+                    <span>Danh sách</span>
+                </button>
+                <div>
+                    <span className={`student-badge ${selectedExam.status}`}>
+                        {getExamStatusLabel(selectedExam.status)}
+                    </span>
+                    <h2>{selectedExam.courseName}</h2>
+                    <p>{(selectedExam.questions || []).length} câu hỏi</p>
+                </div>
+                <div className="student-exam-score">
+                    <span>Điểm</span>
+                    <strong>{formatScore(selectedExam.score)}</strong>
+                </div>
+            </div>
+
+            {isExamLoading ? (
+                <div className="student-exam-loading">
+                    <Loader2 className="student-spin" size={24} />
+                    <span>Đang tải bài thu hoạch...</span>
+                </div>
+            ) : (
+                <>
+                    <div className="student-exam-meta">
+                        <span>Bắt đầu: {selectedExam.startedAt ? `${formatShortDate(selectedExam.startedAt)} ${formatTime(selectedExam.startedAt)}` : 'Chưa bắt đầu'}</span>
+                        <span>Nộp bài: {selectedExam.endedAt ? `${formatShortDate(selectedExam.endedAt)} ${formatTime(selectedExam.endedAt)}` : 'Chưa nộp'}</span>
+                    </div>
+
+                    <div className="student-question-list">
+                        {(selectedExam.questions || []).map((question, index) => (
+                            <section key={question.maID} className="student-question-block">
+                                <div className="student-question-title">
+                                    <span>Câu {index + 1}</span>
+                                    {isSubmitted && (
+                                        <em className={`student-question-result ${getQuestionResult(question)}`}>
+                                            {getQuestionResult(question) === 'correct' ? 'Đúng' : 'Sai'}
+                                        </em>
+                                    )}
+                                    <h3>{question.questionText || 'Câu hỏi chưa có nội dung'}</h3>
+                                </div>
+                                <div className="student-answer-list" role="radiogroup" aria-label={`Câu ${index + 1}`}>
+                                    {(question.answers || []).map((answer) => {
+                                        const checked = selectedAnswers[question.maID] === answer.maID;
+                                        const answerState = isSubmitted
+                                            ? answer.isCorrect
+                                                ? 'correct'
+                                                : checked
+                                                    ? 'wrong'
+                                                    : ''
+                                            : '';
+                                        return (
+                                            <label
+                                                key={answer.maID}
+                                                className={`student-answer-option ${checked ? 'selected' : ''} ${answerState}`}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name={`question-${question.maID}`}
+                                                    checked={checked}
+                                                    disabled={isSubmitted}
+                                                    onChange={() => handleSelectAnswer(question.maID, answer.maID)}
+                                                />
+                                                <span>{answer.answerText || 'Đáp án chưa có nội dung'}</span>
+                                                {isSubmitted && answer.isCorrect && <strong>Đáp án đúng</strong>}
+                                                {isSubmitted && checked && !answer.isCorrect && <strong>Bạn đã chọn</strong>}
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        ))}
+                    </div>
+
+                    {submitWarning && <div className="student-alert student-exam-warning">{submitWarning}</div>}
+
+                    <div className="student-exam-footer">
+                        {isSubmitted ? (
+                            <span className="student-submitted-note">
+                                <FileCheck2 size={18} />
+                                Bài thu hoạch đã được nộp.
+                            </span>
+                        ) : (
+                            <button
+                                type="button"
+                                className="student-primary-action"
+                                onClick={handleSubmit}
+                                disabled={examActionId === selectedExam.maID}
+                            >
+                                {examActionId === selectedExam.maID ? <Loader2 className="student-spin" size={17} /> : <Send size={17} />}
+                                Nộp bài
+                            </button>
+                        )}
+                    </div>
+                </>
+            )}
+        </article>
+    );
+};
+
+const StudentExamPanel = ({
+    exams = [],
+    selectedExam,
+    isExamLoading,
+    examActionId,
+    onOpenExam,
+    onCloseExam,
+    onSubmitExam
+}) => {
+    if (selectedExam) {
+        return (
+            <StudentExamDetail
+                key={selectedExam.maID}
+                selectedExam={selectedExam}
+                isExamLoading={isExamLoading}
+                examActionId={examActionId}
+                onCloseExam={onCloseExam}
+                onSubmitExam={onSubmitExam}
+            />
+        );
+    }
+
+    return (
+        <article className="student-panel student-exam-list-panel">
+            <div className="student-section-title">
+                <ClipboardList size={19} />
+                <h2>Danh sách bài thu hoạch cần thực hiện</h2>
+            </div>
+            <div className="student-exam-list">
+                {exams.length > 0 ? (
+                    exams.map((exam) => (
+                        <article key={exam.maID} className="student-exam-card">
+                            <div className="student-exam-card-main">
+                                <span className={`student-badge ${exam.status}`}>
+                                    {getExamStatusLabel(exam.status)}
+                                </span>
+                                <h3>{exam.courseName}</h3>
+                                <p>{exam.endedAt ? `Đã nộp lúc ${formatShortDate(exam.endedAt)} ${formatTime(exam.endedAt)}` : 'Chọn làm bài để xem câu hỏi và nộp bài.'}</p>
+                            </div>
+                            <div className="student-exam-card-side">
+                                <span>Điểm</span>
+                                <strong>{formatScore(exam.score)}</strong>
+                                <button
+                                    type="button"
+                                    className="student-primary-action"
+                                    onClick={() => onOpenExam(exam.maID, { viewResult: Boolean(exam.endedAt) })}
+                                    disabled={examActionId === exam.maID}
+                                >
+                                    {examActionId === exam.maID ? <Loader2 className="student-spin" size={17} /> : <FileCheck2 size={17} />}
+                                    {exam.endedAt ? 'Xem bài' : 'Làm bài'}
+                                </button>
+                            </div>
+                        </article>
+                    ))
+                ) : (
+                    <p className="student-empty">Chưa có bài thu hoạch được giao.</p>
+                )}
+            </div>
+        </article>
+    );
+};
+
 const uniqueCourses = (schedules) => {
     const seen = new Set();
     return schedules.filter((schedule) => {
@@ -122,19 +406,35 @@ const uniqueCourses = (schedules) => {
     });
 };
 
-const getScheduleDate = (schedule) => toDate(schedule.expectedStart || schedule.expectedDate);
+const getScheduleDate = (schedule) => {
+    const date = toDate(schedule.expectedDate);
+    if (!date) return null;
+
+    const scheduleDate = new Date(date);
+    scheduleDate.setHours(0, 0, 0, 0);
+    return scheduleDate;
+};
+
+const getScheduleDateTime = (schedule) => combineDateAndTime(schedule.expectedDate, schedule.expectedStart);
 
 const WEEKDAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
 const StudentWorkspaceUI = ({
     student,
     schedules,
+    exams,
+    selectedExam,
     isLoading,
+    isExamLoading,
     error,
     successMessage,
     actionId,
+    examActionId,
     onRefresh,
-    onCheckin
+    onCheckin,
+    onOpenExam,
+    onCloseExam,
+    onSubmitExam
 }) => {
     const [activeTab, setActiveTab] = useState('profile');
     const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()));
@@ -174,6 +474,16 @@ const StudentWorkspaceUI = ({
         const scheduleDate = getScheduleDate(schedule);
         return scheduleDate && isSameDay(scheduleDate, selectedDate);
     });
+    const monthSchedules = normalizedSchedules.filter((schedule) => {
+        const scheduleDate = getScheduleDate(schedule);
+        return scheduleDate && isSameMonth(scheduleDate, calendarMonth);
+    });
+    const attendedInMonth = monthSchedules.filter((schedule) => schedule.attended).length;
+    const upcomingMonthSchedules = monthSchedules.filter((schedule) => {
+        const scheduleDate = getScheduleDate(schedule);
+        return scheduleDate && (isAfter(scheduleDate, new Date()) || isSameDay(scheduleDate, new Date()));
+    }).slice(0, 5);
+    const agendaPreviewSchedules = upcomingMonthSchedules.length > 0 ? upcomingMonthSchedules : monthSchedules.slice(0, 5);
 
     const getSchedulesForDate = (date) => normalizedSchedules.filter((schedule) => {
         const scheduleDate = getScheduleDate(schedule);
@@ -196,7 +506,8 @@ const StudentWorkspaceUI = ({
     const tabs = [
         { id: 'profile', label: 'Thông tin học viên', icon: UserRound },
         { id: 'courses', label: 'Khóa học của tôi', icon: BookOpen },
-        { id: 'schedule', label: 'Lịch học của tôi', icon: CalendarDays }
+        { id: 'schedule', label: 'Lịch học của tôi', icon: CalendarDays },
+        { id: 'exams', label: 'Quản lý bài thu hoạch', icon: ClipboardList }
     ];
 
     if (isLoading && !student) {
@@ -420,6 +731,21 @@ const StudentWorkspaceUI = ({
                             </div>
                         </div>
 
+                        <div className="student-calendar-summary" aria-label="Tổng quan lịch học trong tháng">
+                            <div>
+                                <span>Buổi trong tháng</span>
+                                <strong>{monthSchedules.length}</strong>
+                            </div>
+                            <div>
+                                <span>Ngày đang chọn</span>
+                                <strong>{selectedDateSchedules.length}</strong>
+                            </div>
+                            <div>
+                                <span>Đã điểm danh</span>
+                                <strong>{attendedInMonth}</strong>
+                            </div>
+                        </div>
+
                         <div className="student-calendar-layout">
                             <div className="student-calendar">
                                 <div className="student-calendar-weekdays">
@@ -459,9 +785,12 @@ const StudentWorkspaceUI = ({
                             </div>
 
                             <aside className="student-day-agenda">
-                                <div className="student-section-title">
-                                    <Clock size={19} />
-                                    <h2>{format(selectedDate, 'dd/MM/yyyy')}</h2>
+                                <div className="student-agenda-heading">
+                                    <div className="student-section-title">
+                                        <Clock size={19} />
+                                        <h2>{format(selectedDate, 'dd/MM/yyyy')}</h2>
+                                    </div>
+                                    <span>{selectedDateSchedules.length} buổi học</span>
                                 </div>
                                 <div className="student-schedule-list">
                                     {selectedDateSchedules.length > 0 ? (
@@ -500,9 +829,58 @@ const StudentWorkspaceUI = ({
                                         <p className="student-empty">Không có buổi học trong ngày này.</p>
                                     )}
                                 </div>
+
+                                <div className="student-agenda-divider"></div>
+
+                                <div className="student-agenda-heading">
+                                    <div className="student-section-title">
+                                        <CalendarDays size={19} />
+                                        <h2>Buổi học sắp tới</h2>
+                                    </div>
+                                    <span>{monthSchedules.length} buổi trong tháng</span>
+                                </div>
+                                <div className="student-schedule-list compact">
+                                    {agendaPreviewSchedules.length > 0 ? (
+                                        agendaPreviewSchedules.map((schedule) => {
+                                            const status = getScheduleStatus(schedule);
+                                            return (
+                                                <article key={`preview-${schedule.id}`} className={`student-schedule-row ${schedule.attended ? 'attended' : ''}`}>
+                                                    <div className="student-date-block">
+                                                        <strong>{formatShortDate(schedule.expectedDate || schedule.expectedStart)}</strong>
+                                                        <span>{formatTime(schedule.expectedStart)}</span>
+                                                    </div>
+                                                    <div className="student-schedule-main">
+                                                        <span className={`student-badge ${status}`}>
+                                                            {getStatusLabel(status)}
+                                                        </span>
+                                                        <h3>{schedule.topicName}</h3>
+                                                        <p>{schedule.courseName}</p>
+                                                        <small>{schedule.teacherName || 'Chưa phân công'}</small>
+                                                    </div>
+                                                </article>
+                                            );
+                                        })
+                                    ) : (
+                                        <p className="student-empty">Chưa có buổi học trong tháng này.</p>
+                                    )}
+                                </div>
                             </aside>
                         </div>
                     </article>
+                        </section>
+                    )}
+
+                    {activeTab === 'exams' && (
+                        <section className="student-tab-panel">
+                            <StudentExamPanel
+                                exams={exams}
+                                selectedExam={selectedExam}
+                                isExamLoading={isExamLoading}
+                                examActionId={examActionId}
+                                onOpenExam={onOpenExam}
+                                onCloseExam={onCloseExam}
+                                onSubmitExam={onSubmitExam}
+                            />
                         </section>
                     )}
                 </div>

@@ -5,24 +5,38 @@ const StudentWorkspacePage = () => {
     const {
         student,
         schedules,
+        exams,
+        selectedExam,
         isLoading,
+        isExamLoading,
         error,
         successMessage,
         actionId,
+        examActionId,
         refetch,
-        checkin
+        checkin,
+        openExam,
+        closeExam,
+        submitExam
     } = useStudentWorkspace();
 
     return (
         <StudentWorkspaceUI
             student={student}
             schedules={schedules}
+            exams={exams}
+            selectedExam={selectedExam}
             isLoading={isLoading}
+            isExamLoading={isExamLoading}
             error={error}
             successMessage={successMessage}
             actionId={actionId}
+            examActionId={examActionId}
             onRefresh={refetch}
             onCheckin={checkin}
+            onOpenExam={openExam}
+            onCloseExam={closeExam}
+            onSubmitExam={submitExam}
         />
     );
 };

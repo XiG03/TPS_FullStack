@@ -37,6 +37,7 @@ export const getCurrentUserRole = () => {
 export const getDefaultPathForRole = (role) => {
     const normalized = normalizeRole(role);
 
+    if (normalized === 'admin') return '/schedule';
     if (normalized === 'teacher') return '/teacher/me';
     if (normalized === 'student') return '/student/me';
 

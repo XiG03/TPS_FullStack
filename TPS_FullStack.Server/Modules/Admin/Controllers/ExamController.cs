@@ -6,7 +6,7 @@ namespace TPS_FullStack.Server.Modules.Admin
 {
     [Route("api/v1/exams")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+
     public class ExamController : ControllerBase
     {
         private readonly IFinalExamServices _finalExamServices;
@@ -15,14 +15,14 @@ namespace TPS_FullStack.Server.Modules.Admin
         {
             _examService = examService;
         }
-        
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllExams()
         {
             var result = await _examService.ExamGetAllAsync();
             return StatusCode(result.statusCode, result);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("{MaID}")]
         public async Task<IActionResult> GetExamDetail(string MaID)
         {
@@ -37,7 +37,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         //     var result = await _examService.ExamUpdateAsync(updateRequest);
         //     return StatusCode(result.statusCode, result);
         // }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("{KhoahocID}/{HocvienID}")]
         public async Task<IActionResult> CreateExam(string KhoahocID, string HocvienID)
         {
@@ -45,6 +45,34 @@ namespace TPS_FullStack.Server.Modules.Admin
             createRequest.KhoahocID = KhoahocID;
             createRequest.HocvienID = HocvienID;
             var result = await _examService.ExamCreateAsync(createRequest);
+            return StatusCode(result.statusCode, result);
+        }
+        [Authorize(Roles = "Admin, Hocvien")]
+        [HttpGet("student/{HocvienID}")]
+        public async Task<IActionResult> GetExamsByStudentID(string? HocvienID)
+        {
+            var result = await _examService.ExamGetAllByStudentIDAsync(HocvienID);
+            return StatusCode(result.statusCode, result);
+        }
+        [Authorize(Roles = "Admin, Hocvien")]
+        [HttpGet("{HocvienID}/{BaithuhoachID}")]
+        public async Task<IActionResult> GetExamDetailByStudentID(string? HocvienID, string? BaithuhoachID)
+        {
+            var result = await _examService.ExamGetDetailByStudentIDAsync(HocvienID, BaithuhoachID);
+            return StatusCode(result.statusCode, result);
+        }
+        [Authorize(Roles = "Admin, Hocvien")]
+        [HttpPut("{HocvienID}/{BaithuhoachID}/submit")]
+        public async Task<IActionResult> SubmitExam(string? HocvienID, string? BaithuhoachID, ExamSubmitResquest submitResquest)
+        {
+            var result = await _examService.ExamSubmitAsync(submitResquest);
+            return StatusCode(result.statusCode, result);
+        }
+        [Authorize(Roles = "Admin, Hocvien")]
+        [HttpGet("{HocvienID}/{BaithuhoachID}/get")]
+        public async Task<IActionResult> GetSubmitExam(string? HocvienID, string? BaithuhoachID)
+        {
+            var result = await _examService.ExamGetSubmitAsync(HocvienID, BaithuhoachID);
             return StatusCode(result.statusCode, result);
         }
     }
