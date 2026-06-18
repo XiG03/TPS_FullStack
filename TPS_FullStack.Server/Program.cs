@@ -99,6 +99,11 @@ builder.Services.AddScoped<ISchedulesService, SchedulesService>();
 builder.Services.AddScoped<ISchedulesRepository, SchedulesRepository>();
 
 
+// Inject External Service
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSetting"));
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 
 // Inject Repository Dependency 
 builder.Services.AddScoped<ILabRepository, LabRepository>();
