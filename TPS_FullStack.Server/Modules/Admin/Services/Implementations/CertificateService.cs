@@ -1,13 +1,23 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
+using TPS_FullStack.Server.Entities;
+using TPS_FullStack.Server.Helpers;
 
 namespace TPS_FullStack.Server.Modules.Admin
 {
     public class CertificateService : ICertificateService
     {
         private readonly ICertificateRepository _certificateRepository;
-        public CertificateService (ICertificateRepository certificateRepository)
+        private readonly IEmailService _emailService;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly ILogger<CertificateService> _logger;
+        public CertificateService(ICertificateRepository certificateRepository, IEmailService emailService, UserManager<AppUser> userManager,
+                                    ILogger<CertificateService> logger)
         {
             _certificateRepository = certificateRepository;
+            _emailService = emailService;
+            _userManager = userManager;
+            _logger = logger;
         }
         public async Task<ServiceDefault<bool>> CertificateDeleteAsync(string MaID)
         {
@@ -36,7 +46,7 @@ namespace TPS_FullStack.Server.Modules.Admin
         public async Task<ServiceDefault<CertificateDetailDto>> CertificateFindByIdAsync(string MaID)
         {
             var result = await _certificateRepository.CertificateFindByIdAsync(MaID);
-            if(result == null)
+            if (result == null)
             {
                 return new ServiceDefault<CertificateDetailDto>
                 {
@@ -45,7 +55,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     Data = null
                 };
             }
-            if(result != null)
+            if (result != null)
             {
                 return new ServiceDefault<CertificateDetailDto>
                 {
@@ -54,14 +64,14 @@ namespace TPS_FullStack.Server.Modules.Admin
                     Data = result
                 };
             }
-            
+
             throw new NotImplementedException();
         }
 
         public async Task<ServiceDefault<List<CertificateGetAllDto>>> CertificateGetAllAsync()
         {
             var result = await _certificateRepository.CertificateGetAllAsync();
-            if(result == null)
+            if (result == null)
             {
                 return new ServiceDefault<List<CertificateGetAllDto>>
                 {
@@ -70,7 +80,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     Data = null
                 };
             }
-            if(result != null)
+            if (result != null)
             {
                 return new ServiceDefault<List<CertificateGetAllDto>>
                 {
@@ -133,10 +143,29 @@ namespace TPS_FullStack.Server.Modules.Admin
 
         public async Task<ServiceDefault<Cert_StudentCreateDto>> CertificateStuAcceptAsync(Cert_StudentCreateDto createDto)
         {
+            createDto.Ngaycap = DateTime.UtcNow;
+            createDto.Ngayhethan = createDto.Ngaycap.Value.AddMonths((int)createDto.Thoigiansudung);
             var result = await _certificateRepository.CertificateStuAcceptAsync(createDto);
 
             if (result)
             {
+                var body = await _emailService.RenderAsync("NotifyCertification", new Dictionary<string, string>
+                {
+                    ["FullName"] = createDto.HocvienID,
+                    ["CertificateName"] = createDto.ChungchiID,
+                    ["Duration"] = createDto.Thoigiansudung.ToString(),
+                    ["StartDate"] = createDto.Ngaycap.ToString(),
+                    ["EndDate"] = createDto.Ngayhethan.ToString(),
+                    ["CenterName"] = createDto.Donvicap
+                });
+
+                var stuEmail = await _userManager.FindByIdAsync(createDto.HocvienID);
+                if (stuEmail == null)
+                {
+                    _logger.LogError("Email is null");
+                }
+                await _emailService.SendEmailAsync(stuEmail.Email, "Thông báo đã được cấp chứng chỉ", body);
+
                 return new ServiceDefault<Cert_StudentCreateDto>
                 {
                     statusCode = StatusCodes.Status200OK,
@@ -144,6 +173,7 @@ namespace TPS_FullStack.Server.Modules.Admin
                     Data = createDto
                 };
             }
+
             if (!result)
             {
                 return new ServiceDefault<Cert_StudentCreateDto>

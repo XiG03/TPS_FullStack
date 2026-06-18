@@ -11,10 +11,10 @@ namespace TPS_FullStack.Server.Modules.Admin
         public string? Mota { get; set; }
         public string? Donvicap { get; set; }
         [JsonIgnore]
-        public string? Ngaycap { get; set; }
+        public DateTime? Ngaycap { get; set; }
         public decimal Thoigiansudung { get; set; }
         [JsonIgnore]
-        public string? Ngayhethan { get; set; }
+        public DateTime? Ngayhethan { get; set; }
         [JsonIgnore]
         public bool? Khongsudung { get; set; }
     }
